@@ -4,7 +4,9 @@ import houseInception.gptComm.domain.User;
 import houseInception.gptComm.domain.chatRoom.Chat;
 import houseInception.gptComm.domain.chatRoom.ChatRoom;
 import houseInception.gptComm.dto.ChatAddDto;
+import houseInception.gptComm.dto.DataListResDto;
 import houseInception.gptComm.dto.GptChatResDto;
+import houseInception.gptComm.dto.GptChatRoomListResDto;
 import houseInception.gptComm.exception.ChatRoomException;
 import houseInception.gptComm.repository.ChatRoomRepository;
 import houseInception.gptComm.repository.UserRepository;
@@ -101,5 +103,30 @@ class ChatRoomServiceTest {
 
         //when
         assertThatThrownBy(() -> chatRoomService.addGptChat(newUser.getId(), chatAddDto)).isInstanceOf(ChatRoomException.class);
+    }
+
+    @Test
+    void getGptChatRoomList() {
+        //given
+        ChatRoom chatRoom1 = ChatRoom.createGptRoom(user1);
+        chatRoomRepository.save(chatRoom1);
+
+        ChatRoom chatRoom2 = ChatRoom.createGptRoom(user1);
+        chatRoomRepository.save(chatRoom2);
+
+        User newUser = User.create("newUser", null, null, null);
+        userRepository.save(newUser);
+
+        ChatRoom newUserChatRoom = ChatRoom.createGptRoom(newUser);
+        chatRoomRepository.save(newUserChatRoom);
+
+        //when
+        DataListResDto<GptChatRoomListResDto> result = chatRoomService.getGptChatRoomList(user1.getId(), 1);
+
+        //then
+        List<GptChatRoomListResDto> data = result.getData();
+        assertThat(data.size()).isEqualTo(2);
+        assertThat(data).extracting("chatRoomUuid").containsExactly(chatRoom2.getChatRoomUuid(), chatRoom1.getChatRoomUuid());
+
     }
 }
