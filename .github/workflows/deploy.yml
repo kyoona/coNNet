@@ -23,7 +23,7 @@ jobs:
           java-version: '17'
 
       - name: Build with Gradle
-        run: ./gptComm/gradlew build -Dmysql.username=${{ secrets.MYSQL_USERNAME }} \
+        run: ./gptComm/gradlew ./gptComm/build -Dmysql.username=${{ secrets.MYSQL_USERNAME }} \
                                       -Dmysql.password=${{ secrets.MYSQL_PASSWORD }} \
                                       -Dmysql.url=${{ secrets.MYSQL_URL }} \
                                       -Djwt.secret.key=${{ secrets.JWT_SECRET_KEY }} \
