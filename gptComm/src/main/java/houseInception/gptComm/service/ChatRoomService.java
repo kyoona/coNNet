@@ -39,23 +39,27 @@ public class ChatRoomService {
         checkExistChatRoom(chatRoomUuid, GPT);
 
         ChatRoom chatRoom;
+        String content;
         if (chatRoomUuid == null) {
             chatRoom = ChatRoom.createGptRoom(user);
+
+            GptResDto gptResDto = gptApiProvider.getChatCompletionWithTitle(chatAddDto.getMessage());
+
+            chatRoom.setTitle(gptResDto.getTitle());
+            chatRoomRepository.save(chatRoom);
+
+            content = gptResDto.getContent();
         } else {
             chatRoom = findChatRoomByUuid(chatRoomUuid);
+            content = gptApiProvider.getChatCompletion(chatAddDto.getMessage());
         }
-
-        GptResDto gptResDto = gptApiProvider.getChatCompletionWithTitle(chatAddDto.getMessage());
-
-        chatRoom.setTitle(gptResDto.getTitle());
-        chatRoomRepository.save(chatRoom);
 
         ChatRoomUser writer = chatRoom.getChatRoomUsers().get(0);
         Chat userChat = chatRoom.addUserChatToGpt(writer, chatAddDto.getMessage());
-        Chat gptChat = chatRoom.addGptChat(gptResDto.getContent());
+        Chat gptChat = chatRoom.addGptChat(content);
         em.flush();
 
-        return new GptChatResDto(chatRoom.getChatRoomUuid(), gptResDto.getTitle(), userChat.getId(), gptChat.getId(), gptResDto.getContent());
+        return new GptChatResDto(chatRoom.getChatRoomUuid(), chatRoom.getTitle(), userChat.getId(), gptChat.getId(), content);
     }
 
     private void checkExistChatRoom(String chatRoomUuid, ChatRoomType chatRoomType) {

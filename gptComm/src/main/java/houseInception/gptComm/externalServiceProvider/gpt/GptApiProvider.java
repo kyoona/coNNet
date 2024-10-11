@@ -36,7 +36,7 @@ public class GptApiProvider {
 
         List<Map<String, String>> messages = new ArrayList<>();
         messages.add(userMessage);
-        requestBody.put("messages", messages);
+        requestBody.put("messages", "[" + messages + "]이 메세지에 응답을 생성해줘.");
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
@@ -48,7 +48,11 @@ public class GptApiProvider {
                 String.class
         );
 
-        return response.getBody();
+        try {
+            return objectMapper.readValue(response.getBody(), ChatCompletionResponse.class).getChoices().get(0).getMessage().getContent();
+        } catch (Exception e) {
+            throw new JsonParseException();
+        }
     }
 
     public GptResDto getChatCompletionWithTitle(String content) {
