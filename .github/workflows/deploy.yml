@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./gptComm
+        working-directory: ./gptComm  # 이 줄을 유지하여 모든 단계에서 ./gptComm 디렉토리에서 실행합니다.
 
     steps:
       - name: Checkout code
@@ -26,10 +26,10 @@ jobs:
           java-version: '17'
 
       - name: Make gradlew executable
-        run: chmod +x .gradlew
+        run: chmod +x gradlew  # .gradlew가 아니라 gradlew여야 합니다.
 
       - name: Build with Gradle
-        run: .gradlew build \
+        run: ./gradlew build \  # .gradlew가 아닌 ./gradlew로 실행해야 합니다.
           -Dmysql.username=${{ secrets.MYSQL_USERNAME }} \
           -Dmysql.password=${{ secrets.MYSQL_PASSWORD }} \
           -Dmysql.url=${{ secrets.MYSQL_URL }} \
@@ -37,7 +37,7 @@ jobs:
           -Dgpt.api.key=${{ secrets.GPT_API_KEY }}
 
       - name: Build Docker image
-        run: docker build -t kyoona/house-inception:latest .
+        run: docker build -t kyoona/house-inception:latest .  # 현재 디렉토리에서 Dockerfile을 찾습니다.
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
