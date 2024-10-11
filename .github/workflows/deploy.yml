@@ -11,6 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./gptComm
 
     steps:
       - name: Checkout code
@@ -23,10 +26,10 @@ jobs:
           java-version: '17'
 
       - name: Make gradlew executable
-        run: chmod +x ./gptComm/gradlew
+        run: chmod +x .gradlew
 
       - name: Build with Gradle
-        run: ./gptComm/gradlew build \
+        run: .gradlew build \
           -Dmysql.username=${{ secrets.MYSQL_USERNAME }} \
           -Dmysql.password=${{ secrets.MYSQL_PASSWORD }} \
           -Dmysql.url=${{ secrets.MYSQL_URL }} \
@@ -34,7 +37,7 @@ jobs:
           -Dgpt.api.key=${{ secrets.GPT_API_KEY }}
 
       - name: Build Docker image
-        run: docker build -t kyoona/house-inception:latest ./gptComm/
+        run: docker build -t kyoona/house-inception:latest .
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
