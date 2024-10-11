@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./gptComm  # 이 줄을 유지하여 모든 단계에서 ./gptComm 디렉토리에서 실행합니다.
+        working-directory: ./gptComm  # 모든 단계에서 ./gptComm 디렉토리에서 실행합니다.
 
     steps:
       - name: Checkout code
@@ -26,10 +26,10 @@ jobs:
           java-version: '17'
 
       - name: Make gradlew executable
-        run: chmod +x gradlew  # .gradlew가 아니라 gradlew여야 합니다.
+        run: chmod +x gradlew  # gradlew의 실행 권한을 설정합니다.
 
       - name: Build with Gradle
-        run: ./gradlew build \  # .gradlew가 아닌 ./gradlew로 실행해야 합니다.
+        run: ./gradlew build \  # gradlew를 실행합니다.
           -Dmysql.username=${{ secrets.MYSQL_USERNAME }} \
           -Dmysql.password=${{ secrets.MYSQL_PASSWORD }} \
           -Dmysql.url=${{ secrets.MYSQL_URL }} \
