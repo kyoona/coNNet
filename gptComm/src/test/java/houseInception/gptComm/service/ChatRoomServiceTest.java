@@ -5,6 +5,7 @@ import houseInception.gptComm.domain.chatRoom.Chat;
 import houseInception.gptComm.domain.chatRoom.ChatRoom;
 import houseInception.gptComm.dto.ChatAddDto;
 import houseInception.gptComm.dto.GptChatResDto;
+import houseInception.gptComm.exception.ChatRoomException;
 import houseInception.gptComm.repository.ChatRoomRepository;
 import houseInception.gptComm.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static houseInception.gptComm.domain.Status.ALIVE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 @SpringBootTest
@@ -83,5 +85,21 @@ class ChatRoomServiceTest {
 
         List<Chat> chatList = chatRoomRepository.getChatListOfChatRoom(findChatRoom.getId());
         assertThat(chatList.size()).isEqualTo(2);
+    }
+
+    @Test
+    void addGptChat_기존채팅방_권한X() {
+        //given
+        User newUser = User.create("newUser", null, null, null);
+        userRepository.save(newUser);
+
+        ChatRoom chatRoom = ChatRoom.createGptRoom(user1);
+        chatRoomRepository.save(chatRoom);
+
+        String message = "GPT모델 중 가장 싼 모델은 뭐야?";
+        ChatAddDto chatAddDto = new ChatAddDto(chatRoom.getChatRoomUuid(), message);
+
+        //when
+        assertThatThrownBy(() -> chatRoomService.addGptChat(newUser.getId(), chatAddDto)).isInstanceOf(ChatRoomException.class);
     }
 }
