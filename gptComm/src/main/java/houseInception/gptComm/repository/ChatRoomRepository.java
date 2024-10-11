@@ -7,8 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
+public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long>, ChatRoomCustomRepository {
 
     Optional<ChatRoom> findByChatRoomUuidAndStatus(String chatRoomUuid, Status status);
+
     boolean existsByChatRoomUuidAndChatRoomTypeAndStatus(String chatRoomUuid, ChatRoomType chatRoomType, Status status);
 }

@@ -44,11 +44,11 @@ public class ChatRoomService {
         } else {
             chatRoom = findChatRoomByUuid(chatRoomUuid);
         }
-        chatRoomRepository.save(chatRoom);
 
         GptResDto gptResDto = gptApiProvider.getChatCompletionWithTitle(chatAddDto.getMessage());
 
         chatRoom.setTitle(gptResDto.getTitle());
+        chatRoomRepository.save(chatRoom);
 
         ChatRoomUser writer = chatRoom.getChatRoomUsers().get(0);
         Chat userChat = chatRoom.addUserChatToGpt(writer, chatAddDto.getMessage());

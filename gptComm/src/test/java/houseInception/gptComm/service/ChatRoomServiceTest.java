@@ -1,8 +1,11 @@
 package houseInception.gptComm.service;
 
 import houseInception.gptComm.domain.User;
+import houseInception.gptComm.domain.chatRoom.Chat;
+import houseInception.gptComm.domain.chatRoom.ChatRoom;
 import houseInception.gptComm.dto.ChatAddDto;
 import houseInception.gptComm.dto.GptChatResDto;
+import houseInception.gptComm.repository.ChatRoomRepository;
 import houseInception.gptComm.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static houseInception.gptComm.domain.Status.ALIVE;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 @SpringBootTest
@@ -20,6 +28,8 @@ class ChatRoomServiceTest {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    ChatRoomRepository chatRoomRepository;
 
     User user1;
 
@@ -44,6 +54,12 @@ class ChatRoomServiceTest {
         GptChatResDto result = chatRoomService.addGptChat(user1.getId(), chatAddDto);
 
         //then
-        System.out.println("result = " + result);
+        ChatRoom chatRoom = chatRoomRepository.findByChatRoomUuidAndStatus(result.getChatRoomUuid(), ALIVE).orElse(null);
+        assertThat(result.getChatRoomUuid()).isEqualTo(chatRoom.getChatRoomUuid());
+        assertThat(result.getTitle()).isEqualTo(chatRoom.getTitle());
+
+        List<Chat> chatList = chatRoomRepository.getChatListOfChatRoom(chatRoom.getId());
+        assertThat(chatList.size()).isEqualTo(2);
+        assertThat(chatList).extracting("id").containsExactly(result.getUserChatId(), result.getGptChatId());
     }
 }
