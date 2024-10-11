@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static houseInception.gptComm.domain.Status.ALIVE;
 import static houseInception.gptComm.domain.chatRoom.ChatRoomType.GPT;
+import static houseInception.gptComm.response.status.BaseErrorCode.NOT_CHATROOM_USER;
 import static houseInception.gptComm.response.status.BaseErrorCode.NO_SUCH_CHATROOM;
 
 @Transactional(readOnly = true)
@@ -51,6 +52,7 @@ public class ChatRoomService {
             content = gptResDto.getContent();
         } else {
             chatRoom = findChatRoomByUuid(chatRoomUuid);
+            checkChatRoomUser(chatRoom.getId(), userId);
             content = gptApiProvider.getChatCompletion(chatAddDto.getMessage());
         }
 
@@ -65,6 +67,12 @@ public class ChatRoomService {
     private void checkExistChatRoom(String chatRoomUuid, ChatRoomType chatRoomType) {
         if(chatRoomUuid != null && !chatRoomRepository.existsByChatRoomUuidAndChatRoomTypeAndStatus(chatRoomUuid, chatRoomType, ALIVE)){
             throw new ChatRoomException(NO_SUCH_CHATROOM);
+        }
+    }
+
+    private void checkChatRoomUser(Long chatRoomId, Long userId){
+        if(!chatRoomRepository.existsChatRoomUser(chatRoomId, userId, ALIVE)) {
+            throw new ChatRoomException(NOT_CHATROOM_USER);
         }
     }
 
