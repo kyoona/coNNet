@@ -13,6 +13,11 @@ public class BaseErrorResponse {
     private String message;
     private String requestId;
 
+    public BaseErrorResponse(StatusCode code) {
+        this.code = code.getCode();
+        this.message = code.getMessage();
+    }
+
     public static ResponseEntity<BaseErrorResponse> get(StatusCode code) {
         BaseErrorResponse res = new BaseErrorResponse(code.getCode(), code.getMessage(), null);
         return new ResponseEntity<>(res, code.getHttpStatus());

@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static houseInception.gptComm.domain.Status.ALIVE;
+import static houseInception.gptComm.domain.UserRole.USER;
+
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
@@ -18,12 +21,21 @@ public class User extends BaseTime{
     private String userName;
     private String userProfile;
     private String email;
-    private String googleToken;
     private String refreshToken;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = ALIVE;
+
+    public static User create(String userName, String userProfile, String email, String refreshToken){
+        User user = new User();
+        user.userName = userName;
+        user.userProfile = userProfile;
+        user.email = email;
+        user.refreshToken = refreshToken;
+        user.role = USER;
+        return user;
+    }
 }
