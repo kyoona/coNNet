@@ -8,9 +8,11 @@ import houseInception.gptComm.domain.chatRoom.ChatRoomUser;
 import houseInception.gptComm.dto.ChatAddDto;
 import houseInception.gptComm.dto.GptChatResDto;
 import houseInception.gptComm.exception.ChatRoomException;
-import houseInception.gptComm.externalServiceProvider.GptApiProvider;
+import houseInception.gptComm.externalServiceProvider.gpt.GptApiProvider;
+import houseInception.gptComm.externalServiceProvider.gpt.GptResDto;
 import houseInception.gptComm.repository.ChatRoomRepository;
 import houseInception.gptComm.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
     private final GptApiProvider gptApiProvider;
+    private final EntityManager em;
 
     @Transactional
     public GptChatResDto addGptChat(Long userId, ChatAddDto chatAddDto) {
@@ -41,32 +44,18 @@ public class ChatRoomService {
         } else {
             chatRoom = findChatRoomByUuid(chatRoomUuid);
         }
+        chatRoomRepository.save(chatRoom);
 
-        String gptResponse = gptApiProvider.getChatCompletionWithTitle(chatAddDto.getMessage());
-        System.out.println("gptResponse = " + gptResponse);
-        String title = extractTitle(gptResponse);
-        String responseContent = extractResponseContent(gptResponse);
+        GptResDto gptResDto = gptApiProvider.getChatCompletionWithTitle(chatAddDto.getMessage());
 
-        chatRoom.setTitle(title);
+        chatRoom.setTitle(gptResDto.getTitle());
 
         ChatRoomUser writer = chatRoom.getChatRoomUsers().get(0);
         Chat userChat = chatRoom.addUserChatToGpt(writer, chatAddDto.getMessage());
-        Chat gptChat = chatRoom.addGptChat(responseContent);
+        Chat gptChat = chatRoom.addGptChat(gptResDto.getContent());
+        em.flush();
 
-        chatRoomRepository.save(chatRoom);
-
-        return new GptChatResDto(chatRoom.getChatRoomUuid(), title, userChat.getId(), gptChat.getId(), responseContent);
-    }
-
-    private String extractTitle(String response) {
-        int start = response.indexOf("<<") + 2;
-        int end = response.indexOf(">>");
-        return response.substring(start, end).trim();
-    }
-
-    private String extractResponseContent(String response) {
-        int end = response.indexOf(">>") + 2;
-        return response.substring(end).trim();
+        return new GptChatResDto(chatRoom.getChatRoomUuid(), gptResDto.getTitle(), userChat.getId(), gptChat.getId(), gptResDto.getContent());
     }
 
     private void checkExistChatRoom(String chatRoomUuid, ChatRoomType chatRoomType) {

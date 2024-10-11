@@ -1,5 +1,7 @@
-package houseInception.gptComm.externalServiceProvider;
+package houseInception.gptComm.externalServiceProvider.gpt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import houseInception.gptComm.exception.JsonParseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -13,6 +15,7 @@ import java.util.*;
 public class GptApiProvider {
 
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
     @Value("${gpt.key}")
     private String GPT_API_KEY;
@@ -48,14 +51,14 @@ public class GptApiProvider {
         return response.getBody();
     }
 
-    public String getChatCompletionWithTitle(String content) {
+    public GptResDto getChatCompletionWithTitle(String content) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(GPT_API_KEY); // Authorization 헤더에 Bearer 토큰 추가
 
         Map<String, String> userMessage = new HashMap<>();
         userMessage.put("role", "user");
-        userMessage.put("content", "[" + content + "] 이 메세지에 대한 제목과 응답을 생성해줘. 제목은 메세지 내용을 요약해서 20자 이내로 명사형으로 끝나. 제목은 응답의 가장 처음 <<>>안에 넣어줘. 제목과 응답 사이에 문자는 없어.");
+        userMessage.put("content", "[" + content + "] 이 메세지에 대한 제목과 응답을 생성해줘. 제목은 메세지 내용을 요약해서 20자 이내로 명사형으로 끝나. 제목은 응답의 가장 처음 <<>>안에 넣어줘. 제목과 응답 사이에 문자,엔터는 없어.");
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", "gpt-3.5-turbo");
@@ -73,7 +76,26 @@ public class GptApiProvider {
                 entity,
                 String.class
         );
+        
+        try {
+            String resMessage = objectMapper.readValue(response.getBody(), ChatCompletionResponse.class).getChoices().get(0).getMessage().getContent();
+            String title = extractTitle(resMessage);
+            String responseContent = extractResponseContent(resMessage);
 
-        return response.getBody();
+            return new GptResDto(title, responseContent);
+        } catch (Exception e) {
+            throw new JsonParseException();
+        }
+    }
+
+    private String extractTitle(String response) {
+        int start = response.indexOf("<<") + 2;
+        int end = response.indexOf(">>");
+        return response.substring(start, end).trim();
+    }
+
+    private String extractResponseContent(String response) {
+        int end = response.indexOf(">>") + 2;
+        return response.substring(end).trim();
     }
 }
