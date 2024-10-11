@@ -1,5 +1,6 @@
 package houseInception.gptComm.google;
 
+import houseInception.gptComm.exception.InValidTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -7,6 +8,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import static houseInception.gptComm.response.status.BaseErrorCode.INVALID_GOOGLE_TOKEN;
 
 @RequiredArgsConstructor
 @Service
@@ -32,7 +35,7 @@ public class GoogleOathProvider {
             );
             return response.getBody();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve Google user information", e);
+            throw new InValidTokenException(INVALID_GOOGLE_TOKEN);
         }
     }
 }

@@ -23,8 +23,8 @@ import static houseInception.gptComm.response.status.BaseErrorCode.INVALID_GOOGL
 public class LoginService {
 
     private final UserRepository userRepository;
-    private GoogleOathProvider googleOathProvider;
-    private JwtTokenProvider tokenProvider;
+    private final GoogleOathProvider googleOathProvider;
+    private final JwtTokenProvider tokenProvider;
 
     @Transactional
     public LoginResDto signIn(SignInDto signInDto) {
@@ -45,6 +45,6 @@ public class LoginService {
     }
 
     public boolean isNotServiceUser(String email){
-        return !userRepository.existByEmailAndStatus(email, ALIVE);
+        return !userRepository.existsByEmailAndStatus(email, ALIVE);
     }
 }
