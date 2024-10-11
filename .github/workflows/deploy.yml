@@ -23,15 +23,14 @@ jobs:
           java-version: '17'
 
       - name: Build with Gradle
-        run: |
-          ./gptComm/gradlew build -Dmysql.username=${{ secrets.MYSQL_USERNAME }} \
-                          -Dmysql.password=${{ secrets.MYSQL_PASSWORD }} \
-                          -Dmysql.url=${{ secrets.MYSQL_URL }} \
-                          -Djwt.secret.key=${{ secrets.JWT_SECRET_KEY }} \
-                          -Dgpt.api.key=${{ secrets.GPT_API_KEY }}
+        run: ./gptComm/gradlew build -Dmysql.username=${{ secrets.MYSQL_USERNAME }} \
+                                      -Dmysql.password=${{ secrets.MYSQL_PASSWORD }} \
+                                      -Dmysql.url=${{ secrets.MYSQL_URL }} \
+                                      -Djwt.secret.key=${{ secrets.JWT_SECRET_KEY }} \
+                                      -Dgpt.api.key=${{ secrets.GPT_API_KEY }}
 
       - name: Build Docker image
-        run: docker build -t kyoona/house-inception:latest ./gptComm/.
+        run: docker build -t kyoona/house-inception:latest ./gptComm/
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
@@ -61,4 +60,3 @@ jobs:
               -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
               -e GPT_API_KEY=${{ secrets.GPT_API_KEY }} \
               kyoona/house-inception:latest
-
