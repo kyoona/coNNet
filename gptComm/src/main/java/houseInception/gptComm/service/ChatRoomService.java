@@ -6,7 +6,9 @@ import houseInception.gptComm.domain.chatRoom.ChatRoom;
 import houseInception.gptComm.domain.chatRoom.ChatRoomType;
 import houseInception.gptComm.domain.chatRoom.ChatRoomUser;
 import houseInception.gptComm.dto.ChatAddDto;
+import houseInception.gptComm.dto.DataListResDto;
 import houseInception.gptComm.dto.GptChatResDto;
+import houseInception.gptComm.dto.GptChatRoomListResDto;
 import houseInception.gptComm.exception.ChatRoomException;
 import houseInception.gptComm.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.gptComm.externalServiceProvider.gpt.GptResDto;
@@ -16,6 +18,8 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static houseInception.gptComm.domain.Status.ALIVE;
 import static houseInception.gptComm.domain.chatRoom.ChatRoomType.GPT;
@@ -83,5 +87,11 @@ public class ChatRoomService {
         }
 
         return chatRoom;
+    }
+
+    public DataListResDto<GptChatRoomListResDto> getGptChatRoomList(Long userId, int page) {
+        List<GptChatRoomListResDto> chatRoomList = chatRoomRepository.getGptChatRoomListByUserId(userId, page);
+
+        return new DataListResDto<GptChatRoomListResDto>(page, chatRoomList);
     }
 }

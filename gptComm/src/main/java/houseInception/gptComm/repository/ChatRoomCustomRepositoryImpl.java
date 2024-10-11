@@ -1,17 +1,21 @@
 package houseInception.gptComm.repository;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import houseInception.gptComm.domain.QUser;
 import houseInception.gptComm.domain.Status;
-import houseInception.gptComm.domain.chatRoom.Chat;
-import houseInception.gptComm.domain.chatRoom.QChat;
-import houseInception.gptComm.domain.chatRoom.QChatRoomUser;
+import houseInception.gptComm.domain.chatRoom.*;
+import houseInception.gptComm.dto.GptChatRoomListResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static houseInception.gptComm.domain.QUser.user;
 import static houseInception.gptComm.domain.Status.ALIVE;
+import static houseInception.gptComm.domain.chatRoom.ChatRoomType.GPT;
 import static houseInception.gptComm.domain.chatRoom.QChat.chat;
+import static houseInception.gptComm.domain.chatRoom.QChatRoom.chatRoom;
 import static houseInception.gptComm.domain.chatRoom.QChatRoomUser.chatRoomUser;
 
 @RequiredArgsConstructor
@@ -41,5 +45,23 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository{
                 .fetchOne();
 
         return userCount > 0;
+    }
+
+    @Override
+    public List<GptChatRoomListResDto> getGptChatRoomListByUserId(Long userId, int page) {
+        return query
+                .select(Projections.constructor(GptChatRoomListResDto.class,
+                        chatRoom.chatRoomUuid, chatRoom.title, chatRoom.createdAt))
+                .from(chatRoom)
+                .innerJoin(chatRoomUser).on(chatRoomUser.chatRoom.id.eq(chatRoom.id))
+                .innerJoin(user).on(user.id.eq(chatRoomUser.user.id))
+                .where(user.id.eq(userId),
+                        chatRoom.chatRoomType.eq(GPT),
+                        chatRoomUser.status.eq(ALIVE),
+                        chatRoom.status.eq(ALIVE))
+                .orderBy(chatRoom.createdAt.desc())
+                .offset((page - 1) * 30)
+                .limit(31)
+                .fetch();
     }
 }
