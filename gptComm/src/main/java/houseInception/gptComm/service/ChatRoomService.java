@@ -43,6 +43,7 @@ public class ChatRoomService {
         }
 
         String gptResponse = gptApiProvider.getChatCompletionWithTitle(chatAddDto.getMessage());
+        System.out.println("gptResponse = " + gptResponse);
         String title = extractTitle(gptResponse);
         String responseContent = extractResponseContent(gptResponse);
 
