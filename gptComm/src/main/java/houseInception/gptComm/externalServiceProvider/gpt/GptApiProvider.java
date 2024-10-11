@@ -32,11 +32,11 @@ public class GptApiProvider {
 
         Map<String, String> userMessage = new HashMap<>();
         userMessage.put("role", "user");
-        userMessage.put("content", content);
+        userMessage.put("content", "[" + content + "]이 메세지에 응답을 생성해줘.");
 
         List<Map<String, String>> messages = new ArrayList<>();
         messages.add(userMessage);
-        requestBody.put("messages", "[" + messages + "]이 메세지에 응답을 생성해줘.");
+        requestBody.put("messages", messages);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
