@@ -1,4 +1,4 @@
-package houseInception.gptComm.google;
+package houseInception.gptComm.externalServiceProvider;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
