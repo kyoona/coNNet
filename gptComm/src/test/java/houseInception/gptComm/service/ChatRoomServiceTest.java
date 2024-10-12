@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static houseInception.gptComm.domain.Status.ALIVE;
+import static houseInception.gptComm.domain.Status.DELETED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -128,5 +129,33 @@ class ChatRoomServiceTest {
         assertThat(data.size()).isEqualTo(2);
         assertThat(data).extracting("chatRoomUuid").containsExactly(chatRoom2.getChatRoomUuid(), chatRoom1.getChatRoomUuid());
 
+    }
+
+    @Test
+    void deleteChatRoom() {
+        //given
+        ChatRoom chatRoom = ChatRoom.createGptRoom(user1);
+        chatRoomRepository.save(chatRoom);
+
+        //when
+        chatRoomService.deleteChatRoom(user1.getId(), chatRoom.getChatRoomUuid());
+
+        //then
+        ChatRoom findChatRoom = chatRoomRepository.findById(chatRoom.getId()).orElse(null);
+        assertThat(findChatRoom).isNotNull();
+        assertThat(findChatRoom.getStatus()).isEqualTo(DELETED);
+    }
+
+    @Test
+    void deleteChatRoom_권한X() {
+        //given
+        ChatRoom chatRoom = ChatRoom.createGptRoom(user1);
+        chatRoomRepository.save(chatRoom);
+
+        User newUser = User.create("newUser", null, null, null);
+        userRepository.save(newUser);
+
+        //when
+        assertThatThrownBy(() -> chatRoomService.deleteChatRoom(newUser.getId(), chatRoom.getChatRoomUuid())).isInstanceOf(ChatRoomException.class);
     }
 }
