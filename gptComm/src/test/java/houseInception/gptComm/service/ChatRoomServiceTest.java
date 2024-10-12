@@ -3,19 +3,18 @@ package houseInception.gptComm.service;
 import houseInception.gptComm.domain.User;
 import houseInception.gptComm.domain.chatRoom.Chat;
 import houseInception.gptComm.domain.chatRoom.ChatRoom;
-import houseInception.gptComm.dto.ChatAddDto;
-import houseInception.gptComm.dto.DataListResDto;
-import houseInception.gptComm.dto.GptChatResDto;
-import houseInception.gptComm.dto.GptChatRoomListResDto;
+import houseInception.gptComm.domain.chatRoom.ChatRoomUser;
+import houseInception.gptComm.dto.*;
 import houseInception.gptComm.exception.ChatRoomException;
 import houseInception.gptComm.repository.ChatRoomRepository;
 import houseInception.gptComm.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -37,6 +36,9 @@ class ChatRoomServiceTest {
     @Autowired
     ChatRoomRepository chatRoomRepository;
 
+    @Autowired
+    EntityManager em;
+
     User user1;
 
     @BeforeEach
@@ -45,7 +47,7 @@ class ChatRoomServiceTest {
         userRepository.save(user1);
     }
 
-    @AfterEach
+//    @AfterEach
     void afterEach(){
         userRepository.deleteAll();
     }
@@ -157,5 +159,41 @@ class ChatRoomServiceTest {
 
         //when
         assertThatThrownBy(() -> chatRoomService.deleteChatRoom(newUser.getId(), chatRoom.getChatRoomUuid())).isInstanceOf(ChatRoomException.class);
+    }
+
+    @Test
+    void getGptChatRoomChatList() {
+        //given
+        ChatRoom chatRoom = ChatRoom.createGptRoom(user1);
+        chatRoomRepository.save(chatRoom);
+
+        ChatRoomUser chatRoomUser1 = chatRoom.getChatRoomUsers().get(0);
+        Chat chat1 = chatRoom.addUserChatToGpt(chatRoomUser1, "content1");
+        Chat chat2 = chatRoom.addGptChat("I am GPT 1");
+        Chat chat3 = chatRoom.addUserChatToGpt(chatRoomUser1, "content2");
+
+        em.flush();
+
+        //when
+        GptChatRoomChatListResDto result = chatRoomService.getGptChatRoomChatList(user1.getId(), chatRoom.getChatRoomUuid(), 1);
+
+        //then
+        List<GptChatRoomChatResDto> messages = result.getMessages();
+        assertThat(messages.size()).isEqualTo(3);
+        assertThat(messages).extracting("chatId").containsExactly(chat3.getId(), chat2.getId(), chat1.getId());
+        assertThat(messages).extracting("writer").containsNull();
+    }
+
+    @Test
+    void getGptChatRoomChatList_권한X() {
+        //given
+        ChatRoom chatRoom = ChatRoom.createGptRoom(user1);
+        chatRoomRepository.save(chatRoom);
+
+        User newUser = User.create("newUser", null, null, null);
+        userRepository.save(newUser);
+
+        //when
+        assertThatThrownBy(() -> chatRoomService.getGptChatRoomChatList(newUser.getId(), chatRoom.getChatRoomUuid(), 1)).isInstanceOf(ChatRoomException.class);
     }
 }
