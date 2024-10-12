@@ -18,6 +18,8 @@ public enum BaseErrorCode implements StatusCode{
     INVALID_GOOGLE_TOKEN(40001, "유효하지 않은 Google Access Token입니다.", HttpStatus.BAD_REQUEST),
     NO_SUCH_CHATROOM(40002, "채팅방이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     NOT_CHATROOM_USER(40003, "채팅방에 대한 권한이 없습니다.", HttpStatus.BAD_REQUEST),
+    NO_SUCH_USER(40004, "사용자가 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_REFRESH_TOKEN(40005, "유효하지 않은 Refresh Token입니다.", HttpStatus.BAD_REQUEST),
 
     //5XX 서버 에러
     INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR.name(), HttpStatus.INTERNAL_SERVER_ERROR);
