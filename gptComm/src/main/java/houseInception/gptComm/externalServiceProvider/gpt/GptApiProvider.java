@@ -28,7 +28,8 @@ public class GptApiProvider {
         headers.setBearerAuth(GPT_API_KEY); // Authorization 헤더에 Bearer 토큰 추가
 
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", "gpt-3.5-turbo");
+        requestBody.put("model", "gpt-4o");
+        requestBody.put("max_completion_tokens", 16384);
 
         Map<String, String> userMessage = new HashMap<>();
         userMessage.put("role", "user");
@@ -65,7 +66,8 @@ public class GptApiProvider {
         userMessage.put("content", "[" + content + "] 이 메세지에 대한 제목과 응답을 생성해줘. 제목은 메세지 내용을 요약해서 20자 이내로 명사형으로 끝나. 제목은 응답의 가장 처음 <<>>안에 넣어줘. 제목과 응답 사이에 문자,엔터는 없어.");
 
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", "gpt-3.5-turbo");
+        requestBody.put("model", "gpt-4o");
+        requestBody.put("max_completion_tokens", 16384);
 
         List<Map<String, String>> messages = new ArrayList<>();
         messages.add(userMessage);
@@ -82,6 +84,7 @@ public class GptApiProvider {
         );
         
         try {
+
             String resMessage = objectMapper.readValue(response.getBody(), ChatCompletionResponse.class).getChoices().get(0).getMessage().getContent();
             String title = extractTitle(resMessage);
             String responseContent = extractResponseContent(resMessage);

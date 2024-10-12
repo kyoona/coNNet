@@ -5,10 +5,7 @@ import houseInception.gptComm.domain.chatRoom.Chat;
 import houseInception.gptComm.domain.chatRoom.ChatRoom;
 import houseInception.gptComm.domain.chatRoom.ChatRoomType;
 import houseInception.gptComm.domain.chatRoom.ChatRoomUser;
-import houseInception.gptComm.dto.ChatAddDto;
-import houseInception.gptComm.dto.DataListResDto;
-import houseInception.gptComm.dto.GptChatResDto;
-import houseInception.gptComm.dto.GptChatRoomListResDto;
+import houseInception.gptComm.dto.*;
 import houseInception.gptComm.exception.ChatRoomException;
 import houseInception.gptComm.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.gptComm.externalServiceProvider.gpt.GptResDto;
@@ -68,8 +65,41 @@ public class ChatRoomService {
         return new GptChatResDto(chatRoom.getChatRoomUuid(), chatRoom.getTitle(), userChat.getId(), gptChat.getId(), content);
     }
 
+    @Transactional
+    public Long deleteChatRoom(Long userId, String chatRoomUuid) {
+        checkExistChatRoom(chatRoomUuid);
+        ChatRoom chatRoom = findChatRoomByUuid(chatRoomUuid);
+        checkChatRoomUser(chatRoom.getId(), userId);
+
+        chatRoom.delete();
+
+        return chatRoom.getId();
+    }
+
+    public DataListResDto<GptChatRoomListResDto> getGptChatRoomList(Long userId, int page) {
+        List<GptChatRoomListResDto> chatRoomList = chatRoomRepository.getGptChatRoomListByUserId(userId, page);
+
+        return new DataListResDto<GptChatRoomListResDto>(page, chatRoomList);
+    }
+
+    public GptChatRoomChatListResDto getGptChatRoomChatList(Long userId, String chatRoomUuid, int page) {
+        checkExistChatRoom(chatRoomUuid, GPT);
+        ChatRoom chatRoom = findChatRoomByUuid(chatRoomUuid);
+        checkChatRoomUser(chatRoom.getId(), userId);
+
+        List<GptChatRoomChatResDto> chatList = chatRoomRepository.getGptChatRoomChatList(chatRoom.getId(), page);
+
+        return new GptChatRoomChatListResDto(chatRoomUuid, chatRoom.getTitle(), page, chatList);
+    }
+
     private void checkExistChatRoom(String chatRoomUuid, ChatRoomType chatRoomType) {
         if(chatRoomUuid != null && !chatRoomRepository.existsByChatRoomUuidAndChatRoomTypeAndStatus(chatRoomUuid, chatRoomType, ALIVE)){
+            throw new ChatRoomException(NO_SUCH_CHATROOM);
+        }
+    }
+
+    private void checkExistChatRoom(String chatRoomUuid) {
+        if(!chatRoomRepository.existsByChatRoomUuidAndStatus(chatRoomUuid, ALIVE)){
             throw new ChatRoomException(NO_SUCH_CHATROOM);
         }
     }
@@ -87,11 +117,5 @@ public class ChatRoomService {
         }
 
         return chatRoom;
-    }
-
-    public DataListResDto<GptChatRoomListResDto> getGptChatRoomList(Long userId, int page) {
-        List<GptChatRoomListResDto> chatRoomList = chatRoomRepository.getGptChatRoomListByUserId(userId, page);
-
-        return new DataListResDto<GptChatRoomListResDto>(page, chatRoomList);
     }
 }
