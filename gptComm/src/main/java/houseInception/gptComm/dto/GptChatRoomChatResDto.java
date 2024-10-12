@@ -4,9 +4,13 @@ import com.querydsl.core.annotations.QueryProjection;
 import houseInception.gptComm.domain.ChatterRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+import static houseInception.gptComm.domain.ChatterRole.GPT;
+
+@ToString
 @Getter
 @NoArgsConstructor
 public class GptChatRoomChatResDto {
@@ -24,7 +28,7 @@ public class GptChatRoomChatResDto {
         this.writerRole = writerRole;
         this.createAt = createAt;
 
-        if (writerId == null) {
+        if (writerRole == GPT) {
             this.writer = null;
         }else {
             this.writer = new UserResDto(writerId, writerName, writerProfile);
