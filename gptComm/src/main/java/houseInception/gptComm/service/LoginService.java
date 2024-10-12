@@ -62,6 +62,14 @@ public class LoginService {
         return new TokenResDto(accessToken, refreshToken);
     }
 
+    @Transactional
+    public Long signOut(Long userId) {
+        User user = findUser(userId);
+        user.deleteRefreshToken();
+
+        return user.getId();
+    }
+
     private boolean isNotServiceUser(String email){
         return !userRepository.existsByEmailAndStatus(email, ALIVE);
     }

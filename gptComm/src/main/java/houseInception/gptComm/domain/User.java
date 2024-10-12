@@ -42,4 +42,8 @@ public class User extends BaseTime{
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
+
+    public void deleteRefreshToken(){
+        this.refreshToken = null;
+    }
 }

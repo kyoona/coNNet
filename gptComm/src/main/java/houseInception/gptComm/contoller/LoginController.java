@@ -3,6 +3,8 @@ package houseInception.gptComm.contoller;
 import houseInception.gptComm.dto.TokenResDto;
 import houseInception.gptComm.dto.RefreshDto;
 import houseInception.gptComm.dto.SignInDto;
+import houseInception.gptComm.response.BaseResponse;
+import houseInception.gptComm.response.BaseResultDto;
 import houseInception.gptComm.service.LoginService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +35,13 @@ public class LoginController {
         TokenResDto result = loginService.refresh(userId, refreshDto.getRefreshToken());
 
         return result;
+    }
+
+    @PostMapping("/sign-out")
+    public BaseResponse<BaseResultDto> signOut(){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = loginService.signOut(userId);
+
+        return BaseResponse.getSimpleRes(resultId);
     }
 }
