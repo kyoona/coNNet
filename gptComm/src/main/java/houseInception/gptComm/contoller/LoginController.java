@@ -1,6 +1,7 @@
 package houseInception.gptComm.contoller;
 
-import houseInception.gptComm.dto.LoginResDto;
+import houseInception.gptComm.dto.TokenResDto;
+import houseInception.gptComm.dto.RefreshDto;
 import houseInception.gptComm.dto.SignInDto;
 import houseInception.gptComm.service.LoginService;
 import jakarta.validation.Valid;
@@ -20,8 +21,16 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/sign-in")
-    public LoginResDto signIn(@RequestBody @Valid SignInDto signInDto){
-        LoginResDto result = loginService.signIn(signInDto);
+    public TokenResDto signIn(@RequestBody @Valid SignInDto signInDto){
+        TokenResDto result = loginService.signIn(signInDto);
+
+        return result;
+    }
+
+    @PostMapping("/refresh")
+    public TokenResDto refresh(@RequestBody @Valid RefreshDto refreshDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        TokenResDto result = loginService.refresh(userId, refreshDto.getRefreshToken());
 
         return result;
     }

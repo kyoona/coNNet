@@ -23,8 +23,7 @@ public class SpringConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(POST, "/login/**").permitAll() // 로그인, 로그아웃
-                        .requestMatchers(POST, "/users").permitAll() // 회원가입
+                        .requestMatchers(POST, "/login/sign-in").permitAll() // 로그인
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(userValidationFilter, JwtAuthenticationFilter.class)
