@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static houseInception.gptComm.domain.Status.ALIVE;
+import static houseInception.gptComm.domain.Status.DELETED;
 import static houseInception.gptComm.domain.chatRoom.ChatRoomType.GPT;
 
 @Getter
@@ -66,6 +67,10 @@ public class ChatRoom extends BaseTime {
         chats.add(chat);
 
         return chat;
+    }
+
+    public void delete(){
+        status = DELETED;
     }
 
     public void setTitle(String title) {

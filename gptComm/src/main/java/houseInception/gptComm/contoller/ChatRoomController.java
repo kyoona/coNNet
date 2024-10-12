@@ -4,6 +4,8 @@ import houseInception.gptComm.dto.ChatAddDto;
 import houseInception.gptComm.dto.DataListResDto;
 import houseInception.gptComm.dto.GptChatResDto;
 import houseInception.gptComm.dto.GptChatRoomListResDto;
+import houseInception.gptComm.response.BaseResponse;
+import houseInception.gptComm.response.BaseResultDto;
 import houseInception.gptComm.service.ChatRoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +32,13 @@ public class ChatRoomController {
         DataListResDto<GptChatRoomListResDto> result = chatRoomService.getGptChatRoomList(userId, page);
 
         return result;
+    }
+
+    @DeleteMapping("/{chatRoomUuid}")
+    public BaseResponse<BaseResultDto> deleteChatRoom(@PathVariable String  chatRoomUuid){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = chatRoomService.deleteChatRoom(userId, chatRoomUuid);
+
+        return BaseResponse.getSimpleRes(resultId);
     }
 }

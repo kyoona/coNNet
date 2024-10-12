@@ -4,10 +4,6 @@ spring:
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  data:
-    redis:
-      host: localhost
-      port: 6379
   jpa:
     hibernate:
       ddl-auto: create #주의 사용에 따라 create, update 사용 후 none으로 변경해주세요
@@ -24,3 +20,9 @@ jwt:
 
 gpt:
   key: ${GPT_API_KEY}
+
+logging:
+  level:
+    root: INFO
+  file:
+    name: logs/spring-boot-app.log

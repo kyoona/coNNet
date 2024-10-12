@@ -68,8 +68,25 @@ public class ChatRoomService {
         return new GptChatResDto(chatRoom.getChatRoomUuid(), chatRoom.getTitle(), userChat.getId(), gptChat.getId(), content);
     }
 
+    @Transactional
+    public Long deleteChatRoom(Long userId, String chatRoomUuid) {
+        checkExistChatRoom(chatRoomUuid);
+        ChatRoom chatRoom = findChatRoomByUuid(chatRoomUuid);
+        checkChatRoomUser(chatRoom.getId(), userId);
+
+        chatRoom.delete();
+
+        return chatRoom.getId();
+    }
+
     private void checkExistChatRoom(String chatRoomUuid, ChatRoomType chatRoomType) {
         if(chatRoomUuid != null && !chatRoomRepository.existsByChatRoomUuidAndChatRoomTypeAndStatus(chatRoomUuid, chatRoomType, ALIVE)){
+            throw new ChatRoomException(NO_SUCH_CHATROOM);
+        }
+    }
+
+    private void checkExistChatRoom(String chatRoomUuid) {
+        if(!chatRoomRepository.existsByChatRoomUuidAndStatus(chatRoomUuid, ALIVE)){
             throw new ChatRoomException(NO_SUCH_CHATROOM);
         }
     }

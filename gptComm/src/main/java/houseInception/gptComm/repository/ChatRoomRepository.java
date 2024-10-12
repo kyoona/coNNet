@@ -12,4 +12,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long>, ChatR
     Optional<ChatRoom> findByChatRoomUuidAndStatus(String chatRoomUuid, Status status);
 
     boolean existsByChatRoomUuidAndChatRoomTypeAndStatus(String chatRoomUuid, ChatRoomType chatRoomType, Status status);
+    boolean existsByChatRoomUuidAndStatus(String chatRoomUuid, Status status);
 }
