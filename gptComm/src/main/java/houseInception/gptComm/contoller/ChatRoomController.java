@@ -1,9 +1,6 @@
 package houseInception.gptComm.contoller;
 
-import houseInception.gptComm.dto.ChatAddDto;
-import houseInception.gptComm.dto.DataListResDto;
-import houseInception.gptComm.dto.GptChatResDto;
-import houseInception.gptComm.dto.GptChatRoomListResDto;
+import houseInception.gptComm.dto.*;
 import houseInception.gptComm.response.BaseResponse;
 import houseInception.gptComm.response.BaseResultDto;
 import houseInception.gptComm.service.ChatRoomService;
@@ -35,10 +32,19 @@ public class ChatRoomController {
     }
 
     @DeleteMapping("/{chatRoomUuid}")
-    public BaseResponse<BaseResultDto> deleteChatRoom(@PathVariable String  chatRoomUuid){
+    public BaseResponse<BaseResultDto> deleteChatRoom(@PathVariable String chatRoomUuid){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = chatRoomService.deleteChatRoom(userId, chatRoomUuid);
 
         return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @GetMapping("/gpt/{chatRoomUuid}")
+    public GptChatRoomChatListResDto getGptChatRoomChatList(@PathVariable String chatRoomUuid,
+                                                            @RequestParam(defaultValue = "1") int page){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        GptChatRoomChatListResDto result = chatRoomService.getGptChatRoomChatList(userId, chatRoomUuid, page);
+
+        return result;
     }
 }
