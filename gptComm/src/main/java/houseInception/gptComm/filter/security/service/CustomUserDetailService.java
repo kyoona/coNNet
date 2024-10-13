@@ -1,9 +1,8 @@
-package houseInception.gptComm.security.service;
+package houseInception.gptComm.filter.security.service;
 
-import houseInception.gptComm.domain.Status;
 import houseInception.gptComm.domain.User;
 import houseInception.gptComm.repository.UserRepository;
-import houseInception.gptComm.security.CustomUserDetails;
+import houseInception.gptComm.filter.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
