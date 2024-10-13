@@ -1,6 +1,6 @@
 package houseInception.gptComm.contoller;
 
-import houseInception.gptComm.security.CustomUserDetails;
+import houseInception.gptComm.filter.security.CustomUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 

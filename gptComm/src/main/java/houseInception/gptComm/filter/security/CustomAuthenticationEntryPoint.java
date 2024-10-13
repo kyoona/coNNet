@@ -1,4 +1,4 @@
-package houseInception.gptComm.security;
+package houseInception.gptComm.filter.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import houseInception.gptComm.response.BaseErrorResponse;

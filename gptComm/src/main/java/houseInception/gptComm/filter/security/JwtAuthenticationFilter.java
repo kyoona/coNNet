@@ -1,4 +1,4 @@
-package houseInception.gptComm.security;
+package houseInception.gptComm.filter.security;
 
 import houseInception.gptComm.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;

@@ -1,5 +1,6 @@
-package houseInception.gptComm.security;
+package houseInception.gptComm.filter.security;
 
+import houseInception.gptComm.filter.MdcFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import static org.springframework.http.HttpMethod.POST;
 @Configuration
 public class SpringConfig {
 
+    private final MdcFilter mdcFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserValidationFilter userValidationFilter;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
@@ -23,8 +25,9 @@ public class SpringConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(POST, "/login/sign-in").permitAll() // 로그인
+                        .requestMatchers(POST, "/login/sign-in").permitAll()
                         .anyRequest().authenticated())
+                .addFilterBefore(mdcFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(userValidationFilter, JwtAuthenticationFilter.class)
                 .exceptionHandling(exceptionConfig -> exceptionConfig

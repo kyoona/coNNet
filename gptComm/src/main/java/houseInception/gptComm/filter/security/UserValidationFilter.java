@@ -1,6 +1,6 @@
-package houseInception.gptComm.security;
+package houseInception.gptComm.filter.security;
 
-import houseInception.gptComm.security.service.CustomUserDetailService;
+import houseInception.gptComm.filter.security.service.CustomUserDetailService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
