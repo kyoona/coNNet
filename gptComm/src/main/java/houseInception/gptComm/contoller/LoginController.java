@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @Slf4j
 @RequestMapping("/login")
 @RequiredArgsConstructor
@@ -23,18 +25,25 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/sign-in")
-    public TokenResDto signIn(@RequestBody @Valid SignInDto signInDto){
+    public BaseResponse<TokenResDto> signIn(@RequestBody @Valid SignInDto signInDto){
         TokenResDto result = loginService.signIn(signInDto);
 
-        return result;
+        return new BaseResponse<>(result);
     }
 
     @PostMapping("/refresh")
-    public TokenResDto refresh(@RequestBody @Valid RefreshDto refreshDto){
+    public BaseResponse<TokenResDto> refresh(@RequestBody @Valid RefreshDto refreshDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         TokenResDto result = loginService.refresh(userId, refreshDto.getRefreshToken());
 
-        return result;
+        return new BaseResponse<>(result);
+    }
+
+    @PostMapping("/refresh/check")
+    public BaseResponse<Map<String, Boolean>> checkRefreshToken(@RequestBody @Valid RefreshDto refreshDto){
+        loginService.checkRefreshToken(refreshDto.getRefreshToken());
+
+        return new BaseResponse<>(Map.of("isValid", true));
     }
 
     @PostMapping("/sign-out")
