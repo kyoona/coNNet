@@ -25,18 +25,18 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping("/sign-in")
-    public TokenResDto signIn(@RequestBody @Valid SignInDto signInDto){
+    public BaseResponse<TokenResDto> signIn(@RequestBody @Valid SignInDto signInDto){
         TokenResDto result = loginService.signIn(signInDto);
 
-        return result;
+        return new BaseResponse<>(result);
     }
 
     @PostMapping("/refresh")
-    public TokenResDto refresh(@RequestBody @Valid RefreshDto refreshDto){
+    public BaseResponse<TokenResDto> refresh(@RequestBody @Valid RefreshDto refreshDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         TokenResDto result = loginService.refresh(userId, refreshDto.getRefreshToken());
 
-        return result;
+        return new BaseResponse<>(result);
     }
 
     @PostMapping("/refresh/check")
