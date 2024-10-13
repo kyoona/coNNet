@@ -54,6 +54,9 @@ public class LoginService {
         if(!user.equals(refreshToken)){
             throw new InValidTokenException(INVALID_REFRESH_TOKEN);
         }
+        if(!tokenProvider.validateToken(refreshToken)){
+            throw new InValidTokenException(INVALID_REFRESH_TOKEN);
+        }
 
         String accessToken = tokenProvider.createAccessToken(user.getEmail());
         String newRefreshToken = tokenProvider.createRefreshToken(user.getEmail());
