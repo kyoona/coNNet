@@ -54,15 +54,20 @@ public class LoginService {
         if(!user.equals(refreshToken)){
             throw new InValidTokenException(INVALID_REFRESH_TOKEN);
         }
-        if(!tokenProvider.validateToken(refreshToken)){
-            throw new InValidTokenException(INVALID_REFRESH_TOKEN);
-        }
+        checkValidToken(refreshToken);
 
         String accessToken = tokenProvider.createAccessToken(user.getEmail());
         String newRefreshToken = tokenProvider.createRefreshToken(user.getEmail());
         user.setRefreshToken(newRefreshToken);
 
         return new TokenResDto(accessToken, refreshToken);
+    }
+
+    public void checkRefreshToken(String refreshToken) {
+        checkValidToken(refreshToken);
+        if(!userRepository.existsByRefreshTokenAndStatus(refreshToken, ALIVE)){
+            throw new InValidTokenException(INVALID_REFRESH_TOKEN);
+        }
     }
 
     @Transactional
@@ -74,6 +79,7 @@ public class LoginService {
     }
 
     private boolean isNotServiceUser(String email){
+
         return !userRepository.existsByEmailAndStatus(email, ALIVE);
     }
 
@@ -93,5 +99,11 @@ public class LoginService {
         }
 
         return user;
+    }
+
+    private void checkValidToken(String refreshToken) {
+        if(!tokenProvider.validateToken(refreshToken)){
+            throw new InValidTokenException(INVALID_REFRESH_TOKEN);
+        }
     }
 }

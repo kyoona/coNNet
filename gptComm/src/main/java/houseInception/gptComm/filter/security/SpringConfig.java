@@ -26,6 +26,7 @@ public class SpringConfig {
         return http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(POST, "/login/sign-in").permitAll()
+                        .requestMatchers(POST, "/refresh/check").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(mdcFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
