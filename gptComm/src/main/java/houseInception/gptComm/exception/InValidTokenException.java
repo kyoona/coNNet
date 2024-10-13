@@ -3,6 +3,7 @@ package houseInception.gptComm.exception;
 import houseInception.gptComm.response.status.StatusCode;
 
 public class InValidTokenException extends BaseException{
+
     public InValidTokenException(StatusCode status, String errorMessage) {
         super(status, errorMessage);
     }
