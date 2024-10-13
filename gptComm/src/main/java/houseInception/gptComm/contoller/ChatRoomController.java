@@ -16,19 +16,19 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
 
     @PostMapping("/gpt")
-    public GptChatResDto addGptChat(@RequestBody @Valid ChatAddDto chatAddDto){
+    public BaseResponse<GptChatResDto> addGptChat(@RequestBody @Valid ChatAddDto chatAddDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         GptChatResDto result = chatRoomService.addGptChat(userId, chatAddDto);
 
-        return result;
+        return new BaseResponse<>(result);
     }
 
     @GetMapping("/gpt")
-    public DataListResDto<GptChatRoomListResDto> getGptChatRoomList(@RequestParam(defaultValue = "1") int page){
+    public BaseResponse<DataListResDto<GptChatRoomListResDto>> getGptChatRoomList(@RequestParam(defaultValue = "1") int page){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         DataListResDto<GptChatRoomListResDto> result = chatRoomService.getGptChatRoomList(userId, page);
 
-        return result;
+        return new BaseResponse<>(result);
     }
 
     @DeleteMapping("/{chatRoomUuid}")
@@ -40,11 +40,11 @@ public class ChatRoomController {
     }
 
     @GetMapping("/gpt/{chatRoomUuid}")
-    public GptChatRoomChatListResDto getGptChatRoomChatList(@PathVariable String chatRoomUuid,
+    public BaseResponse<GptChatRoomChatListResDto> getGptChatRoomChatList(@PathVariable String chatRoomUuid,
                                                             @RequestParam(defaultValue = "1") int page){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         GptChatRoomChatListResDto result = chatRoomService.getGptChatRoomChatList(userId, chatRoomUuid, page);
 
-        return result;
+        return new BaseResponse<>(result);
     }
 }
