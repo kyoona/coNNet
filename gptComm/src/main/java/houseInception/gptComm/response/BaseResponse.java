@@ -3,8 +3,10 @@ package houseInception.gptComm.response;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
+@Slf4j
 @Getter
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class BaseResponse<T> {
