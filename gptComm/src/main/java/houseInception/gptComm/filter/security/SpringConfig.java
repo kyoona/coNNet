@@ -24,6 +24,7 @@ public class SpringConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable()) // CORS 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(POST, "/login/sign-in").permitAll()
                         .requestMatchers(POST, "/refresh/check").permitAll()
