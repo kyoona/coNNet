@@ -43,9 +43,26 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
 
+    - name: Print environment variables
+      run: |
+        echo "MYSQL_USERNAME=${MYSQL_USERNAME}"
+        echo "MYSQL_PASSWORD=${MYSQL_PASSWORD}"
+        echo "MYSQL_URL=${MYSQL_URL}"
+        echo "GPT_API_KEY=${GPT_API_KEY}"
+        echo "JWT_SECRET_KEY=${JWT_SECRET_KEY}"
+        echo "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}"
+        echo "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}"
+      env:
+        MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+        MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        MYSQL_URL: ${{ secrets.MYSQL_URL }}
+        GPT_API_KEY: ${{ secrets.GPT_API_KEY }}
+        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+
     - name: Build with Gradle Wrapper
       working-directory: gptComm
-      run: ./gradlew build -i
       env:
         DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -54,4 +71,5 @@ jobs:
         MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
         MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         MYSQL_URL: ${{ secrets.MYSQL_URL }}
+      run: ./gradlew build -i
 
