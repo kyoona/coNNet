@@ -70,6 +70,6 @@ jobs:
         JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
         MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        MYSQL_URL: MYSQL_URL=jdbc:mysql://mysql:3306/gpt_service
+        MYSQL_URL: jdbc:mysql://mysql:3306/gpt_service
       run: ./gradlew build -i
 
