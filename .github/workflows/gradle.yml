@@ -43,7 +43,7 @@ jobs:
 
     - name: Build with Gradle Wrapper
       working-directory: gptComm
-      run: ./gradlew build
+      run: ./gradlew build -i
       env:
         DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
