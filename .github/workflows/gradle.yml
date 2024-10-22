@@ -14,6 +14,7 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
+    
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -28,7 +29,7 @@ jobs:
         mysql version: '8.0'
         mysql database: 'gpt_service'
         mysql root password: ${{ secrets.MYSQL_PASSWORD }}
-        
+    
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
 
@@ -44,3 +45,12 @@ jobs:
         MYSQL_URL: ${{ secrets.MYSQL_URL }}
       run: ./gradlew build -i
 
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+    
+    - name: Build Docker image
+      working-directory: gptComm
+      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/gpt-service:latest .
+
+    - name: Push Docker image to Docker Hub
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/gpt-service:latest
