@@ -12,20 +12,6 @@ jobs:
     permissions:
       contents: read
     
-    services:
-      mysql:
-        image: mysql:latest
-        ports:
-          - 3306:3306
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          MYSQL_DATABASE: gpt_service
-        options: > 
-          --health-cmd="mysqladmin ping --silent" 
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -33,17 +19,14 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-
-    - name: Wait for MySQL to be ready
-      run: |
-        for i in {30..0}; do
-          if mysqladmin ping -h"127.0.0.1" --silent; then
-            break
-          fi
-          echo 'Waiting for MySQL...'
-          sleep 1
-        done
-      shell: bash
+    
+    - name: Start MySQL
+      uses: mirromutth/mysql-action@v1
+      with:
+        mysql_database: gpt_service
+        mysql_root_password: ${{ secrets.MYSQL_PASSWORD }}
+        mysql_version: 8.0
+        ports: 3306
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
