@@ -20,7 +20,7 @@ public class GoogleOathProvider {
     private final RestTemplate restTemplate;
 
     public GoogleUserInfo getUserInfo(String googleToken){
-        String googleUserInfoEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo";
+        String googleUserInfoEndpoint = "https://www.googleapis.com/oauth2/v2/userinfo";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(googleToken);
@@ -34,6 +34,7 @@ public class GoogleOathProvider {
                     entity,
                     GoogleUserInfo.class
             );
+
             return response.getBody();
         } catch (Exception e) {
             throw new InValidTokenException(INVALID_GOOGLE_TOKEN);
