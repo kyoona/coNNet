@@ -28,6 +28,16 @@ jobs:
         mysql_version: 8.0
         ports: 3306
 
+    - name: Wait for MySQL to be ready
+      run: |
+        for i in {1..30}; do
+          if mysqladmin ping -h localhost --silent; then
+          break
+          fi1
+          echo "Waiting for MySQL to be ready..."
+          sleep 2
+        done
+        
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
 
