@@ -14,6 +14,7 @@ public class BaseResponse<T> {
     private T result;
 
     public BaseResponse(T result) {
+        this.requestId = MDC.get("request_id");
         this.result = result;
     }
 

@@ -20,8 +20,6 @@ public class GoogleOathProvider {
     private final RestTemplate restTemplate;
 
     public GoogleUserInfo getUserInfo(String googleToken){
-
-        log.info("user googleToken = {}", googleToken);
         String googleUserInfoEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo";
 
         HttpHeaders headers = new HttpHeaders();
