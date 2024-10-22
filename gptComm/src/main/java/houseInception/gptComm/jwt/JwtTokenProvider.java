@@ -49,9 +49,9 @@ public class JwtTokenProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public boolean validateToken(String token){
+    public boolean validateToken(String token) {
         try {
-            Jwt<Header, Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJwt(token);
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (ExpiredJwtException e) {
             log.error("ExpiredJwtException: {}", e.getMessage());

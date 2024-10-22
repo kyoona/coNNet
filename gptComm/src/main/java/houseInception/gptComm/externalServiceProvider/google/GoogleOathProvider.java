@@ -2,6 +2,7 @@ package houseInception.gptComm.externalServiceProvider.google;
 
 import houseInception.gptComm.exception.InValidTokenException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import static houseInception.gptComm.response.status.BaseErrorCode.INVALID_GOOGLE_TOKEN;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class GoogleOathProvider {
@@ -18,7 +20,6 @@ public class GoogleOathProvider {
     private final RestTemplate restTemplate;
 
     public GoogleUserInfo getUserInfo(String googleToken){
-
         String googleUserInfoEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo";
 
         HttpHeaders headers = new HttpHeaders();
