@@ -60,6 +60,6 @@ jobs:
       
     - name: Pull Docker image on EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key.pem ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
+        ssh -i /tmp/ssh_key.pem ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
         docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
         docker pull ${{ secrets.DOCKERHUB_USERNAME }}/gpt-service:latest
