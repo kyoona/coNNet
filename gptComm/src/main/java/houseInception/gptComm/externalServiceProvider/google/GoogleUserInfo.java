@@ -8,10 +8,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GoogleUserInfo {
-    private String sub;
-    private String name;
-    private String given_name;
     private String family_name;
-    private String email;
+    private String name;
     private String picture;
+    private String email;
+    private String given_name;
+    private String id;
+    private boolean verified_email;
 }
