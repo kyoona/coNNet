@@ -69,6 +69,6 @@ jobs:
         key : ${{ secrets.EC2_SSH_KEY }}
         port: 22
         script: |
-          docker contianer ls
+          docker container ls
   
     
