@@ -14,10 +14,10 @@ class GoogleOathProviderTest {
     @Autowired
     GoogleOathProvider oathProvider;
 
-    @Test
+/*    @Test
     void getUserInfo() {
         String googleToken = "4/0AVG7fiRbtKc1FDeJcI1DqIyL1QZnNOriMUewNK3cPzIOFj6nhnRyOEx3KX17KfhfZGUg9A";
         GoogleUserInfo userInfo = oathProvider.getUserInfo(googleToken);
         log.info("userInfo {}", userInfo.getEmail());
-    }
+    }*/
 }
