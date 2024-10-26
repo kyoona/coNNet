@@ -34,7 +34,6 @@ public class LoginService {
             throw new InValidTokenException(INVALID_GOOGLE_TOKEN);
         }
 
-//        GoogleUserInfo userInfo = new GoogleUserInfo("a", "user name", "name", "family", "email", "dd");
         String accessToken = tokenProvider.createAccessToken(userInfo.getEmail());
         String refreshToken = tokenProvider.createRefreshToken(userInfo.getEmail());
 
