@@ -57,3 +57,18 @@ jobs:
 
     - name: Push Docker image to Docker Hub
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/gpt-service:latest
+      
+  deploy: 
+    runs-on: ubuntu-latest
+    steps:
+    - name: excuting remote ssh commands
+      uses: appleboy/ssh-action@v0.1.9
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key : ${{ secrets.EC2_SSH_KEY }}
+        port: 22
+        script: |
+          docker contianer ls
+  
+    
