@@ -62,7 +62,7 @@ public class GoogleOathProvider {
         requestBodyMap.put("code", googleToken);
         requestBodyMap.put("client_id", clientId);
         requestBodyMap.put("client_secret", clientSecret);
-        requestBodyMap.put("redirect_uri", "http://localhost:5174");
+        requestBodyMap.put("redirect_uri", "http://localhost:5173/login");
         requestBodyMap.put("grant_type", "authorization_code");
 
         ObjectMapper objectMapper = new ObjectMapper();
