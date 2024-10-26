@@ -16,7 +16,7 @@ class GoogleOathProviderTest {
 
     @Test
     void getUserInfo() {
-        String googleToken = "ya29.a0AcM612yKrF7_jlOb7k9Hg4iUa5UWP3OGhWa70RBc5aLubrw1GEdW2bJxDx5oaa3JJCLb-DfwOks1fhb7RN3V59UL-7o2cVA-qk8h1p8oYK56UuiQPD-0K9zAXeIPQGnKO1GlEAGtW1eshfrAgiMjOGRB8wAPo04CPj6shjdcaCgYKAZkSARMSFQHGX2Mio6AzJ8x8ytBlF9GK-QBnOg0175";
+        String googleToken = "4/0AVG7fiRbtKc1FDeJcI1DqIyL1QZnNOriMUewNK3cPzIOFj6nhnRyOEx3KX17KfhfZGUg9A";
         GoogleUserInfo userInfo = oathProvider.getUserInfo(googleToken);
         log.info("userInfo {}", userInfo.getEmail());
     }
