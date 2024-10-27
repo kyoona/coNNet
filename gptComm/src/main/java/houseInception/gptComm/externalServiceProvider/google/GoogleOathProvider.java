@@ -57,6 +57,7 @@ public class GoogleOathProvider {
 
     private String getAccessToken(String googleToken) {
         String googleAccessKeyEndpoint = "https://oauth2.googleapis.com/token";
+        log.info("googleToken = {}", googleToken);
 
         Map<String, String> requestBodyMap = new HashMap<>();
         requestBodyMap.put("code", googleToken);
