@@ -3,6 +3,8 @@ package houseInception.gptComm.service;
 import houseInception.gptComm.domain.Friend;
 import houseInception.gptComm.domain.FriendStatus;
 import houseInception.gptComm.domain.User;
+import houseInception.gptComm.dto.DataListResDto;
+import houseInception.gptComm.dto.UserResDto;
 import houseInception.gptComm.exception.FriendException;
 import houseInception.gptComm.exception.UserException;
 import houseInception.gptComm.repository.FriendRepository;
@@ -11,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static houseInception.gptComm.domain.FriendStatus.WAIT;
 import static houseInception.gptComm.response.status.BaseErrorCode.*;
@@ -57,6 +61,12 @@ public class FriendService {
         friendRepository.delete(friend);
 
         return friend.getId();
+    }
+
+    public DataListResDto<UserResDto> getFriendWaitList(Long userId) {
+        List<UserResDto> requestSenders = friendRepository.findFriendRequestList(userId);
+
+        return new DataListResDto<UserResDto>(0, requestSenders);
     }
 
     private void checkAlreadyFriendRelation(Long userId, Long targetId){

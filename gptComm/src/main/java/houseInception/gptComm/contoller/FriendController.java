@@ -1,13 +1,12 @@
 package houseInception.gptComm.contoller;
 
+import houseInception.gptComm.dto.DataListResDto;
+import houseInception.gptComm.dto.UserResDto;
 import houseInception.gptComm.response.BaseResponse;
 import houseInception.gptComm.response.BaseResultDto;
 import houseInception.gptComm.service.FriendService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/friend")
 @RequiredArgsConstructor
@@ -38,5 +37,13 @@ public class FriendController {
         Long resultId = friendService.denyFriendRequest(userId, targetId);
 
         return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @GetMapping("/wait")
+    public BaseResponse<DataListResDto<UserResDto>> getFriendWaitList(){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        DataListResDto<UserResDto> result = friendService.getFriendWaitList(userId);
+
+        return new BaseResponse<>(result);
     }
 }
