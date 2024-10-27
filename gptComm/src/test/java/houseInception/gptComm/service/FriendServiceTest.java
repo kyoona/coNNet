@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import static houseInception.gptComm.domain.FriendStatus.ACCEPT;
 import static houseInception.gptComm.domain.FriendStatus.WAIT;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -71,8 +72,6 @@ class FriendServiceTest {
         //given
         Friend friend = Friend.createFriend(user1, user2);
         friendRepository.save(friend);
-        em.flush();
-        em.clear();
 
         //when
         assertThatThrownBy(() -> friendService.requestFriend(user1.getId(), user2.getId())).isInstanceOf(FriendException.class);
@@ -83,10 +82,40 @@ class FriendServiceTest {
         //given
         Friend friend = Friend.createFriend(user1, user2);
         friendRepository.save(friend);
-        em.flush();
-        em.clear();
 
         //when
         assertThatThrownBy(() -> friendService.requestFriend(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
+    }
+
+    @Test
+    void acceptFriendRequest() {
+        //given
+        Friend friend = Friend.createFriend(user1, user2);
+        friendRepository.save(friend);
+
+        //when
+        Long friendId = friendService.acceptFriendRequest(user2.getId(), user1.getId());
+
+        //then
+        Friend findFriend = friendRepository.findById(friendId).orElse(null);
+        assertThat(findFriend).isNotNull();
+        assertThat(findFriend.getAcceptStatus()).isEqualTo(ACCEPT);
+    }
+
+    @Test
+    void acceptFriendRequest_요청존재x() {
+        //when
+        assertThatThrownBy(() -> friendService.acceptFriendRequest(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
+    }
+
+    @Test
+    void acceptFriendRequest_이미수락() {
+        //given
+        Friend friend = Friend.createFriend(user1, user2);
+        friend.accept();
+        friendRepository.save(friend);
+
+        //when
+        assertThatThrownBy(() -> friendService.acceptFriendRequest(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
     }
 }

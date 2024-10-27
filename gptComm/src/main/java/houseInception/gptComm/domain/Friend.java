@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static houseInception.gptComm.domain.FriendStatus.ACCEPT;
 import static houseInception.gptComm.domain.FriendStatus.WAIT;
 
 @Getter
@@ -34,5 +35,9 @@ public class Friend extends BaseTime{
         friend.recipient = targetUser;
 
         return friend;
+    }
+
+    public void accept(){
+        this.acceptStatus = ACCEPT;
     }
 }

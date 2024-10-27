@@ -1,6 +1,7 @@
 package houseInception.gptComm.service;
 
 import houseInception.gptComm.domain.Friend;
+import houseInception.gptComm.domain.FriendStatus;
 import houseInception.gptComm.domain.User;
 import houseInception.gptComm.exception.FriendException;
 import houseInception.gptComm.exception.UserException;
@@ -11,8 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static houseInception.gptComm.response.status.BaseErrorCode.ALREADY_FRIEND_REQUEST;
-import static houseInception.gptComm.response.status.BaseErrorCode.NO_SUCH_USER;
+import static houseInception.gptComm.domain.FriendStatus.WAIT;
+import static houseInception.gptComm.response.status.BaseErrorCode.*;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -36,9 +37,32 @@ public class FriendService {
         return friend.getId();
     }
 
+    @Transactional
+    public Long acceptFriendRequest(Long userId, Long targetId) {
+        checkExistUser(targetId);
+        checkHasFriendRequest(targetId, userId);
+
+        Friend friend = findFriend(targetId, userId, WAIT);
+        friend.accept();
+
+        return friend.getId();
+    }
+
     private void checkAlreadyFriendRelation(Long userId, Long targetId){
         if(friendRepository.existsFriend(userId, targetId)){
             throw new FriendException(ALREADY_FRIEND_REQUEST);
+        }
+    }
+
+    private void checkHasFriendRequest(Long senderId, Long recipientId){
+        if(!friendRepository.existsBySenderIdAndRecipientIdAndAcceptStatus(senderId, recipientId, WAIT)){
+            throw new FriendException(NO_SUCH_FRIEND_REQUEST);
+        }
+    }
+
+    private void checkExistUser(Long userId){
+        if (!userRepository.existsById(userId)){
+            throw new UserException(NO_SUCH_USER);
         }
     }
 
@@ -49,5 +73,14 @@ public class FriendService {
         }
 
         return user;
+    }
+
+    private Friend findFriend(Long senderId, Long recipientId, FriendStatus acceptStatus){
+        Friend friend = friendRepository.findBySenderIdAndRecipientIdAndAcceptStatus(senderId, recipientId, acceptStatus).orElse(null);
+        if(friend == null){
+            throw new FriendException(NO_SUCH_FRIEND);
+        }
+
+        return friend;
     }
 }

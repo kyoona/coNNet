@@ -23,4 +23,10 @@ public class FriendController {
 
         return BaseResponse.getSimpleRes(resultId);
     }
+
+    @PostMapping("/{userId}/accept")
+    public void acceptFriendRequest(@PathVariable Long targetId){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        friendService.acceptFriendRequest(userId, targetId);
+    }
 }
