@@ -25,8 +25,18 @@ public class FriendController {
     }
 
     @PostMapping("/{userId}/accept")
-    public void acceptFriendRequest(@PathVariable Long targetId){
+    public BaseResponse<BaseResultDto> acceptFriendRequest(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        friendService.acceptFriendRequest(userId, targetId);
+        Long resultId = friendService.acceptFriendRequest(userId, targetId);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @PostMapping("/{userId}/deny")
+    public BaseResponse<BaseResultDto> denyFriendRequest(@PathVariable Long targetId){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = friendService.denyFriendRequest(userId, targetId);
+
+        return BaseResponse.getSimpleRes(resultId);
     }
 }

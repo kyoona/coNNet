@@ -48,6 +48,17 @@ public class FriendService {
         return friend.getId();
     }
 
+    @Transactional
+    public Long denyFriendRequest(Long userId, Long targetId) {
+        checkExistUser(targetId);
+        checkHasFriendRequest(targetId, userId);
+
+        Friend friend = findFriend(targetId, userId, WAIT);
+        friendRepository.delete(friend);
+
+        return friend.getId();
+    }
+
     private void checkAlreadyFriendRelation(Long userId, Long targetId){
         if(friendRepository.existsFriend(userId, targetId)){
             throw new FriendException(ALREADY_FRIEND_REQUEST);

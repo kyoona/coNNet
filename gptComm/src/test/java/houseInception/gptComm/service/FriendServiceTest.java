@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
+
 import static houseInception.gptComm.domain.FriendStatus.ACCEPT;
 import static houseInception.gptComm.domain.FriendStatus.WAIT;
 import static org.assertj.core.api.Assertions.*;
@@ -117,5 +119,24 @@ class FriendServiceTest {
 
         //when
         assertThatThrownBy(() -> friendService.acceptFriendRequest(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
+    }
+
+    @Test
+    void denyFriendRequest() {
+        //given
+        Friend friend = Friend.createFriend(user1, user2);
+        friendRepository.save(friend);
+
+        //when
+        Long friendId = friendService.denyFriendRequest(user2.getId(), user1.getId());
+
+        //then
+        assertThatThrownBy(() -> friendRepository.findById(friendId).orElseThrow()).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void denyFriendRequest_요청존재x() {
+        //when
+        assertThatThrownBy(() -> friendService.denyFriendRequest(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
     }
 }
