@@ -9,9 +9,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GoogleAccessToken {
 
-    private String access_token;
-    private int expires_in;
-    private String token_type;
-    private String scope;
-    private String refresh_token;
+    private String iss;
+    private String azp;
+    private String aud;
+    private String sub;
+    private String email;
+    private boolean emailVerified;
+    private long nbf;
+    private String name;
+    private String picture;
+    private String givenName;
+    private String familyName;
+    private long iat;
+    private long exp;
+    private String jti;
+    private String alg;
+    private String kid;
+    private String typ;
 }
