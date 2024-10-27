@@ -46,4 +46,12 @@ public class FriendController {
 
         return new BaseResponse<>(result);
     }
+
+    @GetMapping
+    public BaseResponse<DataListResDto<UserResDto>> getFriendList(){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        DataListResDto<UserResDto> result = friendService.getFriendList(userId);
+
+        return new BaseResponse<>(result);
+    }
 }

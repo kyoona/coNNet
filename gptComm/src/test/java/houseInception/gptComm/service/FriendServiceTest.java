@@ -44,6 +44,8 @@ class FriendServiceTest {
     User user1;
     User user2;
     User user3;
+    User user4;
+    User user5;
 
     @BeforeEach
     void beforeEach(){
@@ -55,6 +57,12 @@ class FriendServiceTest {
 
         user3 = User.create("user3", null, null, null);
         userRepository.save(user3);
+
+        user4 = User.create("user4", null, null, null);
+        userRepository.save(user4);
+
+        user5 = User.create("user5", null, null, null);
+        userRepository.save(user5);
     }
 
     @AfterEach
@@ -150,9 +158,6 @@ class FriendServiceTest {
     @Test
     void getFriendWaitList() {
         //given
-        User user4 = User.create("user4", null, null, null);
-        userRepository.save(user4);
-
         Friend friend1 = Friend.createFriend(user2, user1);
         friendRepository.save(friend1);
 
@@ -171,5 +176,32 @@ class FriendServiceTest {
         assertThat(senderList.size()).isEqualTo(2);
         assertThat(senderList).extracting("userId").contains(user2.getId(), user3.getId());
 
+    }
+
+    @Test
+    void getFriendList() {
+        //given
+        Friend friend1 = Friend.createFriend(user1, user2);
+        friend1.accept();
+        friendRepository.save(friend1);
+
+        Friend friend2 = Friend.createFriend(user3, user1);
+        friend2.accept();
+        friendRepository.save(friend2);
+
+        Friend friend3 = Friend.createFriend(user1, user4);
+        friend3.accept();
+        friendRepository.save(friend3);
+
+        Friend friend4 = Friend.createFriend(user1, user5);
+        friendRepository.save(friend4);
+
+        //when
+        DataListResDto<UserResDto> result = friendService.getFriendList(user1.getId());
+
+        //then
+        List<UserResDto> friendUserList = result.getData();
+        assertThat(friendUserList.size()).isEqualTo(3);
+        assertThat(friendUserList).extracting("userId").containsExactly(user2.getId(), user3.getId(), user4.getId());
     }
 }

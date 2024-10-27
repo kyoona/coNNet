@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static houseInception.gptComm.domain.FriendStatus.WAIT;
@@ -67,6 +68,17 @@ public class FriendService {
         List<UserResDto> requestSenders = friendRepository.findFriendRequestList(userId);
 
         return new DataListResDto<UserResDto>(0, requestSenders);
+    }
+
+    public DataListResDto<UserResDto> getFriendList(Long userId) {
+        List<Friend> friendList = friendRepository.findFriendListWithUser(userId);
+        List<UserResDto> friendUserList = friendList.stream()
+                .map(friend -> friend.getSender().getId().equals(userId) ? friend.getRecipient() : friend.getSender())
+                .sorted(Comparator.comparing(User::getUserName))
+                .map(UserResDto::new)
+                .toList();
+
+        return new DataListResDto<UserResDto>(0, friendUserList);
     }
 
     private void checkAlreadyFriendRelation(Long userId, Long targetId){

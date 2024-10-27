@@ -1,6 +1,7 @@
 package houseInception.gptComm.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import houseInception.gptComm.domain.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,5 +18,11 @@ public class UserResDto {
         this.userId = userId;
         this.userName = userName;
         this.userProfile = userProfile;
+    }
+
+    public UserResDto(User user) {
+        this.userId = user.getId();
+        this.userName = user.getUserName();
+        this.userProfile = user.getUserProfile();
     }
 }

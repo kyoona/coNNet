@@ -2,6 +2,7 @@ package houseInception.gptComm.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import houseInception.gptComm.domain.Friend;
 import houseInception.gptComm.domain.FriendStatus;
 import houseInception.gptComm.domain.QFriend;
 import houseInception.gptComm.domain.QUser;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static houseInception.gptComm.domain.FriendStatus.ACCEPT;
 import static houseInception.gptComm.domain.FriendStatus.WAIT;
 import static houseInception.gptComm.domain.QFriend.friend;
 import static houseInception.gptComm.domain.QUser.user;
@@ -29,6 +31,19 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
                 .join(user).on(user.id.eq(friend.sender.id))
                 .where(friend.recipient.id.eq(userId),
                         friend.acceptStatus.eq(WAIT))
+                .fetch();
+    }
+
+    @Override
+    public List<Friend> findFriendListWithUser(Long userId) {
+        QUser sender = new QUser("sender");
+        QUser recipient = new QUser("recipient");
+
+        return query.selectFrom(friend)
+                .join(friend.sender, sender).fetchJoin()
+                .join(friend.recipient, recipient).fetchJoin()
+                .where((friend.recipient.id.eq(userId).or(friend.sender.id.eq(userId))
+                        .and(friend.acceptStatus.eq(ACCEPT))))
                 .fetch();
     }
 
