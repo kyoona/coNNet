@@ -12,6 +12,7 @@ import houseInception.gptComm.externalServiceProvider.gpt.GptResDto;
 import houseInception.gptComm.repository.ChatRoomRepository;
 import houseInception.gptComm.repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +64,17 @@ public class ChatRoomService {
         em.flush();
 
         return new GptChatResDto(chatRoom.getChatRoomUuid(), chatRoom.getTitle(), userChat.getId(), gptChat.getId(), content);
+    }
+
+    @Transactional
+    public Long updateChatRoom(Long userId, String chatRoomUuid, String title) {
+        checkExistChatRoom(chatRoomUuid);
+        ChatRoom chatRoom = findChatRoomByUuid(chatRoomUuid);
+        checkChatRoomUser(chatRoom.getId(), userId);
+
+        chatRoom.updateChatRoom(title);
+
+        return chatRoom.getId();
     }
 
     @Transactional

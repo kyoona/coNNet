@@ -31,6 +31,15 @@ public class ChatRoomController {
         return new BaseResponse<>(result);
     }
 
+    @PatchMapping("/{chatRoomUuid}")
+    public BaseResponse updateChatRoom(@PathVariable String chatRoomUuid,
+                               @RequestBody @Valid ChatRoomUpdateDto chatRoomUpdateDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = chatRoomService.updateChatRoom(userId, chatRoomUuid, chatRoomUpdateDto.getTitle());
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
     @DeleteMapping("/{chatRoomUuid}")
     public BaseResponse<BaseResultDto> deleteChatRoom(@PathVariable String chatRoomUuid){
         Long userId = UserAuthorizationUtil.getLoginUserId();
@@ -41,7 +50,7 @@ public class ChatRoomController {
 
     @GetMapping("/gpt/{chatRoomUuid}")
     public BaseResponse<GptChatRoomChatListResDto> getGptChatRoomChatList(@PathVariable String chatRoomUuid,
-                                                            @RequestParam(defaultValue = "1") int page){
+                                                                          @RequestParam(defaultValue = "1") int page){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         GptChatRoomChatListResDto result = chatRoomService.getGptChatRoomChatList(userId, chatRoomUuid, page);
 

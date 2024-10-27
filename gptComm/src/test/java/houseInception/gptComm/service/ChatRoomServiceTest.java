@@ -40,11 +40,15 @@ class ChatRoomServiceTest {
     EntityManager em;
 
     User user1;
+    User user2;
 
     @BeforeEach
     void beforeEach(){
         user1 = User.create("user1", null, null, null);
         userRepository.save(user1);
+
+        user2 = User.create("user2", null, null, null);
+        userRepository.save(user2);
     }
 
 //    @AfterEach
@@ -131,6 +135,33 @@ class ChatRoomServiceTest {
         assertThat(data.size()).isEqualTo(2);
         assertThat(data).extracting("chatRoomUuid").containsExactly(chatRoom2.getChatRoomUuid(), chatRoom1.getChatRoomUuid());
 
+    }
+
+    @Test
+    void updateChatRoom() {
+        //given
+        ChatRoom chatRoom = ChatRoom.createGptRoom(user1);
+        chatRoomRepository.save(chatRoom);
+
+        //when
+        String title = "new title";
+        chatRoomService.updateChatRoom(user1.getId(), chatRoom.getChatRoomUuid(), title);
+
+        //then
+        ChatRoom findChatRoom = chatRoomRepository.findById(chatRoom.getId()).orElse(null);
+        assertThat(findChatRoom).isNotNull();
+        assertThat(findChatRoom.getTitle()).isEqualTo(title);
+    }
+
+    @Test
+    void updateChatRoom_권한X() {
+        //given
+        ChatRoom chatRoom = ChatRoom.createGptRoom(user1);
+        chatRoomRepository.save(chatRoom);
+
+        //when
+        String title = "new title";
+        assertThatThrownBy(() -> chatRoomService.updateChatRoom(user2.getId(), chatRoom.getChatRoomUuid(), title)).isInstanceOf(ChatRoomException.class);
     }
 
     @Test
