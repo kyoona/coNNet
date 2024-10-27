@@ -2,11 +2,11 @@ package houseInception.gptComm.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import static houseInception.gptComm.domain.FriendStatus.WAIT;
-import static houseInception.gptComm.domain.Status.ALIVE;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
@@ -28,6 +28,11 @@ public class Friend extends BaseTime{
     @Enumerated(EnumType.STRING)
     private FriendStatus acceptStatus = WAIT;
 
-    @Enumerated(EnumType.STRING)
-    private Status status = ALIVE;
+    public static Friend createFriend(User user, User targetUser){
+        Friend friend = new Friend();
+        friend.sender = user;
+        friend.recipient = targetUser;
+
+        return friend;
+    }
 }
