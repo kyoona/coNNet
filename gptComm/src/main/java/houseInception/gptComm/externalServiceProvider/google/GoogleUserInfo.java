@@ -8,11 +8,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GoogleUserInfo {
-    private String family_name;
+    private String iss;
+    private String azp;
+    private String aud;
+    private String sub;
+    private String email;
+    private boolean emailVerified;
+    private long nbf;
     private String name;
     private String picture;
-    private String email;
-    private String given_name;
-    private String id;
-    private boolean verified_email;
+    private String givenName;
+    private String familyName;
+    private long iat;
+    private long exp;
+    private String jti;
+    private String alg;
+    private String kid;
+    private String typ;
 }
