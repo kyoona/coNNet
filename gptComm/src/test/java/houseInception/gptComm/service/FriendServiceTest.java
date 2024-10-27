@@ -1,7 +1,6 @@
 package houseInception.gptComm.service;
 
 import houseInception.gptComm.domain.Friend;
-import houseInception.gptComm.domain.FriendStatus;
 import houseInception.gptComm.domain.User;
 import houseInception.gptComm.dto.DataListResDto;
 import houseInception.gptComm.dto.UserResDto;
@@ -9,9 +8,7 @@ import houseInception.gptComm.exception.FriendException;
 import houseInception.gptComm.repository.FriendRepository;
 import houseInception.gptComm.repository.UserRepository;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.AssertionsKt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +21,6 @@ import java.util.NoSuchElementException;
 import static houseInception.gptComm.domain.FriendStatus.ACCEPT;
 import static houseInception.gptComm.domain.FriendStatus.WAIT;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -80,7 +76,7 @@ class FriendServiceTest {
         Friend friend = friendRepository.findById(friendId).orElse(null);
         assertThat(friend).isNotNull();
         assertThat(friend.getSender().getId()).isEqualTo(user1.getId());
-        assertThat(friend.getRecipient().getId()).isEqualTo(user2.getId());
+        assertThat(friend.getReceiver().getId()).isEqualTo(user2.getId());
         assertThat(friend.getAcceptStatus()).isEqualTo(WAIT);
     }
 
@@ -203,5 +199,33 @@ class FriendServiceTest {
         List<UserResDto> friendUserList = result.getData();
         assertThat(friendUserList.size()).isEqualTo(3);
         assertThat(friendUserList).extracting("userId").containsExactly(user2.getId(), user3.getId(), user4.getId());
+    }
+
+    @Test
+    void deleteFriend_sender가() {
+        //given
+        Friend friend1 = Friend.createFriend(user1, user2);
+        friend1.accept();
+        friendRepository.save(friend1);
+
+        //when
+        Long friendId = friendService.deleteFriend(user1.getId(), user2.getId());
+
+        //then
+        assertThatThrownBy(() -> friendRepository.findById(friendId).orElseThrow()).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void deleteFriend_recipient가() {
+        //given
+        Friend friend1 = Friend.createFriend(user1, user2);
+        friend1.accept();
+        friendRepository.save(friend1);
+
+        //when
+        Long friendId = friendService.deleteFriend(user2.getId(), user1.getId());
+
+        //then
+        assertThatThrownBy(() -> friendRepository.findById(friendId).orElseThrow()).isInstanceOf(NoSuchElementException.class);
     }
 }

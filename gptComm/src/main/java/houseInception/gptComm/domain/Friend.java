@@ -2,7 +2,6 @@ package houseInception.gptComm.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,7 +23,7 @@ public class Friend extends BaseTime{
 
     @JoinColumn(name = "recipientId")
     @ManyToOne(fetch = FetchType.LAZY)
-    private User recipient;
+    private User receiver;
 
     @Enumerated(EnumType.STRING)
     private FriendStatus acceptStatus = WAIT;
@@ -32,7 +31,7 @@ public class Friend extends BaseTime{
     public static Friend createFriend(User user, User targetUser){
         Friend friend = new Friend();
         friend.sender = user;
-        friend.recipient = targetUser;
+        friend.receiver = targetUser;
 
         return friend;
     }

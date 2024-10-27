@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static houseInception.gptComm.domain.FriendStatus.ACCEPT;
 import static houseInception.gptComm.domain.FriendStatus.WAIT;
@@ -29,20 +30,32 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
                         user.id, user.userName, user.userProfile))
                 .from(friend)
                 .join(user).on(user.id.eq(friend.sender.id))
-                .where(friend.recipient.id.eq(userId),
+                .where(friend.receiver.id.eq(userId),
                         friend.acceptStatus.eq(WAIT))
                 .fetch();
     }
 
     @Override
+    public Optional<Friend> findFriendSenderOrReceiver(Long userId1, Long userId2) {
+        Friend findFriend = query.selectFrom(friend)
+                .where(
+                        (friend.sender.id.eq(userId1).and(friend.receiver.id.eq(userId2)))
+                                .or(friend.sender.id.eq(userId2).and(friend.receiver.id.eq(userId1)))
+                )
+                .fetchFirst();
+
+        return Optional.ofNullable(findFriend);
+    }
+
+    @Override
     public List<Friend> findFriendListWithUser(Long userId) {
         QUser sender = new QUser("sender");
-        QUser recipient = new QUser("recipient");
+        QUser receiver = new QUser("receiver");
 
         return query.selectFrom(friend)
                 .join(friend.sender, sender).fetchJoin()
-                .join(friend.recipient, recipient).fetchJoin()
-                .where((friend.recipient.id.eq(userId).or(friend.sender.id.eq(userId))
+                .join(friend.receiver, receiver).fetchJoin()
+                .where((friend.receiver.id.eq(userId).or(friend.sender.id.eq(userId))
                         .and(friend.acceptStatus.eq(ACCEPT))))
                 .fetch();
     }
@@ -52,8 +65,8 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
         Long count = query.select(friend.count())
                 .from(friend)
                 .where(
-                        (friend.sender.id.eq(userId).and(friend.recipient.id.eq(targetId)))
-                                .or(friend.sender.id.eq(targetId).and(friend.recipient.id.eq(userId)))
+                        (friend.sender.id.eq(userId).and(friend.receiver.id.eq(targetId)))
+                                .or(friend.sender.id.eq(targetId).and(friend.receiver.id.eq(userId)))
                 )
                 .fetchFirst();
 

@@ -15,7 +15,7 @@ public class FriendController {
 
     private final FriendService friendService;
 
-    @PostMapping("/{userId}")
+    @PostMapping("/{targetId}")
     public BaseResponse<BaseResultDto> requestFriend(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.requestFriend(userId, targetId);
@@ -23,7 +23,7 @@ public class FriendController {
         return BaseResponse.getSimpleRes(resultId);
     }
 
-    @PostMapping("/{userId}/accept")
+    @PostMapping("/{targetId}/accept")
     public BaseResponse<BaseResultDto> acceptFriendRequest(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.acceptFriendRequest(userId, targetId);
@@ -31,10 +31,18 @@ public class FriendController {
         return BaseResponse.getSimpleRes(resultId);
     }
 
-    @PostMapping("/{userId}/deny")
+    @PostMapping("/{targetId}/deny")
     public BaseResponse<BaseResultDto> denyFriendRequest(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.denyFriendRequest(userId, targetId);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @DeleteMapping("/{targetId}")
+    public BaseResponse<BaseResultDto> deleteFriend(@PathVariable Long targetId){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = friendService.deleteFriend(userId, targetId);
 
         return BaseResponse.getSimpleRes(resultId);
     }

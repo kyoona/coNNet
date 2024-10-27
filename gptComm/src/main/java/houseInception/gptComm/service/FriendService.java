@@ -64,6 +64,16 @@ public class FriendService {
         return friend.getId();
     }
 
+    @Transactional
+    public Long deleteFriend(Long userId, Long targetId) {
+        checkExistUser(targetId);
+
+        Friend friend = findFriendSenderOrReceiver(userId, targetId);
+        friendRepository.delete(friend);
+
+        return friend.getId();
+    }
+
     public DataListResDto<UserResDto> getFriendWaitList(Long userId) {
         List<UserResDto> requestSenders = friendRepository.findFriendRequestList(userId);
 
@@ -73,7 +83,7 @@ public class FriendService {
     public DataListResDto<UserResDto> getFriendList(Long userId) {
         List<Friend> friendList = friendRepository.findFriendListWithUser(userId);
         List<UserResDto> friendUserList = friendList.stream()
-                .map(friend -> friend.getSender().getId().equals(userId) ? friend.getRecipient() : friend.getSender())
+                .map(friend -> friend.getSender().getId().equals(userId) ? friend.getReceiver() : friend.getSender())
                 .sorted(Comparator.comparing(User::getUserName))
                 .map(UserResDto::new)
                 .toList();
@@ -87,8 +97,8 @@ public class FriendService {
         }
     }
 
-    private void checkHasFriendRequest(Long senderId, Long recipientId){
-        if(!friendRepository.existsBySenderIdAndRecipientIdAndAcceptStatus(senderId, recipientId, WAIT)){
+    private void checkHasFriendRequest(Long senderId, Long receiverId){
+        if(!friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(senderId, receiverId, WAIT)){
             throw new FriendException(NO_SUCH_FRIEND_REQUEST);
         }
     }
@@ -108,9 +118,18 @@ public class FriendService {
         return user;
     }
 
-    private Friend findFriend(Long senderId, Long recipientId, FriendStatus acceptStatus){
-        Friend friend = friendRepository.findBySenderIdAndRecipientIdAndAcceptStatus(senderId, recipientId, acceptStatus).orElse(null);
+    private Friend findFriend(Long senderId, Long receiverId, FriendStatus acceptStatus){
+        Friend friend = friendRepository.findBySenderIdAndReceiverIdAndAcceptStatus(senderId, receiverId, acceptStatus).orElse(null);
         if(friend == null){
+            throw new FriendException(NO_SUCH_FRIEND);
+        }
+
+        return friend;
+    }
+
+    private Friend findFriendSenderOrReceiver(Long user1, Long user2){
+        Friend friend = friendRepository.findFriendSenderOrReceiver(user1, user2).orElse(null);
+        if (friend == null) {
             throw new FriendException(NO_SUCH_FRIEND);
         }
 
