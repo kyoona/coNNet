@@ -52,6 +52,10 @@ public class ChatRoom extends BaseTime {
         return chatRoom;
     }
 
+    public void updateChatRoom(String title){
+        this.title = title;
+    }
+
     public Chat addUserChatToGpt(ChatRoomUser writer, String content){
         if(writer.getChatRoom().id.equals(this.id) && this.chatRoomType.equals(GPT)){
             Chat chat = Chat.createUserChatToGpt(this, writer, content);
