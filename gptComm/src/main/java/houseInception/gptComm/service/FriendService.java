@@ -37,7 +37,7 @@ public class FriendService {
 
         checkAlreadyFriendRelation(userId, targetId);
 
-        if(!userId.equals(targetId)){
+        if(userId.equals(targetId)){
             throw new FriendException(CANT_NOT_REQUEST_SELF);
         }
 

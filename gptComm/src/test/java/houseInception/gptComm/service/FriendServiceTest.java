@@ -101,6 +101,11 @@ class FriendServiceTest {
     }
 
     @Test
+    void requestFriend_스스로에게_친구_요청() {
+        assertThatThrownBy(() -> friendService.requestFriend(user1.getId(), user1.getId())).isInstanceOf(FriendException.class);
+    }
+
+    @Test
     void acceptFriendRequest() {
         //given
         Friend friend = Friend.createFriend(user1, user2);
