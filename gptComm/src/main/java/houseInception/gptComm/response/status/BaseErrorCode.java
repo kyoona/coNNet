@@ -21,6 +21,7 @@ public enum BaseErrorCode implements StatusCode{
     NO_SUCH_FRIEND(40005, "친구가 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     ALREADY_FRIEND_REQUEST(40006, "이미 요청된 관계입니다.", HttpStatus.BAD_REQUEST),
     NO_SUCH_FRIEND_REQUEST(40007, "요청이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
+    CANT_NOT_REQUEST_SELF(40008, "본인에게 친구 요청을 보낼 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     INVALID_GOOGLE_TOKEN(40101, "유효하지 않은 Google Access Token입니다.", HttpStatus.UNAUTHORIZED),
     INVALID_REFRESH_TOKEN(40102, "유효하지 않은 Refresh Token입니다.", HttpStatus.UNAUTHORIZED),

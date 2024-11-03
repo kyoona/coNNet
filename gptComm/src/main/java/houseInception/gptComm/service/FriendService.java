@@ -9,6 +9,7 @@ import houseInception.gptComm.exception.FriendException;
 import houseInception.gptComm.exception.UserException;
 import houseInception.gptComm.repository.FriendRepository;
 import houseInception.gptComm.repository.UserRepository;
+import houseInception.gptComm.response.status.BaseErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,10 @@ public class FriendService {
         User targetUser = findUser(targetId);
 
         checkAlreadyFriendRelation(userId, targetId);
+
+        if(!userId.equals(targetId)){
+            throw new FriendException(CANT_NOT_REQUEST_SELF);
+        }
 
         Friend friend = Friend.createFriend(user, targetUser);
         friendRepository.save(friend);
