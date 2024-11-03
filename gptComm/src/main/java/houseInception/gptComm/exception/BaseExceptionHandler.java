@@ -50,14 +50,21 @@ public class BaseExceptionHandler {
 
     @ExceptionHandler(UserException.class)
     public ResponseEntity<BaseErrorResponse> handleUserException(UserException e) {
-        log.error("User Exception: {}", e.getMessage(), e);
+        log.error("User Exception<{}>: {}", e.getStatus().getMessage(), e);
 
         return BaseErrorResponse.get(e.getStatus());
     }
 
     @ExceptionHandler(ChatRoomException.class)
     public ResponseEntity<BaseErrorResponse> handleChatRoomException(ChatRoomException e) {
-        log.error("ChatRoom Exception: {}", e.getMessage(), e);
+        log.error("ChatRoom Exception<{}>: {}", e.getStatus().getMessage(), e);
+
+        return BaseErrorResponse.get(e.getStatus());
+    }
+
+    @ExceptionHandler(FriendException.class)
+    public ResponseEntity<BaseErrorResponse> handleFriendExceptionn(FriendException e) {
+        log.error("Friend Exception<{}>: {}", e.getStatus().getMessage(), e);
 
         return BaseErrorResponse.get(e.getStatus());
     }
