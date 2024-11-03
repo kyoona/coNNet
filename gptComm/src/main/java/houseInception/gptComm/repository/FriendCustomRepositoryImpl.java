@@ -6,6 +6,7 @@ import houseInception.gptComm.domain.Friend;
 import houseInception.gptComm.domain.FriendStatus;
 import houseInception.gptComm.domain.QFriend;
 import houseInception.gptComm.domain.QUser;
+import houseInception.gptComm.dto.DefaultUserResDto;
 import houseInception.gptComm.dto.UserResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -25,8 +26,8 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
     private final JPAQueryFactory query;
 
     @Override
-    public List<UserResDto> findFriendRequestList(Long userId) {
-        return query.select(Projections.constructor(UserResDto.class,
+    public List<DefaultUserResDto> findFriendRequestList(Long userId) {
+        return query.select(Projections.constructor(DefaultUserResDto.class,
                         user.id, user.userName, user.userProfile))
                 .from(friend)
                 .join(user).on(user.id.eq(friend.sender.id))

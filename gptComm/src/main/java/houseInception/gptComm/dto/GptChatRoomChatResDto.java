@@ -18,7 +18,7 @@ public class GptChatRoomChatResDto {
     private Long chatId;
     private String content;
     private ChatterRole writerRole;
-    private UserResDto writer;
+    private DefaultUserResDto writer;
     private LocalDateTime createAt;
 
     @QueryProjection
@@ -31,7 +31,7 @@ public class GptChatRoomChatResDto {
         if (writerRole == GPT) {
             this.writer = null;
         }else {
-            this.writer = new UserResDto(writerId, writerName, writerProfile);
+            this.writer = new DefaultUserResDto(writerId, writerName, writerProfile);
         }
     }
 }
