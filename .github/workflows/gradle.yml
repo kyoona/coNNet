@@ -79,6 +79,7 @@ jobs:
             --log-opt awslogs-region=ap-northeast-2 \
             --log-opt awslogs-group=house-inception \
             --log-opt awslogs-stream=i-01247077d8dd0e1c2 \
+            --log-opt awslogs-multiline-pattern="^\[[a-f0-9-]{36}\]" \
             --network="host" \
             --env-file ./env.list \
             kyoona/gpt-service:latest
