@@ -20,14 +20,11 @@ public class UserService {
     private final UserRepository userRepository;
 
     public UserResDto getUserInfo(Long userId, String email) {
-        User findUser;
         if (email == null) {
-            findUser = findUser(userId);
+            return new UserResDto(findUser(userId));
         }else {
-            findUser = findUserByEmail(email);
+            return userRepository.findUserByEmailWithFriendRelation(userId, email);
         }
-
-        return new UserResDto(findUser);
     }
 
     private User findUserByEmail(String email){

@@ -3,6 +3,7 @@ package houseInception.gptComm.service;
 import houseInception.gptComm.domain.Friend;
 import houseInception.gptComm.domain.User;
 import houseInception.gptComm.dto.DataListResDto;
+import houseInception.gptComm.dto.DefaultUserResDto;
 import houseInception.gptComm.dto.UserResDto;
 import houseInception.gptComm.exception.FriendException;
 import houseInception.gptComm.repository.FriendRepository;
@@ -170,10 +171,10 @@ class FriendServiceTest {
         friendRepository.save(friend3);
 
         //when
-        DataListResDto<UserResDto> result = friendService.getFriendWaitList(user1.getId());
+        DataListResDto<DefaultUserResDto> result = friendService.getFriendWaitList(user1.getId());
 
         //then
-        List<UserResDto> senderList = result.getData();
+        List<DefaultUserResDto> senderList = result.getData();
         assertThat(senderList.size()).isEqualTo(2);
         assertThat(senderList).extracting("userId").contains(user2.getId(), user3.getId());
 
@@ -198,10 +199,10 @@ class FriendServiceTest {
         friendRepository.save(friend4);
 
         //when
-        DataListResDto<UserResDto> result = friendService.getFriendList(user1.getId());
+        DataListResDto<DefaultUserResDto> result = friendService.getFriendList(user1.getId());
 
         //then
-        List<UserResDto> friendUserList = result.getData();
+        List<DefaultUserResDto> friendUserList = result.getData();
         assertThat(friendUserList.size()).isEqualTo(3);
         assertThat(friendUserList).extracting("userId").containsExactly(user2.getId(), user3.getId(), user4.getId());
     }

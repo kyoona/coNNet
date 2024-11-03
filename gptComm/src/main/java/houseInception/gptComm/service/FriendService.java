@@ -4,6 +4,7 @@ import houseInception.gptComm.domain.Friend;
 import houseInception.gptComm.domain.FriendStatus;
 import houseInception.gptComm.domain.User;
 import houseInception.gptComm.dto.DataListResDto;
+import houseInception.gptComm.dto.DefaultUserResDto;
 import houseInception.gptComm.dto.UserResDto;
 import houseInception.gptComm.exception.FriendException;
 import houseInception.gptComm.exception.UserException;
@@ -79,21 +80,21 @@ public class FriendService {
         return friend.getId();
     }
 
-    public DataListResDto<UserResDto> getFriendWaitList(Long userId) {
-        List<UserResDto> requestSenders = friendRepository.findFriendRequestList(userId);
+    public DataListResDto<DefaultUserResDto> getFriendWaitList(Long userId) {
+        List<DefaultUserResDto> requestSenders = friendRepository.findFriendRequestList(userId);
 
-        return new DataListResDto<UserResDto>(0, requestSenders);
+        return new DataListResDto<DefaultUserResDto>(0, requestSenders);
     }
 
-    public DataListResDto<UserResDto> getFriendList(Long userId) {
+    public DataListResDto<DefaultUserResDto> getFriendList(Long userId) {
         List<Friend> friendList = friendRepository.findFriendListWithUser(userId);
-        List<UserResDto> friendUserList = friendList.stream()
+        List<DefaultUserResDto> friendUserList = friendList.stream()
                 .map(friend -> friend.getSender().getId().equals(userId) ? friend.getReceiver() : friend.getSender())
                 .sorted(Comparator.comparing(User::getUserName))
-                .map(UserResDto::new)
+                .map(DefaultUserResDto::new)
                 .toList();
 
-        return new DataListResDto<UserResDto>(0, friendUserList);
+        return new DataListResDto<DefaultUserResDto>(0, friendUserList);
     }
 
     private void checkAlreadyFriendRelation(Long userId, Long targetId){

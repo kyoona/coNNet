@@ -1,6 +1,7 @@
 package houseInception.gptComm.contoller;
 
 import houseInception.gptComm.dto.DataListResDto;
+import houseInception.gptComm.dto.DefaultUserResDto;
 import houseInception.gptComm.dto.UserResDto;
 import houseInception.gptComm.response.BaseResponse;
 import houseInception.gptComm.response.BaseResultDto;
@@ -48,17 +49,17 @@ public class FriendController {
     }
 
     @GetMapping("/wait")
-    public BaseResponse<DataListResDto<UserResDto>> getFriendWaitList(){
+    public BaseResponse<DataListResDto<DefaultUserResDto>> getFriendWaitList(){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        DataListResDto<UserResDto> result = friendService.getFriendWaitList(userId);
+        DataListResDto<DefaultUserResDto> result = friendService.getFriendWaitList(userId);
 
         return new BaseResponse<>(result);
     }
 
     @GetMapping
-    public BaseResponse<DataListResDto<UserResDto>> getFriendList(){
+    public BaseResponse<DataListResDto<DefaultUserResDto>> getFriendList(){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        DataListResDto<UserResDto> result = friendService.getFriendList(userId);
+        DataListResDto<DefaultUserResDto> result = friendService.getFriendList(userId);
 
         return new BaseResponse<>(result);
     }
