@@ -1,6 +1,7 @@
 package houseInception.gptComm.repository;
 
 import houseInception.gptComm.domain.Friend;
+import houseInception.gptComm.dto.DefaultUserResDto;
 import houseInception.gptComm.dto.UserResDto;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface FriendCustomRepository {
     Optional<Friend> findFriendSenderOrReceiver(Long userId1, Long userId2);
     List<Friend> findFriendListWithUser(Long userId);
 
-    List<UserResDto> findFriendRequestList(Long userId);
+    List<DefaultUserResDto> findFriendRequestList(Long userId);
 
     boolean existsFriend(Long userId, Long targetId);
 }
