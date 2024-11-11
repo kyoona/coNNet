@@ -1,4 +1,4 @@
-package houseInception.gptComm.domain.chatRoom;
+package houseInception.gptComm.domain.gptRoom;
 
 import houseInception.gptComm.domain.BaseTime;
 import houseInception.gptComm.domain.Status;
@@ -13,9 +13,9 @@ import static houseInception.gptComm.domain.Status.ALIVE;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Entity
-public class ChatRoomUser extends BaseTime {
+public class GptRoomUser extends BaseTime {
 
-    @Column(name = "chatRoomUserId")
+    @Column(name = "gptRoomUserId")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -23,15 +23,15 @@ public class ChatRoomUser extends BaseTime {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @JoinColumn(name = "chatRoomId")
+    @JoinColumn(name = "gptRoomId")
     @ManyToOne(fetch = FetchType.LAZY)
-    private ChatRoom chatRoom;
+    private GptRoom gptRoom;
 
     @Enumerated(value = EnumType.STRING)
     private Status status = ALIVE;
 
-    protected ChatRoomUser(User user, ChatRoom chatRoom) {
+    protected GptRoomUser(User user, GptRoom gptRoom) {
         this.user = user;
-        this.chatRoom = chatRoom;
+        this.gptRoom = gptRoom;
     }
 }

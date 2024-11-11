@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatRoomUpdateDto {
+public class GptRoomUpdateDto {
 
     @NotBlank
     private String title;

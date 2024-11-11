@@ -1,10 +1,8 @@
 package houseInception.gptComm.exception;
 
 import houseInception.gptComm.response.BaseErrorResponse;
-import houseInception.gptComm.response.status.BaseErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TypeMismatchException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -55,9 +53,9 @@ public class BaseExceptionHandler {
         return BaseErrorResponse.get(e.getStatus());
     }
 
-    @ExceptionHandler(ChatRoomException.class)
-    public ResponseEntity<BaseErrorResponse> handleChatRoomException(ChatRoomException e) {
-        log.error("ChatRoom Exception<{}>: {}", e.getStatus().getMessage(), e);
+    @ExceptionHandler(GptRoomException.class)
+    public ResponseEntity<BaseErrorResponse> handleChatRoomException(GptRoomException e) {
+        log.error("GptRoom Exception<{}>: {}", e.getStatus().getMessage(), e);
 
         return BaseErrorResponse.get(e.getStatus());
     }

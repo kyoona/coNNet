@@ -1,4 +1,4 @@
-package houseInception.gptComm.domain.chatRoom;
+package houseInception.gptComm.domain.gptRoom;
 
 import houseInception.gptComm.domain.BaseTime;
 import houseInception.gptComm.domain.ChatterRole;
@@ -15,19 +15,19 @@ import static houseInception.gptComm.domain.Status.ALIVE;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Entity
-public class Chat extends BaseTime {
+public class GptRoomChat extends BaseTime {
 
-    @Column(name = "chatId")
+    @Column(name = "GptRoomChatId")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JoinColumn(name = "chatRoomId")
     @ManyToOne(fetch = FetchType.LAZY)
-    private ChatRoom chatRoom;
+    private GptRoom gptRoom;
 
     @JoinColumn(name = "writerId")
     @ManyToOne(fetch = FetchType.LAZY)
-    private ChatRoomUser writer;
+    private GptRoomUser writer;
 
     @Enumerated(EnumType.STRING)
     private ChatterRole writerRole;
@@ -41,9 +41,9 @@ public class Chat extends BaseTime {
     @Enumerated(EnumType.STRING)
     private Status status = ALIVE;
 
-    protected static Chat createUserChatToGpt(ChatRoom chatRoom, ChatRoomUser writer, String content){
-        Chat chat = new Chat();
-        chat.chatRoom = chatRoom;
+    protected static GptRoomChat createUserChat(GptRoom gptRoom, GptRoomUser writer, String content){
+        GptRoomChat chat = new GptRoomChat();
+        chat.gptRoom = gptRoom;
         chat.writer = writer;
         chat.writerRole = USER;
         chat.content = content;
@@ -52,9 +52,9 @@ public class Chat extends BaseTime {
         return chat;
     }
 
-    protected static Chat createGptChat(ChatRoom chatRoom, String content){
-        Chat chat = new Chat();
-        chat.chatRoom = chatRoom;
+    protected static GptRoomChat createGptChat(GptRoom gptRoom, String content){
+        GptRoomChat chat = new GptRoomChat();
+        chat.gptRoom = gptRoom;
         chat.writer = null;
         chat.writerRole = GPT;
         chat.content = content;

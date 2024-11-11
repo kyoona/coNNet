@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatAddDto {
+public class GptRoomChatAddDto {
 
     private String chatRoomUuid;
 

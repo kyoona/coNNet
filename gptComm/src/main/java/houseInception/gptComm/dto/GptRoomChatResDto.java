@@ -13,7 +13,7 @@ import static houseInception.gptComm.domain.ChatterRole.GPT;
 @ToString
 @Getter
 @NoArgsConstructor
-public class GptChatRoomChatResDto {
+public class GptRoomChatResDto {
 
     private Long chatId;
     private String content;
@@ -22,7 +22,7 @@ public class GptChatRoomChatResDto {
     private LocalDateTime createAt;
 
     @QueryProjection
-    public GptChatRoomChatResDto(Long chatId, String content, ChatterRole writerRole, Long writerId, String writerName, String writerProfile, LocalDateTime createAt) {
+    public GptRoomChatResDto(Long chatId, String content, ChatterRole writerRole, Long writerId, String writerName, String writerProfile, LocalDateTime createAt) {
         this.chatId = chatId;
         this.content = content;
         this.writerRole = writerRole;

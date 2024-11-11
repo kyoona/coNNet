@@ -6,15 +6,15 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class GptChatRoomListResDto {
+public class GptRoomListResDto {
 
     private String chatRoomUuid;
     private String title;
     private LocalDateTime createAt;
 
     @QueryProjection
-    public GptChatRoomListResDto(String chatRoomUuid, String title, LocalDateTime createAt) {
-        this.chatRoomUuid = chatRoomUuid;
+    public GptRoomListResDto(String gptRoomUuid, String title, LocalDateTime createAt) {
+        this.chatRoomUuid = gptRoomUuid;
         this.title = title;
         this.createAt = createAt;
     }

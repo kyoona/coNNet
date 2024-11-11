@@ -14,5 +14,5 @@ public class GptChatRoomChatListResDto {
     private String chatRoomUuid;
     private String title;
     private int page;
-    private List<GptChatRoomChatResDto> messages;
+    private List<GptRoomChatResDto> messages;
 }
