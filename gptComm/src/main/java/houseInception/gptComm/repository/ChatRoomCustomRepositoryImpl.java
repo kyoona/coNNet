@@ -64,8 +64,8 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository{
                         chatRoomUser.status.eq(ALIVE),
                         chatRoom.status.eq(ALIVE))
                 .orderBy(chatRoom.createdAt.desc())
-                .offset((page - 1) * 30)
-                .limit(31)
+                .offset((page - 1) * 5)
+                .limit(6)
                 .fetch();
     }
 
