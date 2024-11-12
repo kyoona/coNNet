@@ -25,14 +25,14 @@ jobs:
         host port: 3306
         container port: 3306
         mysql version: '8.0'
-        mysql database: 'gpt_service'
+        mysql database: 'connet'
         mysql root password: ${{ secrets.MYSQL_PASSWORD }}
     
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
 
     - name: Build with Gradle Wrapper
-      working-directory: gptComm
+      working-directory: connet
       env:
         DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -50,11 +50,11 @@ jobs:
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
     
     - name: Build Docker image
-      working-directory: gptComm
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/gpt-service:latest .
+      working-directory: connet
+      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/connet:latest .
 
     - name: Push Docker image to Docker Hub
-      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/gpt-service:latest
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/connet:latest
       
   deploy: 
     runs-on: ubuntu-latest
@@ -69,12 +69,12 @@ jobs:
         key : ${{ secrets.EC2_SSH_KEY }}
         port: 22
         script: |
-          docker pull kyoona/gpt-service:latest
-          docker stop gpt-service || true
-          docker rm gpt-service || true
+          docker pull kyoona/connet:latest
+          docker stop connet || true
+          docker rm connet || true
           
           docker run -d \
-            --name gpt-service \
+            --name connet \
             --log-driver=awslogs \
             --log-opt awslogs-region=ap-northeast-2 \
             --log-opt awslogs-group=house-inception \
@@ -82,4 +82,4 @@ jobs:
             --log-opt awslogs-multiline-pattern="^\[[a-f0-9-]{36}\]" \
             --network="host" \
             --env-file ./env.list \
-            kyoona/gpt-service:latest
+            kyoona/connet:latest
