@@ -2,8 +2,8 @@ package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.UserBlock;
-import houseInception.connet.dto.UserResDto;
 import houseInception.connet.exception.UserException;
+import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,25 +16,23 @@ import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_USER;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class UserBlockService {
 
+    private final UserBlockRepository userBlockRepository;
     private final UserRepository userRepository;
 
-    public UserResDto getUserInfo(Long userId, String email) {
-        if (email == null) {
-            return new UserResDto(findUser(userId));
-        }else {
-            return userRepository.findUserByEmailWithFriendRelation(userId, email);
-        }
-    }
+    @Transactional
+    public Long blockUser(Long userId, Long targetId) {
+        User targetUser = findUser(targetId);
+        User user = findUser(userId);
 
-    private User findUserByEmail(String email){
-        User user = userRepository.findByEmailAndStatus(email, ALIVE).orElse(null);
-        if (user == null) {
-            throw new UserException(NO_SUCH_USER);
-        }
+        UserBlock userBlock1 = UserBlock.create(user, targetUser);
+        userBlockRepository.save(userBlock1);
 
-        return user;
+        UserBlock userBlock2 = UserBlock.create(targetUser, user);
+        userBlockRepository.save(userBlock2);
+
+        return userBlock1.getId();
     }
 
     private User findUser(Long userId){
