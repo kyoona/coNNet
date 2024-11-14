@@ -1,13 +1,12 @@
 package houseInception.connet.contoller;
 
+import houseInception.connet.dto.DataListResDto;
+import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.BaseResultDto;
 import houseInception.connet.service.UserBlockService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/userBlocks")
 @RequiredArgsConstructor
@@ -22,5 +21,13 @@ public class UserBlockController {
         Long resultId = userBlockService.blockUser(userId, targetId);
 
         return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @GetMapping
+    public BaseResponse<DataListResDto<DefaultUserResDto>> getBlockUserList(){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        DataListResDto<DefaultUserResDto> result = userBlockService.getBlockUserList(userId);
+
+        return new BaseResponse<>(result);
     }
 }
