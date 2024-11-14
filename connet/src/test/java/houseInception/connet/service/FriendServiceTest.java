@@ -2,11 +2,13 @@ package houseInception.connet.service;
 
 import houseInception.connet.domain.Friend;
 import houseInception.connet.domain.User;
+import houseInception.connet.domain.UserBlock;
 import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.exception.FriendException;
 import houseInception.connet.repository.FriendRepository;
+import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
@@ -34,6 +36,8 @@ class FriendServiceTest {
     FriendRepository friendRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    UserBlockRepository userBlockRepository;
 
     @Autowired
     EntityManager em;
@@ -75,6 +79,16 @@ class FriendServiceTest {
 
         //then
         assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user1.getId(), user2.getId(), WAIT)).isTrue();
+    }
+
+    @Test
+    void requestFriend_차단된_사용자() {
+        //given
+        UserBlock userBlock = UserBlock.create(user1, user2);
+        userBlockRepository.save(userBlock);
+
+        //when
+        assertThatThrownBy(() -> friendService.requestFriend(user1.getId(), user2.getId())).isInstanceOf(FriendException.class);
     }
 
     @Test

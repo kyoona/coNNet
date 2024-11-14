@@ -9,6 +9,7 @@ import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.exception.FriendException;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.FriendRepository;
+import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +31,13 @@ public class FriendService {
 
     private final FriendRepository friendRepository;
     private final UserRepository userRepository;
+    private final UserBlockRepository userBlockRepository;
 
     @Transactional
     public Long requestFriend(Long userId, Long targetId) {
-        User user = findUser(userId);
         User targetUser = findUser(targetId);
+        checkUserBlock(userId, targetId);
+        User user = findUser(userId);
 
         if(userId.equals(targetId)){
             throw new FriendException(CANT_NOT_REQUEST_SELF);
@@ -115,6 +118,12 @@ public class FriendService {
     private void checkExistUser(Long userId){
         if (!userRepository.existsById(userId)){
             throw new UserException(NO_SUCH_USER);
+        }
+    }
+
+    private void checkUserBlock(Long userId, Long targetId){
+        if (userBlockRepository.existsByUserIdAndTargetId(userId, targetId)){
+            throw new FriendException(BLOCK_USER);
         }
     }
 
