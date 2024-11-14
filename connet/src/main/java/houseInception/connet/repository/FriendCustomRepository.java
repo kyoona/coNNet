@@ -8,7 +8,6 @@ import java.util.Optional;
 
 public interface FriendCustomRepository {
 
-    Optional<Friend> findFriendSenderOrReceiver(Long userId1, Long userId2);
     List<Friend> findFriendListWithUser(Long userId);
 
     List<DefaultUserResDto> findFriendRequestList(Long userId);

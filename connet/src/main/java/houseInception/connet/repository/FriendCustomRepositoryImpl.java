@@ -34,18 +34,6 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
     }
 
     @Override
-    public Optional<Friend> findFriendSenderOrReceiver(Long userId1, Long userId2) {
-        Friend findFriend = query.selectFrom(friend)
-                .where(
-                        (friend.sender.id.eq(userId1).and(friend.receiver.id.eq(userId2)))
-                                .or(friend.sender.id.eq(userId2).and(friend.receiver.id.eq(userId1)))
-                )
-                .fetchFirst();
-
-        return Optional.ofNullable(findFriend);
-    }
-
-    @Override
     public List<Friend> findFriendListWithUser(Long userId) {
         QUser sender = new QUser("sender");
         QUser receiver = new QUser("receiver");

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 
+import static houseInception.connet.domain.FriendStatus.ACCEPT;
 import static houseInception.connet.domain.FriendStatus.WAIT;
 import static houseInception.connet.response.status.BaseErrorCode.*;
 
@@ -77,10 +78,13 @@ public class FriendService {
     public Long deleteFriend(Long userId, Long targetId) {
         checkExistUser(targetId);
 
-        Friend friend = findFriendSenderOrReceiver(userId, targetId);
-        friendRepository.delete(friend);
+        Friend friend1 = findFriend(userId, targetId, ACCEPT);
+        friendRepository.delete(friend1);
 
-        return friend.getId();
+        Friend friend2 = findFriend(targetId, userId, ACCEPT);
+        friendRepository.delete(friend2);
+
+        return friend1.getId();
     }
 
     public DataListResDto<DefaultUserResDto> getFriendWaitList(Long userId) {
@@ -130,15 +134,6 @@ public class FriendService {
     private Friend findFriend(Long senderId, Long receiverId, FriendStatus acceptStatus){
         Friend friend = friendRepository.findBySenderIdAndReceiverIdAndAcceptStatus(senderId, receiverId, acceptStatus).orElse(null);
         if(friend == null){
-            throw new FriendException(NO_SUCH_FRIEND);
-        }
-
-        return friend;
-    }
-
-    private Friend findFriendSenderOrReceiver(Long user1, Long user2){
-        Friend friend = friendRepository.findFriendSenderOrReceiver(user1, user2).orElse(null);
-        if (friend == null) {
             throw new FriendException(NO_SUCH_FRIEND);
         }
 

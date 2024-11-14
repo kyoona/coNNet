@@ -202,30 +202,21 @@ class FriendServiceTest {
     }
 
     @Test
-    void deleteFriend_sender가() {
+    void deleteFriend() {
         //given
         Friend friend1 = Friend.createFriend(user1, user2);
         friend1.accept();
         friendRepository.save(friend1);
 
-        //when
-        Long friendId = friendService.deleteFriend(user1.getId(), user2.getId());
-
-        //then
-        assertThatThrownBy(() -> friendRepository.findById(friendId).orElseThrow()).isInstanceOf(NoSuchElementException.class);
-    }
-
-    @Test
-    void deleteFriend_recipient가() {
-        //given
-        Friend friend1 = Friend.createFriend(user1, user2);
-        friend1.accept();
-        friendRepository.save(friend1);
+        Friend friend2 = Friend.createFriend(user2, user1);
+        friend2.accept();
+        friendRepository.save(friend2);
 
         //when
-        Long friendId = friendService.deleteFriend(user2.getId(), user1.getId());
+        friendService.deleteFriend(user1.getId(), user2.getId());
 
         //then
-        assertThatThrownBy(() -> friendRepository.findById(friendId).orElseThrow()).isInstanceOf(NoSuchElementException.class);
+        assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user1.getId(), user2.getId(), ACCEPT)).isFalse();
+        assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user2.getId(), user1.getId(), ACCEPT)).isFalse();
     }
 }
