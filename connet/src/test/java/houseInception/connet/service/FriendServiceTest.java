@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static houseInception.connet.domain.FriendStatus.ACCEPT;
 import static houseInception.connet.domain.FriendStatus.WAIT;
@@ -50,19 +51,19 @@ class FriendServiceTest {
 
     @BeforeEach
     void beforeEach(){
-        user1 = User.create("user1", null, null, null);
+        user1 = User.create("user1", null, UUID.randomUUID().toString(), null);
         userRepository.save(user1);
 
-        user2 = User.create("user2", null, null, null);
+        user2 = User.create("user2", null, UUID.randomUUID().toString(), null);
         userRepository.save(user2);
 
-        user3 = User.create("user3", null, null, null);
+        user3 = User.create("user3", null, UUID.randomUUID().toString(), null);
         userRepository.save(user3);
 
-        user4 = User.create("user4", null, null, null);
+        user4 = User.create("user4", null, UUID.randomUUID().toString(), null);
         userRepository.save(user4);
 
-        user5 = User.create("user5", null, null, null);
+        user5 = User.create("user5", null, UUID.randomUUID().toString(), null);
         userRepository.save(user5);
     }
 
@@ -73,47 +74,56 @@ class FriendServiceTest {
     }
 
     @Test
-    void requestFriend() {
+    void requestFriendById() {
         //when
-        friendService.requestFriend(user1.getId(), user2.getId());
+        friendService.requestFriendById(user1.getId(), user2.getId());
 
         //then
         assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user1.getId(), user2.getId(), WAIT)).isTrue();
     }
 
     @Test
-    void requestFriend_차단된_사용자() {
+    void requestFriend_ById_차단된_사용자() {
         //given
         UserBlock userBlock = UserBlock.create(user1, user2);
         userBlockRepository.save(userBlock);
 
         //when
-        assertThatThrownBy(() -> friendService.requestFriend(user1.getId(), user2.getId())).isInstanceOf(FriendException.class);
+        assertThatThrownBy(() -> friendService.requestFriendById(user1.getId(), user2.getId())).isInstanceOf(FriendException.class);
     }
 
     @Test
-    void requestFriend_이미_요청() {
+    void requestFriend_ById_이미_요청() {
         //given
         Friend friend = Friend.createFriend(user1, user2);
         friendRepository.save(friend);
 
         //when
-        assertThatThrownBy(() -> friendService.requestFriend(user1.getId(), user2.getId())).isInstanceOf(FriendException.class);
+        assertThatThrownBy(() -> friendService.requestFriendById(user1.getId(), user2.getId())).isInstanceOf(FriendException.class);
     }
 
     @Test
-    void requestFriend_상대방이_이미_요청() {
+    void requestFriend_ById_상대방이_이미_요청() {
         //given
         Friend friend = Friend.createFriend(user1, user2);
         friendRepository.save(friend);
 
         //when
-        assertThatThrownBy(() -> friendService.requestFriend(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
+        assertThatThrownBy(() -> friendService.requestFriendById(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
     }
 
     @Test
-    void requestFriend_스스로에게_친구_요청() {
-        assertThatThrownBy(() -> friendService.requestFriend(user1.getId(), user1.getId())).isInstanceOf(FriendException.class);
+    void requestFriend_ById_스스로에게_친구_요청() {
+        assertThatThrownBy(() -> friendService.requestFriendById(user1.getId(), user1.getId())).isInstanceOf(FriendException.class);
+    }
+
+    @Test
+    void requestFriendByEmail() {
+        //when
+        friendService.requestFriendByEmail(user1.getId(), user2.getEmail());
+
+        //then
+        assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user1.getId(), user2.getId(), WAIT)).isTrue();
     }
 
     @Test

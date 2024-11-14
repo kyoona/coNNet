@@ -16,11 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 
 import static houseInception.connet.domain.FriendStatus.ACCEPT;
 import static houseInception.connet.domain.FriendStatus.WAIT;
+import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.response.status.BaseErrorCode.*;
 
 @Slf4j
@@ -34,7 +34,7 @@ public class FriendService {
     private final UserBlockRepository userBlockRepository;
 
     @Transactional
-    public Long requestFriend(Long userId, Long targetId) {
+    public Long requestFriendById(Long userId, Long targetId) {
         User targetUser = findUser(targetId);
         checkUserBlock(userId, targetId);
         User user = findUser(userId);
@@ -44,6 +44,24 @@ public class FriendService {
         }
 
         checkAlreadyFriendRequestOfTwoWay(userId, targetId);
+
+        Friend friend = Friend.createFriend(user, targetUser);
+        friendRepository.save(friend);
+
+        return friend.getId();
+    }
+
+    @Transactional
+    public Long requestFriendByEmail(Long userId, String email) {
+        User targetUser = findUserByEmail(email);
+        checkUserBlock(userId, targetUser.getId());
+        User user = findUser(userId);
+
+        if(userId.equals(targetUser.getId())){
+            throw new FriendException(CANT_NOT_REQUEST_SELF);
+        }
+
+        checkAlreadyFriendRequestOfTwoWay(userId, targetUser.getId());
 
         Friend friend = Friend.createFriend(user, targetUser);
         friendRepository.save(friend);
@@ -129,6 +147,15 @@ public class FriendService {
 
     private User findUser(Long userId){
         User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new UserException(NO_SUCH_USER);
+        }
+
+        return user;
+    }
+
+    private User findUserByEmail(String email){
+        User user = userRepository.findByEmailAndStatus(email, ALIVE).orElse(null);
         if (user == null) {
             throw new UserException(NO_SUCH_USER);
         }
