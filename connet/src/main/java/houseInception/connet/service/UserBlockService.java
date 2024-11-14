@@ -2,6 +2,7 @@ package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.UserBlock;
+import houseInception.connet.event.publisher.UserBlockEventPublisher;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
@@ -21,6 +22,8 @@ public class UserBlockService {
     private final UserBlockRepository userBlockRepository;
     private final UserRepository userRepository;
 
+    private final UserBlockEventPublisher userBlockEventPublisher;
+
     @Transactional
     public Long blockUser(Long userId, Long targetId) {
         User targetUser = findUser(targetId);
@@ -32,6 +35,8 @@ public class UserBlockService {
         UserBlock userBlock2 = UserBlock.create(targetUser, user);
         userBlockRepository.save(userBlock2);
 
+        userBlockEventPublisher.publishUserBlockEvent(user, targetUser);
+        
         return userBlock1.getId();
     }
 
