@@ -1,16 +1,15 @@
 package houseInception.connet.repository;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import houseInception.connet.domain.Friend;
-import houseInception.connet.domain.QUser;
 import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.FriendFilterDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import static houseInception.connet.domain.FriendStatus.ACCEPT;
 import static houseInception.connet.domain.FriendStatus.WAIT;
@@ -24,7 +23,7 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
     private final JPAQueryFactory query;
 
     @Override
-    public List<DefaultUserResDto> findFriendRequestList(Long userId) {
+    public List<DefaultUserResDto> getFriendRequestList(Long userId) {
         return query.select(Projections.constructor(DefaultUserResDto.class,
                         user.id, user.userName, user.userProfile))
                 .from(friend)
@@ -35,14 +34,21 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
     }
 
     @Override
-    public List<ActiveUserResDto> findFriendListWithUser(Long userId) {
+    public List<ActiveUserResDto> getFriendList(Long userId, FriendFilterDto filterDto) {
         return query.select(Projections.constructor(ActiveUserResDto.class,
                         user.id, user.userName, user.userProfile))
                 .from(friend)
                 .join(user).on(user.id.eq(friend.receiver.id))
                 .where(friend.sender.id.eq(userId),
-                        friend.acceptStatus.eq(ACCEPT))
+                        friend.acceptStatus.eq(ACCEPT),
+                        userNameContains(filterDto.getUserName()))
                 .fetch();
+    }
+
+    private BooleanExpression userNameContains(String userName) {
+        return (userName != null && !userName.isEmpty())
+                ? user.userName.contains(userName)
+                : null;
     }
 
     @Override

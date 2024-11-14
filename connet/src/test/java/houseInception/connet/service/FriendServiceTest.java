@@ -6,6 +6,7 @@ import houseInception.connet.domain.UserBlock;
 import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.FriendFilterDto;
 import houseInception.connet.exception.FriendException;
 import houseInception.connet.repository.FriendRepository;
 import houseInception.connet.repository.UserBlockRepository;
@@ -227,12 +228,39 @@ class FriendServiceTest {
         friendRepository.save(friendD1);
 
         //when
-        DataListResDto<ActiveUserResDto> result = friendService.getFriendList(user1.getId());
+        DataListResDto<ActiveUserResDto> result = friendService.getFriendList(user1.getId(), new FriendFilterDto());
 
         //then
         List<ActiveUserResDto> friendUserList = result.getData();
         assertThat(friendUserList.size()).isEqualTo(3);
         assertThat(friendUserList).extracting("userId").containsExactly(user2.getId(), user3.getId(), user4.getId());
+    }
+
+    @Test
+    void getFriendList_이름_필터() {
+        //given
+        Friend friendA1 = Friend.createFriend(user1, user2);
+        friendA1.accept();
+        friendRepository.save(friendA1);
+        Friend friendA2 = Friend.createFriend(user2, user1);
+        friendA2.accept();
+        friendRepository.save(friendA2);
+
+        Friend friendB1 = Friend.createFriend(user3, user1);
+        friendB1.accept();
+        friendRepository.save(friendB1);
+        Friend friendB2 = Friend.createFriend(user1, user3);
+        friendB2.accept();
+        friendRepository.save(friendB2);
+
+        //when
+        FriendFilterDto filterDto = new FriendFilterDto("2");
+        DataListResDto<ActiveUserResDto> result = friendService.getFriendList(user1.getId(), filterDto);
+
+        //then
+        List<ActiveUserResDto> friendUserList = result.getData();
+        assertThat(friendUserList.size()).isEqualTo(1);
+        assertThat(friendUserList.get(0).getUserId()).isEqualTo(user2.getId());
     }
 
     @Test

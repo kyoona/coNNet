@@ -6,6 +6,7 @@ import houseInception.connet.domain.User;
 import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.FriendFilterDto;
 import houseInception.connet.exception.FriendException;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.FriendRepository;
@@ -110,13 +111,13 @@ public class FriendService {
     }
 
     public DataListResDto<DefaultUserResDto> getFriendWaitList(Long userId) {
-        List<DefaultUserResDto> requestSenders = friendRepository.findFriendRequestList(userId);
+        List<DefaultUserResDto> requestSenders = friendRepository.getFriendRequestList(userId);
 
         return new DataListResDto<DefaultUserResDto>(0, requestSenders);
     }
 
-    public DataListResDto<ActiveUserResDto> getFriendList(Long userId) {
-        List<ActiveUserResDto> friendList = friendRepository.findFriendListWithUser(userId);
+    public DataListResDto<ActiveUserResDto> getFriendList(Long userId, FriendFilterDto friendFilter) {
+        List<ActiveUserResDto> friendList = friendRepository.getFriendList(userId, friendFilter);
 
         return new DataListResDto<ActiveUserResDto>(0, friendList);
     }
