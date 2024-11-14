@@ -74,7 +74,6 @@ class FriendServiceTest {
 
         //then
         assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user1.getId(), user2.getId(), WAIT)).isTrue();
-        assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user2.getId(), user1.getId(), WAIT)).isTrue();
     }
 
     @Test

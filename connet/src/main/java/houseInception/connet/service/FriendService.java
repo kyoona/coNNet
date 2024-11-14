@@ -40,22 +40,23 @@ public class FriendService {
 
         checkAlreadyFriendRelation(userId, targetId);
 
-        Friend friend1 = Friend.createFriend(user, targetUser);
-        friendRepository.save(friend1);
+        Friend friend = Friend.createFriend(user, targetUser);
+        friendRepository.save(friend);
 
-        Friend friend2 = Friend.createFriend(targetUser, user);
-        friendRepository.save(friend2);
-
-        return friend1.getId();
+        return friend.getId();
     }
 
     @Transactional
     public Long acceptFriendRequest(Long userId, Long targetId) {
-        checkExistUser(targetId);
+        User targetUser = findUser(targetId);
         checkHasFriendRequest(targetId, userId);
+        User user = findUser(userId);
 
-        Friend friend = findFriend(targetId, userId, WAIT);
-        friend.accept();
+        Friend requestFriend = findFriend(targetId, userId, WAIT);
+        requestFriend.accept();
+
+        Friend friend = Friend.createFriend(user, targetUser);
+        friendRepository.save(friend);
 
         return friend.getId();
     }
