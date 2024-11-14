@@ -38,7 +38,7 @@ public class FriendService {
             throw new FriendException(CANT_NOT_REQUEST_SELF);
         }
 
-        checkAlreadyFriendRelation(userId, targetId);
+        checkAlreadyFriendRequestOfTwoWay(userId, targetId);
 
         Friend friend = Friend.createFriend(user, targetUser);
         friendRepository.save(friend);
@@ -49,7 +49,7 @@ public class FriendService {
     @Transactional
     public Long acceptFriendRequest(Long userId, Long targetId) {
         User targetUser = findUser(targetId);
-        checkHasFriendRequest(targetId, userId);
+        checkHasFriendRequestOfOneWay(targetId, userId);
         User user = findUser(userId);
 
         Friend requestFriend = findFriend(targetId, userId, WAIT);
@@ -65,7 +65,7 @@ public class FriendService {
     @Transactional
     public Long denyFriendRequest(Long userId, Long targetId) {
         checkExistUser(targetId);
-        checkHasFriendRequest(targetId, userId);
+        checkHasFriendRequestOfOneWay(targetId, userId);
 
         Friend friend = findFriend(targetId, userId, WAIT);
         friendRepository.delete(friend);
@@ -100,13 +100,13 @@ public class FriendService {
         return new DataListResDto<DefaultUserResDto>(0, friendUserList);
     }
 
-    private void checkAlreadyFriendRelation(Long userId, Long targetId){
-        if(friendRepository.existsFriend(userId, targetId)){
+    private void checkAlreadyFriendRequestOfTwoWay(Long userId, Long targetId){
+        if(friendRepository.existsFriendRequest(userId, targetId)){
             throw new FriendException(ALREADY_FRIEND_REQUEST);
         }
     }
 
-    private void checkHasFriendRequest(Long senderId, Long receiverId){
+    private void checkHasFriendRequestOfOneWay(Long senderId, Long receiverId){
         if(!friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(senderId, receiverId, WAIT)){
             throw new FriendException(NO_SUCH_FRIEND_REQUEST);
         }

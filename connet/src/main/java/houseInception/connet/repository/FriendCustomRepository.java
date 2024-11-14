@@ -13,5 +13,5 @@ public interface FriendCustomRepository {
 
     List<DefaultUserResDto> findFriendRequestList(Long userId);
 
-    boolean existsFriend(Long userId, Long targetId);
+    boolean existsFriendRequest(Long userId, Long targetId);
 }

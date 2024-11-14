@@ -59,12 +59,13 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
     }
 
     @Override
-    public boolean existsFriend(Long userId, Long targetId) {
+    public boolean existsFriendRequest(Long userId, Long targetId) {
         Long count = query.select(friend.count())
                 .from(friend)
                 .where(
-                        (friend.sender.id.eq(userId).and(friend.receiver.id.eq(targetId)))
-                                .or(friend.sender.id.eq(targetId).and(friend.receiver.id.eq(userId)))
+                        ((friend.sender.id.eq(userId).and(friend.receiver.id.eq(targetId)))
+                                .or(friend.sender.id.eq(targetId).and(friend.receiver.id.eq(userId)))),
+                        friend.acceptStatus.eq(WAIT)
                 )
                 .fetchFirst();
 

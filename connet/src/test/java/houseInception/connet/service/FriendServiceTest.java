@@ -108,12 +108,11 @@ class FriendServiceTest {
         friendRepository.save(friend);
 
         //when
-        Long friendId = friendService.acceptFriendRequest(user2.getId(), user1.getId());
+        friendService.acceptFriendRequest(user2.getId(), user1.getId());
 
         //then
-        Friend findFriend = friendRepository.findById(friendId).orElse(null);
-        assertThat(findFriend).isNotNull();
-        assertThat(findFriend.getAcceptStatus()).isEqualTo(ACCEPT);
+        assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user1.getId(), user2.getId(), ACCEPT)).isTrue();
+        assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user2.getId(), user1.getId(), ACCEPT)).isTrue();
     }
 
     @Test
