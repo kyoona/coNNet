@@ -3,6 +3,7 @@ package houseInception.connet.service;
 import houseInception.connet.domain.Friend;
 import houseInception.connet.domain.FriendStatus;
 import houseInception.connet.domain.User;
+import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.exception.FriendException;
@@ -93,15 +94,10 @@ public class FriendService {
         return new DataListResDto<DefaultUserResDto>(0, requestSenders);
     }
 
-    public DataListResDto<DefaultUserResDto> getFriendList(Long userId) {
-        List<Friend> friendList = friendRepository.findFriendListWithUser(userId);
-        List<DefaultUserResDto> friendUserList = friendList.stream()
-                .map(friend -> friend.getSender().getId().equals(userId) ? friend.getReceiver() : friend.getSender())
-                .sorted(Comparator.comparing(User::getUserName))
-                .map(DefaultUserResDto::new)
-                .toList();
+    public DataListResDto<ActiveUserResDto> getFriendList(Long userId) {
+        List<ActiveUserResDto> friendList = friendRepository.findFriendListWithUser(userId);
 
-        return new DataListResDto<DefaultUserResDto>(0, friendUserList);
+        return new DataListResDto<ActiveUserResDto>(0, friendList);
     }
 
     private void checkAlreadyFriendRequestOfTwoWay(Long userId, Long targetId){

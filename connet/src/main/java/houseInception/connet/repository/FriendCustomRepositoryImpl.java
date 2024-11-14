@@ -4,6 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.Friend;
 import houseInception.connet.domain.QUser;
+import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DefaultUserResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -34,15 +35,13 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
     }
 
     @Override
-    public List<Friend> findFriendListWithUser(Long userId) {
-        QUser sender = new QUser("sender");
-        QUser receiver = new QUser("receiver");
-
-        return query.selectFrom(friend)
-                .join(friend.sender, sender).fetchJoin()
-                .join(friend.receiver, receiver).fetchJoin()
-                .where((friend.receiver.id.eq(userId).or(friend.sender.id.eq(userId))
-                        .and(friend.acceptStatus.eq(ACCEPT))))
+    public List<ActiveUserResDto> findFriendListWithUser(Long userId) {
+        return query.select(Projections.constructor(ActiveUserResDto.class,
+                        user.id, user.userName, user.userProfile))
+                .from(friend)
+                .join(user).on(user.id.eq(friend.receiver.id))
+                .where(friend.sender.id.eq(userId),
+                        friend.acceptStatus.eq(ACCEPT))
                 .fetch();
     }
 

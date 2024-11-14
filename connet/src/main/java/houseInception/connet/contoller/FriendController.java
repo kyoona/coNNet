@@ -1,5 +1,6 @@
 package houseInception.connet.contoller;
 
+import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.response.BaseResponse;
@@ -56,9 +57,9 @@ public class FriendController {
     }
 
     @GetMapping
-    public BaseResponse<DataListResDto<DefaultUserResDto>> getFriendList(){
+    public BaseResponse<DataListResDto<ActiveUserResDto>> getFriendList(){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        DataListResDto<DefaultUserResDto> result = friendService.getFriendList(userId);
+        DataListResDto<ActiveUserResDto> result = friendService.getFriendList(userId);
 
         return new BaseResponse<>(result);
     }

@@ -2,6 +2,7 @@ package houseInception.connet.service;
 
 import houseInception.connet.domain.Friend;
 import houseInception.connet.domain.User;
+import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.exception.FriendException;
@@ -177,26 +178,35 @@ class FriendServiceTest {
     @Test
     void getFriendList() {
         //given
-        Friend friend1 = Friend.createFriend(user1, user2);
-        friend1.accept();
-        friendRepository.save(friend1);
+        Friend friendA1 = Friend.createFriend(user1, user2);
+        friendA1.accept();
+        friendRepository.save(friendA1);
+        Friend friendA2 = Friend.createFriend(user2, user1);
+        friendA2.accept();
+        friendRepository.save(friendA2);
 
-        Friend friend2 = Friend.createFriend(user3, user1);
-        friend2.accept();
-        friendRepository.save(friend2);
+        Friend friendB1 = Friend.createFriend(user3, user1);
+        friendB1.accept();
+        friendRepository.save(friendB1);
+        Friend friendB2 = Friend.createFriend(user1, user3);
+        friendB2.accept();
+        friendRepository.save(friendB2);
 
-        Friend friend3 = Friend.createFriend(user1, user4);
-        friend3.accept();
-        friendRepository.save(friend3);
+        Friend friendC1 = Friend.createFriend(user1, user4);
+        friendC1.accept();
+        friendRepository.save(friendC1);
+        Friend friendC2 = Friend.createFriend(user4, user1);
+        friendC2.accept();
+        friendRepository.save(friendC2);
 
-        Friend friend4 = Friend.createFriend(user1, user5);
-        friendRepository.save(friend4);
+        Friend friendD1 = Friend.createFriend(user1, user5);
+        friendRepository.save(friendD1);
 
         //when
-        DataListResDto<DefaultUserResDto> result = friendService.getFriendList(user1.getId());
+        DataListResDto<ActiveUserResDto> result = friendService.getFriendList(user1.getId());
 
         //then
-        List<DefaultUserResDto> friendUserList = result.getData();
+        List<ActiveUserResDto> friendUserList = result.getData();
         assertThat(friendUserList.size()).isEqualTo(3);
         assertThat(friendUserList).extracting("userId").containsExactly(user2.getId(), user3.getId(), user4.getId());
     }
