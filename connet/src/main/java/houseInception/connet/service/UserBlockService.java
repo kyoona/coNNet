@@ -36,7 +36,7 @@ public class UserBlockService {
         userBlockRepository.save(userBlock2);
 
         userBlockEventPublisher.publishUserBlockEvent(user, targetUser);
-        
+
         return userBlock1.getId();
     }
 
