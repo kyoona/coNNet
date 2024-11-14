@@ -56,6 +56,7 @@ public class FriendService {
         requestFriend.accept();
 
         Friend friend = Friend.createFriend(user, targetUser);
+        friend.accept();
         friendRepository.save(friend);
 
         return friend.getId();
