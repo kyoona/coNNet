@@ -34,16 +34,19 @@ public class FriendService {
         User user = findUser(userId);
         User targetUser = findUser(targetId);
 
-        checkAlreadyFriendRelation(userId, targetId);
-
         if(userId.equals(targetId)){
             throw new FriendException(CANT_NOT_REQUEST_SELF);
         }
 
-        Friend friend = Friend.createFriend(user, targetUser);
-        friendRepository.save(friend);
+        checkAlreadyFriendRelation(userId, targetId);
 
-        return friend.getId();
+        Friend friend1 = Friend.createFriend(user, targetUser);
+        friendRepository.save(friend1);
+
+        Friend friend2 = Friend.createFriend(targetUser, user);
+        friendRepository.save(friend2);
+
+        return friend1.getId();
     }
 
     @Transactional
