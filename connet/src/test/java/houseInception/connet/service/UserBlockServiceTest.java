@@ -63,6 +63,25 @@ class UserBlockServiceTest {
     }
 
     @Test
+    void blockUser_양방향() {
+        //given
+        UserBlock userBlock = UserBlock.create(user1, user2, REQUEST);
+        userBlockRepository.save(userBlock);
+
+        UserBlock reverseUserBlock = UserBlock.create(user2, user1, ACCEPT);
+        userBlockRepository.save(reverseUserBlock);
+
+        //when
+        userBlockService.blockUser(user2.getId(), user1.getId());
+
+        //then
+        assertThat(userBlockRepository
+                .existsByUserIdAndTargetIdAndBlockType(user1.getId(), user2.getId(), REQUEST)).isTrue();
+        assertThat(userBlockRepository
+                .existsByUserIdAndTargetIdAndBlockType(user2.getId(), user1.getId(), REQUEST)).isTrue();
+    }
+
+    @Test
     void cancelBlock_단방향_차단중() {
         //given
         UserBlock userBlock = UserBlock.create(user1, user2, REQUEST);
