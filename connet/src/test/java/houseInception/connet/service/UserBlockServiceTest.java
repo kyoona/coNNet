@@ -63,6 +63,42 @@ class UserBlockServiceTest {
     }
 
     @Test
+    void cancelBlock_단방향_차단중() {
+        //given
+        UserBlock userBlock = UserBlock.create(user1, user2, REQUEST);
+        userBlockRepository.save(userBlock);
+
+        UserBlock reverseUserBlock = UserBlock.create(user2, user1, ACCEPT);
+        userBlockRepository.save(reverseUserBlock);
+
+        //when
+        userBlockService.cancelBlock(user1.getId(), user2.getId());
+
+        //then
+        assertThat(userBlockRepository.existsByUserIdAndTargetId(user1.getId(), user2.getId())).isFalse();
+        assertThat(userBlockRepository.existsByUserIdAndTargetId(user2.getId(), user1.getId())).isFalse();
+    }
+
+    @Test
+    void cancelBlock_양방향_차단중() {
+        //given
+        UserBlock userBlock = UserBlock.create(user1, user2, REQUEST);
+        userBlockRepository.save(userBlock);
+
+        UserBlock reverseUserBlock = UserBlock.create(user2, user1, REQUEST);
+        userBlockRepository.save(reverseUserBlock);
+
+        //when
+        userBlockService.cancelBlock(user1.getId(), user2.getId());
+
+        //then
+        assertThat(userBlockRepository
+                .existsByUserIdAndTargetIdAndBlockType(user1.getId(), user2.getId(), ACCEPT)).isTrue();
+        assertThat(userBlockRepository
+                .existsByUserIdAndTargetIdAndBlockType(user2.getId(), user1.getId(), REQUEST)).isTrue();
+    }
+
+    @Test
     void getBlockUserList() {
         //given
         UserBlock userBlock1 = UserBlock.create(user1, user2, REQUEST);
