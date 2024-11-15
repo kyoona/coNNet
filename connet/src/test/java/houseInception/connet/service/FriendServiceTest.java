@@ -3,6 +3,7 @@ package houseInception.connet.service;
 import houseInception.connet.domain.Friend;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.UserBlock;
+import houseInception.connet.domain.UserBlockType;
 import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
@@ -86,7 +87,7 @@ class FriendServiceTest {
     @Test
     void requestFriend_ById_차단된_사용자() {
         //given
-        UserBlock userBlock = UserBlock.create(user1, user2);
+        UserBlock userBlock = UserBlock.create(user1, user2, UserBlockType.REQUEST);
         userBlockRepository.save(userBlock);
 
         //when

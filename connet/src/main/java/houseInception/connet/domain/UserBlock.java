@@ -23,10 +23,18 @@ public class UserBlock extends BaseTime{
     @ManyToOne(fetch = FetchType.LAZY)
     private User target;
 
-    public static UserBlock create(User user, User target){
+    @Enumerated(EnumType.STRING)
+    private UserBlockType blockType;
+
+    public static UserBlock create(User user, User target, UserBlockType blockType){
         UserBlock userBlock = new UserBlock();
         userBlock.user = user;
         userBlock.target = target;
+        userBlock.blockType = blockType;
         return userBlock;
+    }
+
+    public void setBlockType(UserBlockType blockType) {
+        this.blockType = blockType;
     }
 }
