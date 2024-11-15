@@ -33,4 +33,8 @@ public class UserBlock extends BaseTime{
         userBlock.blockType = blockType;
         return userBlock;
     }
+
+    public void setBlockType(UserBlockType blockType) {
+        this.blockType = blockType;
+    }
 }

@@ -6,6 +6,7 @@ import houseInception.connet.domain.UserBlockType;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.event.publisher.UserBlockEventPublisher;
+import houseInception.connet.exception.UserBlockException;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
@@ -19,6 +20,7 @@ import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.Status.DELETED;
 import static houseInception.connet.domain.UserBlockType.ACCEPT;
 import static houseInception.connet.domain.UserBlockType.REQUEST;
+import static houseInception.connet.response.status.BaseErrorCode.ALREADY_BLOCK_USER;
 import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_USER;
 
 @Transactional(readOnly = true)
@@ -37,15 +39,24 @@ public class UserBlockService {
         User targetUser = findUser(targetId);
         User user = findUser(userId);
 
-        UserBlock userBlock1 = UserBlock.create(user, targetUser, REQUEST);
-        userBlockRepository.save(userBlock1);
-
-        UserBlock userBlock2 = UserBlock.create(targetUser, user, ACCEPT);
-        userBlockRepository.save(userBlock2);
+        UserBlock findUserBlock = userBlockRepository.findByUserIdAndTargetId(userId, targetId).orElse(null);
+        checkAlreadyRequestBlock(findUserBlock);
 
         userBlockEventPublisher.publishUserBlockEvent(user, targetUser);
 
-        return userBlock1.getId();
+        if(findUserBlock == null){
+            UserBlock userBlock1 = UserBlock.create(user, targetUser, REQUEST);
+            userBlockRepository.save(userBlock1);
+
+            UserBlock userBlock2 = UserBlock.create(targetUser, user, ACCEPT);
+            userBlockRepository.save(userBlock2);
+
+            return userBlock1.getId();
+        }else{
+            findUserBlock.setBlockType(REQUEST);
+
+            return findUserBlock.getId();
+        }
     }
 
     public DataListResDto<DefaultUserResDto> getBlockUserList(Long userId) {
@@ -66,6 +77,12 @@ public class UserBlockService {
     private void checkUser(Long userId){
         if(!userRepository.existsByIdAndStatus(userId, ALIVE)){
             throw new UserException(NO_SUCH_USER);
+        }
+    }
+
+    private void checkAlreadyRequestBlock(UserBlock findUserBlock) {
+        if(findUserBlock != null && findUserBlock.getBlockType() == REQUEST){
+            throw new UserBlockException(ALREADY_BLOCK_USER);
         }
     }
 }
