@@ -20,8 +20,7 @@ import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.Status.DELETED;
 import static houseInception.connet.domain.UserBlockType.ACCEPT;
 import static houseInception.connet.domain.UserBlockType.REQUEST;
-import static houseInception.connet.response.status.BaseErrorCode.ALREADY_BLOCK_USER;
-import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_USER;
+import static houseInception.connet.response.status.BaseErrorCode.*;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -59,6 +58,20 @@ public class UserBlockService {
         }
     }
 
+    @Transactional
+    public Long cancelBlock(Long userId, Long targetId) {
+        checkUser(targetId);
+        UserBlock userBlock = findUserBlock(userId, targetId);
+        UserBlock reverseUserBlock = findUserBlock(targetId, userId);
+
+        userBlockRepository.delete(userBlock);
+        if(reverseUserBlock.getBlockType() == ACCEPT){
+            userBlockRepository.delete(reverseUserBlock);
+        }
+
+        return userBlock.getId();
+    }
+
     public DataListResDto<DefaultUserResDto> getBlockUserList(Long userId) {
         List<DefaultUserResDto> blockUserList = userBlockRepository.getBlockUserList(userId);
 
@@ -72,6 +85,15 @@ public class UserBlockService {
         }
 
         return user;
+    }
+
+    private UserBlock findUserBlock(Long userId, Long targetId){
+        UserBlock userBlock = userBlockRepository.findByUserIdAndTargetId(userId, targetId).orElse(null);
+        if (userBlock == null) {
+            throw new UserBlockException(NO_SUCH_USER_BLOCK);
+        }
+
+        return userBlock;
     }
 
     private void checkUser(Long userId){

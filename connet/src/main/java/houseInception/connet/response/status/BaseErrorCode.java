@@ -24,6 +24,7 @@ public enum BaseErrorCode implements StatusCode{
     CANT_NOT_REQUEST_SELF(40008, "본인에게 친구 요청을 보낼 수 없습니다.", HttpStatus.BAD_REQUEST),
     BLOCK_USER(40009, "차단된 유저입니다.", HttpStatus.BAD_REQUEST),
     ALREADY_BLOCK_USER(400010, "이미 차단된 유저입니다.", HttpStatus.BAD_REQUEST),
+    NO_SUCH_USER_BLOCK(400011, "차단이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
 
     INVALID_GOOGLE_TOKEN(40101, "유효하지 않은 Google Access Token입니다.", HttpStatus.UNAUTHORIZED),
     INVALID_REFRESH_TOKEN(40102, "유효하지 않은 Refresh Token입니다.", HttpStatus.UNAUTHORIZED),
