@@ -34,7 +34,6 @@ public class UserBlockService {
 
     @Transactional
     public Long blockUser(Long userId, Long targetId) {
-        //이미 차단된 유저인지 확인해야함
         User targetUser = findUser(targetId);
         User user = findUser(userId);
 
@@ -44,13 +43,13 @@ public class UserBlockService {
         userBlockEventPublisher.publishUserBlockEvent(user, targetUser);
 
         if(findUserBlock == null){
-            UserBlock userBlock1 = UserBlock.create(user, targetUser, REQUEST);
-            userBlockRepository.save(userBlock1);
+            UserBlock userBlock = UserBlock.create(user, targetUser, REQUEST);
+            userBlockRepository.save(userBlock);
 
-            UserBlock userBlock2 = UserBlock.create(targetUser, user, ACCEPT);
-            userBlockRepository.save(userBlock2);
+            UserBlock reverseUserBlock = UserBlock.create(targetUser, user, ACCEPT);
+            userBlockRepository.save(reverseUserBlock);
 
-            return userBlock1.getId();
+            return userBlock.getId();
         }else{
             findUserBlock.setBlockType(REQUEST);
 
