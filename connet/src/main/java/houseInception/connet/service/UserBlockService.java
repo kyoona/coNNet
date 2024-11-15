@@ -64,9 +64,11 @@ public class UserBlockService {
         UserBlock userBlock = findUserBlock(userId, targetId);
         UserBlock reverseUserBlock = findUserBlock(targetId, userId);
 
-        userBlockRepository.delete(userBlock);
-        if(reverseUserBlock.getBlockType() == ACCEPT){
+        if (reverseUserBlock.getBlockType() == ACCEPT) {
+            userBlockRepository.delete(userBlock);
             userBlockRepository.delete(reverseUserBlock);
+        } else { //상대방도 나를 차단중일때
+            userBlock.setBlockType(ACCEPT);
         }
 
         return userBlock.getId();
