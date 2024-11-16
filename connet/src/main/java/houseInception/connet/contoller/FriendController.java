@@ -15,7 +15,7 @@ public class FriendController {
 
     private final FriendService friendService;
 
-    @PostMapping("/{targetId}")
+    @PostMapping("/{targetId}/request")
     public BaseResponse<BaseResultDto> requestFriend(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.requestFriendById(userId, targetId);
@@ -23,7 +23,7 @@ public class FriendController {
         return BaseResponse.getSimpleRes(resultId);
     }
 
-    @PostMapping
+    @PostMapping("/request")
     public BaseResponse<BaseResultDto> requestFriend(@RequestBody @Valid EmailDto emailDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.requestFriendByEmail(userId, emailDto.getEmail());
