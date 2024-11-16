@@ -31,6 +31,14 @@ public class FriendController {
         return BaseResponse.getSimpleRes(resultId);
     }
 
+    @DeleteMapping("/{targetId}")
+    public BaseResponse<BaseResultDto> cancelFriendRequest(@PathVariable Long targetId){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = friendService.cancelFriendRequest(userId, targetId);
+        
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
     @PostMapping("/{targetId}/accept")
     public BaseResponse<BaseResultDto> acceptFriendRequest(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();

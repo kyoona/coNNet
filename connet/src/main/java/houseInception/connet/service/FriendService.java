@@ -71,6 +71,16 @@ public class FriendService {
     }
 
     @Transactional
+    public Long cancelFriendRequest(Long userId, Long targetId){
+        checkExistUser(targetId);
+
+        Friend friend = findFriend(targetId, userId, WAIT);
+        friendRepository.delete(friend);
+
+        return friend.getId();
+    }
+
+    @Transactional
     public Long acceptFriendRequest(Long userId, Long targetId) {
         User targetUser = findUser(targetId);
         checkHasFriendRequestOfOneWay(targetId, userId);
