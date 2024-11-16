@@ -31,11 +31,11 @@ public class FriendController {
         return BaseResponse.getSimpleRes(resultId);
     }
 
-    @DeleteMapping("/{targetId}")
+    @DeleteMapping("/{targetId}/request")
     public BaseResponse<BaseResultDto> cancelFriendRequest(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.cancelFriendRequest(userId, targetId);
-        
+
         return BaseResponse.getSimpleRes(resultId);
     }
 

@@ -74,7 +74,7 @@ public class FriendService {
     public Long cancelFriendRequest(Long userId, Long targetId){
         checkExistUser(targetId);
 
-        Friend friend = findFriend(targetId, userId, WAIT);
+        Friend friend = findFriend(userId, targetId, WAIT);
         friendRepository.delete(friend);
 
         return friend.getId();
