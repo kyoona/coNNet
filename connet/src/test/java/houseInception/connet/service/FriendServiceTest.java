@@ -129,6 +129,30 @@ class FriendServiceTest {
     }
 
     @Test
+    void cancelFriendRequest() {
+        //given
+        Friend friend = Friend.createFriend(user1, user2);
+        friendRepository.save(friend);
+
+        //when
+        Long resultId = friendService.cancelFriendRequest(user1.getId(), user2.getId());
+
+        //then
+        assertThatThrownBy(() -> friendRepository.findById(resultId).orElseThrow())
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void cancelFriendRequest_요청_존재X() {
+        //given
+        Friend friend = Friend.createFriend(user1, user2);
+        friendRepository.save(friend);
+
+        //when
+        assertThatThrownBy(() -> friendService.cancelFriendRequest(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
+    }
+
+    @Test
     void acceptFriendRequest() {
         //given
         Friend friend = Friend.createFriend(user1, user2);
