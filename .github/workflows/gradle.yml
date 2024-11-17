@@ -34,8 +34,6 @@ jobs:
     - name: Build with Gradle Wrapper
       working-directory: connet
       env:
-        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         GPT_API_KEY: ${{ secrets.GPT_API_KEY }}
         JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
@@ -43,6 +41,10 @@ jobs:
         MYSQL_URL: ${{ secrets.MYSQL_URL }}
         GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
         GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
+        AWS_S3_URL_PREFIX: ${{ secrets.AWS_S3_URL_PREFIX }}
         
       run: ./gradlew build
 
@@ -69,7 +71,7 @@ jobs:
         key : ${{ secrets.EC2_SSH_KEY }}
         port: 22
         script: |
-          docker pull kyoona/connet:latest
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/connet:latest
           docker stop connet || true
           docker rm connet || true
           
@@ -81,5 +83,15 @@ jobs:
             --log-opt awslogs-stream=i-01247077d8dd0e1c2 \
             --log-opt awslogs-multiline-pattern="^\[[a-f0-9-]{36}\]" \
             --network="host" \
-            --env-file ./env.list \
-            kyoona/connet:latest
+            -e GPT_API_KEY=${{ secrets.GPT_API_KEY }} \
+            -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+            -e MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }} \
+            -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
+            -e MYSQL_URL=${{ secrets.MYSQL_URL }} \
+            -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
+            -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
+            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            -e AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }} \
+            -e AWS_S3_URL_PREFIX=${{ secrets.AWS_S3_URL_PREFIX }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/connet:latest
