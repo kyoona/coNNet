@@ -36,7 +36,7 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
     @Override
     public List<ActiveUserResDto> getFriendList(Long userId, FriendFilterDto filterDto) {
         return query.select(Projections.constructor(ActiveUserResDto.class,
-                        user.id, user.userName, user.userProfile))
+                        user.id, user.userName, user.userProfile, user.isActive))
                 .from(friend)
                 .join(user).on(user.id.eq(friend.receiver.id))
                 .where(friend.sender.id.eq(userId),
