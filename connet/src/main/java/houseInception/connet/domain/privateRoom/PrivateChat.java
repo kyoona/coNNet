@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static houseInception.connet.domain.ChatterRole.USER;
 import static houseInception.connet.domain.Status.ALIVE;
 
 @Getter
@@ -21,7 +22,7 @@ public class PrivateChat extends BaseTime {
     private Long id;
 
     @JoinColumn(name = "privateRoomId")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     private PrivateRoom privateRoom;
 
     @JoinColumn(name = "writerId")
@@ -34,8 +35,19 @@ public class PrivateChat extends BaseTime {
     @Enumerated(EnumType.STRING)
     private ChatterRole chatTarget;
 
-    private String content;
+    private String message;
 
     @Enumerated(EnumType.STRING)
     private Status status = ALIVE;
+
+    protected static PrivateChat createUserToUserChat(PrivateRoom privateRoom, PrivateRoomUser privateRoomUser, String message){
+        PrivateChat privateChat = new PrivateChat();
+        privateChat.privateRoom = privateRoom;
+        privateChat.writer = privateRoomUser;
+        privateChat.writerRole = USER;
+        privateChat.chatTarget = USER;
+        privateChat.message =  message;
+
+        return privateChat;
+    }
 }

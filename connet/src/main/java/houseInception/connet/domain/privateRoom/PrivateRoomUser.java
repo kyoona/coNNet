@@ -35,4 +35,10 @@ public class PrivateRoomUser extends BaseTime {
 
     @Enumerated(EnumType.STRING)
     private Status status = ALIVE;
+
+    protected PrivateRoomUser(User user, PrivateRoom privateRoom){
+        this.user = user;
+        this.privateRoom = privateRoom;
+        this.participationTime = LocalDateTime.now();
+    }
 }
