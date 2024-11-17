@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class PrivateRoomController {
 
-    private PrivateRoomService privateRoomService;
+    private final PrivateRoomService privateRoomService;
 
     @PostMapping("/{targetId}")
     public BaseResponse<PrivateChatAddRestDto> addPrivateChat(@PathVariable Long targetId,

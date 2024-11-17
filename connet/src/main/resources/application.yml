@@ -25,6 +25,13 @@ google:
   id: ${GOOGLE_CLIENT_ID}
   password: ${GOOGLE_CLIENT_SECRET}
 
+aws:
+  s3:
+    accessKeyId : ${AWS_ACCESS_KEY_ID}
+    secretAccessKey : ${AWS_SECRET_ACCESS_KEY}
+    bucketName : ${AWS_S3_BUCKET_NAME}
+    imageUrlPrefix : ${AWS_S3_URL_PREFIX}
+
 logging:
   pattern:
     console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ, Asia/Seoul} [%X{request_id}] %-5level [%thread] %logger{36} - %msg%n"
