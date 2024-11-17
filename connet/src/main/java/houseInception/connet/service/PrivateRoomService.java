@@ -11,6 +11,7 @@ import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.PrivateRoomRepository;
+import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
 import houseInception.connet.socketManager.SocketServiceProvider;
 import houseInception.connet.socketManager.dto.PrivateChatResDto;
@@ -38,6 +39,7 @@ public class PrivateRoomService {
     private final SocketServiceProvider socketServiceProvider;
     private final S3ServiceProvider s3ServiceProvider;
     private final PrivateRoomRepository privateRoomRepository;
+    private final UserBlockRepository userBlockRepository;
     private final UserRepository userRepository;
     private final EntityManager em;
 
@@ -49,6 +51,7 @@ public class PrivateRoomService {
         User targetUser = findUser(targetId);
         User user = findUser(userId);
 
+        checkHasUserBlock(userId, targetId);
         checkValidContent(chatAddDto.getMessage(), chatAddDto.getImage());
 
         PrivateRoom privateRoom;
@@ -113,6 +116,12 @@ public class PrivateRoomService {
     private void checkExistUser(Long userId){
         if (!userRepository.existsByIdAndStatus(userId, ALIVE)){
             throw new UserException(NO_SUCH_USER);
+        }
+    }
+
+    private void checkHasUserBlock(Long userId, Long targetId) {
+        if(userBlockRepository.existsByUserIdAndTargetId(userId, targetId)){
+            throw new PrivateRoomException(BLOCK_USER);
         }
     }
 
