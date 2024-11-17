@@ -33,6 +33,7 @@ public class PrivateRoom extends BaseTime {
     @OneToMany(mappedBy = "privateRoom", cascade = CascadeType.ALL)
     private List<PrivateChat> privateChats = new ArrayList<>();
 
+
     @Enumerated(EnumType.STRING)
     private Status status = ALIVE;
 
@@ -45,8 +46,8 @@ public class PrivateRoom extends BaseTime {
         return privateRoom;
     }
 
-    public PrivateChat addUserToUserChat(String message, PrivateRoomUser privateRoomUser){
-        PrivateChat chat = PrivateChat.createUserToUserChat(this, privateRoomUser, message);
+    public PrivateChat addUserToUserChat(String message, String imgUrl, PrivateRoomUser privateRoomUser){
+        PrivateChat chat = PrivateChat.createUserToUserChat(this, privateRoomUser, message, imgUrl);
         this.privateChats.add(chat);
 
         return chat;

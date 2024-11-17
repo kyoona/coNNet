@@ -15,14 +15,14 @@ public class PrivateChatResDto {
     private ChatMessageType type = PRIVATE;
     private String chatRoomUuid;
     private String message;
-    private List<String> images;
+    private String image;
     private ChatterRole writerRole;
     private ChatterResDto writer;
     private LocalDateTime createAt;
 
-    public PrivateChatResDto(String chatRoomUuid, String message, List<String> images, ChatterRole writerRole, User user, LocalDateTime createAt) {
+    public PrivateChatResDto(String chatRoomUuid, String message, String image, ChatterRole writerRole, User user, LocalDateTime createAt) {
         this.message = message;
-        this.images = images;
+        this.image = image;
         this.writerRole = writerRole;
         this.writer = new ChatterResDto(user.getId(), user.getUserName(), user.getUserProfile());
         this.createAt = createAt;

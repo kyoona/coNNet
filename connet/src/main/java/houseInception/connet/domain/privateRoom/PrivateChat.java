@@ -39,18 +39,20 @@ public class PrivateChat extends BaseTime {
     private ChatterRole chatTarget;
 
     private String message;
-    private List<String> images = new ArrayList<>();
+    private String image;
 
     @Enumerated(EnumType.STRING)
     private Status status = ALIVE;
 
-    protected static PrivateChat createUserToUserChat(PrivateRoom privateRoom, PrivateRoomUser privateRoomUser, String message){
+    protected static PrivateChat createUserToUserChat
+            (PrivateRoom privateRoom, PrivateRoomUser privateRoomUser, String message, String imgUrl){
         PrivateChat privateChat = new PrivateChat();
         privateChat.privateRoom = privateRoom;
         privateChat.writer = privateRoomUser;
         privateChat.writerRole = USER;
         privateChat.chatTarget = USER;
         privateChat.message =  message;
+        privateChat.image = imgUrl;
 
         return privateChat;
     }
