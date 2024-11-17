@@ -28,6 +28,18 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public void setUserActive(Long userId){
+        User user = findUser(userId);
+        user.setActive();
+    }
+
+    @Transactional
+    public void setUserInActive(Long userId){
+        User user = findUser(userId);
+        user.setInActive();
+    }
+
     private User findUserByEmail(String email){
         User user = userRepository.findByEmailAndStatus(email, ALIVE).orElse(null);
         if (user == null) {

@@ -22,6 +22,7 @@ public class User extends BaseTime{
     private String userProfile;
     private String email;
     private String refreshToken;
+    private boolean isActive;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
@@ -45,5 +46,13 @@ public class User extends BaseTime{
 
     public void deleteRefreshToken(){
         this.refreshToken = null;
+    }
+
+    public void setActive(){
+        isActive = true;
+    }
+
+    public void setInActive(){
+        isActive = false;
     }
 }

@@ -1,5 +1,6 @@
 package houseInception.socket;
 
+import houseInception.connet.service.UserService;
 import houseInception.connet.socketManager.SocketManager;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
@@ -14,6 +15,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class SocketHandler extends TextWebSocketHandler {
 
     private final SocketManager socketManager;
+    private final UserService userService;
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -25,14 +27,18 @@ public class SocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
 
-        String userId = MDC.get("socketUserId");
-        socketManager.addSocket(Long.parseLong(userId), session);
+        Long userId = Long.parseLong(MDC.get("socketUserId"));
+        socketManager.addSocket(userId, session);
+        userService.setUserActive(userId);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        socketManager.deleteSocket(session);
-
+        Long userId = socketManager.deleteSocket(session);
+        if(userId != null){
+            userService.setUserInActive(userId);
+        }
+        
         super.afterConnectionClosed(session, status);
     }
 }

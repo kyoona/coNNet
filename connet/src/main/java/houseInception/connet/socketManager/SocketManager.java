@@ -14,12 +14,18 @@ public class SocketManager {
         userSocketMap.put(userId, session);
     }
 
-    public void deleteSocket(WebSocketSession session){
+    public Long deleteSocket(WebSocketSession session){
         for (Long userId : userSocketMap.keySet()) {
             if(userSocketMap.get(userId).getId().equals(session.getId())){
                 userSocketMap.remove(userId);
-                return;
+                return userId;
             }
         }
+
+        return null;
+    }
+
+    protected WebSocketSession getSocketSession(Long userId){
+        return userSocketMap.get(userId);
     }
 }
