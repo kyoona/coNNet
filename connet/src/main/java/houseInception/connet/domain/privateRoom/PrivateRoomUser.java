@@ -41,4 +41,12 @@ public class PrivateRoomUser extends BaseTime {
         this.privateRoom = privateRoom;
         this.participationTime = LocalDateTime.now();
     }
+
+    protected void setStatus(Status status) {
+        this.status = status;
+    }
+
+    protected void setParticipationTime(LocalDateTime participationTime) {
+        this.participationTime = participationTime;
+    }
 }

@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -44,9 +45,11 @@ public class PrivateRoom extends BaseTime {
         return privateRoom;
     }
 
-    public void addUserToUserChat(String message, PrivateRoomUser privateRoomUser){
+    public PrivateChat addUserToUserChat(String message, PrivateRoomUser privateRoomUser){
         PrivateChat chat = PrivateChat.createUserToUserChat(this, privateRoomUser, message);
         this.privateChats.add(chat);
+
+        return chat;
     }
 
     public List<PrivateChat> getPrivateChats() {
@@ -55,5 +58,12 @@ public class PrivateRoom extends BaseTime {
 
     public List<PrivateRoomUser> getPrivateRoomUsers() {
         return new ArrayList<>(privateRoomUsers);
+    }
+
+    public void setPrivateRoomUserAlive(PrivateRoomUser privateRoomUser, LocalDateTime participationTime){
+        if(privateRoomUser.getPrivateRoom().getId().equals(this.id)){
+            privateRoomUser.setStatus(ALIVE);
+            privateRoomUser.setParticipationTime(participationTime);
+        }
     }
 }

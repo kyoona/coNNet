@@ -24,4 +24,8 @@ public class SocketManager {
 
         return null;
     }
+
+    protected WebSocketSession getSocketSession(Long userId){
+        return userSocketMap.get(userId);
+    }
 }

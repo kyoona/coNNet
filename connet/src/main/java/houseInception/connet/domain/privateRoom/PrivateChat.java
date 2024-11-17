@@ -8,6 +8,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static houseInception.connet.domain.ChatterRole.USER;
 import static houseInception.connet.domain.Status.ALIVE;
 
@@ -36,6 +39,7 @@ public class PrivateChat extends BaseTime {
     private ChatterRole chatTarget;
 
     private String message;
+    private List<String> images = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private Status status = ALIVE;
