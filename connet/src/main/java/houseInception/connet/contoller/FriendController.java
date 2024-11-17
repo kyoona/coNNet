@@ -1,24 +1,40 @@
 package houseInception.connet.contoller;
 
-import houseInception.connet.dto.DataListResDto;
-import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.*;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.BaseResultDto;
 import houseInception.connet.service.FriendService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/friend")
+@RequestMapping("/friends")
 @RequiredArgsConstructor
 @RestController
 public class FriendController {
 
     private final FriendService friendService;
 
-    @PostMapping("/{targetId}")
+    @PostMapping("/{targetId}/request")
     public BaseResponse<BaseResultDto> requestFriend(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        Long resultId = friendService.requestFriend(userId, targetId);
+        Long resultId = friendService.requestFriendById(userId, targetId);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @PostMapping("/request")
+    public BaseResponse<BaseResultDto> requestFriend(@RequestBody @Valid EmailDto emailDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = friendService.requestFriendByEmail(userId, emailDto.getEmail());
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @DeleteMapping("/{targetId}/request")
+    public BaseResponse<BaseResultDto> cancelFriendRequest(@PathVariable Long targetId){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = friendService.cancelFriendRequest(userId, targetId);
 
         return BaseResponse.getSimpleRes(resultId);
     }
@@ -56,9 +72,9 @@ public class FriendController {
     }
 
     @GetMapping
-    public BaseResponse<DataListResDto<DefaultUserResDto>> getFriendList(){
+    public BaseResponse<DataListResDto<ActiveUserResDto>> getFriendList(@ModelAttribute FriendFilterDto friendFilter){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        DataListResDto<DefaultUserResDto> result = friendService.getFriendList(userId);
+        DataListResDto<ActiveUserResDto> result = friendService.getFriendList(userId, friendFilter);
 
         return new BaseResponse<>(result);
     }

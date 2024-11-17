@@ -1,6 +1,7 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
+import houseInception.connet.domain.UserBlock;
 import houseInception.connet.dto.UserResDto;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.UserRepository;
@@ -27,6 +28,18 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public void setUserActive(Long userId){
+        User user = findUser(userId);
+        user.setActive();
+    }
+
+    @Transactional
+    public void setUserInActive(Long userId){
+        User user = findUser(userId);
+        user.setInActive();
+    }
+
     private User findUserByEmail(String email){
         User user = userRepository.findByEmailAndStatus(email, ALIVE).orElse(null);
         if (user == null) {
@@ -43,5 +56,11 @@ public class UserService {
         }
 
         return user;
+    }
+
+    private void checkUser(Long userId){
+        if(!userRepository.existsByIdAndStatus(userId, ALIVE)){
+            throw new UserException(NO_SUCH_USER);
+        }
     }
 }

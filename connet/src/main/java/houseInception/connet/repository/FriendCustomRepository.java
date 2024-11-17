@@ -1,17 +1,15 @@
 package houseInception.connet.repository;
 
-import houseInception.connet.domain.Friend;
+import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.FriendFilterDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface FriendCustomRepository {
 
-    Optional<Friend> findFriendSenderOrReceiver(Long userId1, Long userId2);
-    List<Friend> findFriendListWithUser(Long userId);
+    List<ActiveUserResDto> getFriendList(Long userId, FriendFilterDto filterDto);
+    List<DefaultUserResDto> getFriendRequestList(Long userId);
 
-    List<DefaultUserResDto> findFriendRequestList(Long userId);
-
-    boolean existsFriend(Long userId, Long targetId);
+    boolean existsFriendRequest(Long userId, Long targetId);
 }
