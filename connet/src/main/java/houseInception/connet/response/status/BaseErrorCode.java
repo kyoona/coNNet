@@ -26,13 +26,15 @@ public enum BaseErrorCode implements StatusCode{
     ALREADY_BLOCK_USER(400010, "이미 차단된 유저입니다.", HttpStatus.BAD_REQUEST),
     NO_SUCH_USER_BLOCK(400011, "차단이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     NO_CONTENT_IN_CHAT(400012, "채팅의 내용이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
+    NO_VALID_FILE_NAME(400013, "파일 이름이 옳바르지 않습니다.", HttpStatus.BAD_REQUEST),
 
     INVALID_GOOGLE_TOKEN(40101, "유효하지 않은 Google Access Token입니다.", HttpStatus.UNAUTHORIZED),
     INVALID_REFRESH_TOKEN(40102, "유효하지 않은 Refresh Token입니다.", HttpStatus.UNAUTHORIZED),
 
     //5XX 서버 에러
     INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR.name(), HttpStatus.INTERNAL_SERVER_ERROR),
-    CANT_NOT_PARSE_SOCKET_MESSAGE(50001, HttpStatus.INTERNAL_SERVER_ERROR.name(), HttpStatus.INTERNAL_SERVER_ERROR);
+    CANT_NOT_PARSE_SOCKET_MESSAGE(50001, HttpStatus.INTERNAL_SERVER_ERROR.name(), HttpStatus.INTERNAL_SERVER_ERROR),
+    CAN_NOT_UPLOAD_FILE_TO_S3(50002, HttpStatus.INTERNAL_SERVER_ERROR.name(), HttpStatus.INTERNAL_SERVER_ERROR);
 
     private int code; //서버 내부 오류 코드
     private String message; //서버 내부 오류 메세지

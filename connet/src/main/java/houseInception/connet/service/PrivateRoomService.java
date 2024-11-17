@@ -9,18 +9,23 @@ import houseInception.connet.dto.PrivateChatAddDto;
 import houseInception.connet.dto.PrivateChatAddRestDto;
 import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.exception.UserException;
+import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.PrivateRoomRepository;
+import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
 import houseInception.connet.socketManager.SocketServiceProvider;
 import houseInception.connet.socketManager.dto.PrivateChatResDto;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.Status.DELETED;
@@ -32,19 +37,25 @@ import static houseInception.connet.response.status.BaseErrorCode.*;
 public class PrivateRoomService {
 
     private final SocketServiceProvider socketServiceProvider;
+    private final S3ServiceProvider s3ServiceProvider;
     private final PrivateRoomRepository privateRoomRepository;
+    private final UserBlockRepository userBlockRepository;
     private final UserRepository userRepository;
     private final EntityManager em;
+
+    @Value("${aws.s3.imageUrlPrefix}")
+    private String s3UrlPrefix;
 
     @Transactional
     public PrivateChatAddRestDto addPrivateChat(Long userId, Long targetId, PrivateChatAddDto chatAddDto) {
         User targetUser = findUser(targetId);
         User user = findUser(userId);
 
-        checkValidContent(chatAddDto.getMessage(), chatAddDto.getImages());
+        checkHasUserBlock(userId, targetId);
+        checkValidContent(chatAddDto.getMessage(), chatAddDto.getImage());
 
         PrivateRoom privateRoom;
-        if (chatAddDto.getChatRoomUuid() == null) {
+        if (chatAddDto.getChatRoomUuid() == null || chatAddDto.getChatRoomUuid().isBlank()) {
             privateRoom = PrivateRoom.create(user, targetUser);
             privateRoomRepository.save(privateRoom);
         } else {
@@ -53,8 +64,9 @@ public class PrivateRoomService {
 
         PrivateRoomUser privateRoomSender = findPrivateRoomUser(privateRoom.getId(), userId);
 
-        //파일일 경우 S3에 저장후 url 공유 로직
-        PrivateChat privateChat = privateRoom.addUserToUserChat(chatAddDto.getMessage(), privateRoomSender);
+        String imgUrl = uploadImages(chatAddDto.getImage());
+
+        PrivateChat privateChat = privateRoom.addUserToUserChat(chatAddDto.getMessage(), imgUrl, privateRoomSender);
         em.flush();
 
         PrivateRoomUser privateRoomReceiver = findPrivateRoomUser(privateRoom.getId(), targetId);
@@ -63,15 +75,37 @@ public class PrivateRoomService {
         }
 
         PrivateChatResDto privateChatResDto =
-                new PrivateChatResDto(privateRoom.getPrivateRoomUuid(), chatAddDto.getMessage(), null, ChatterRole.USER, user, privateChat.getCreatedAt());
+                new PrivateChatResDto(privateRoom.getPrivateRoomUuid(), chatAddDto.getMessage(), imgUrl, ChatterRole.USER, user, privateChat.getCreatedAt());
         socketServiceProvider.sendMessage(targetId, privateChatResDto);
 
         return new PrivateChatAddRestDto(privateRoom.getPrivateRoomUuid());
     }
 
-    private void checkValidContent(String message, List<MultipartFile> images) {
+    private String uploadImages(MultipartFile image){
+        if (image == null) {
+            return null;
+        }
+
+        String newFileName = getUniqueFileName(image.getOriginalFilename());
+        s3ServiceProvider.uploadImage(newFileName, image);
+
+        return s3UrlPrefix + newFileName;
+    }
+
+    private String getUniqueFileName(String originalFileName){
+        int extensionIndex = originalFileName.lastIndexOf(".");
+        if(extensionIndex == -1){
+            throw new PrivateRoomException(NO_VALID_FILE_NAME);
+        }
+
+        String extension = originalFileName.substring(extensionIndex);
+
+        return UUID.randomUUID() + extension;
+    }
+
+    private void checkValidContent(String message, MultipartFile images) {
         boolean hasMessage = StringUtils.hasText(message);
-        boolean hasImages = images != null && !images.isEmpty();
+        boolean hasImages = images != null;
 
         if (!hasMessage && !hasImages) {
             throw new PrivateRoomException(NO_CONTENT_IN_CHAT);
@@ -82,6 +116,12 @@ public class PrivateRoomService {
     private void checkExistUser(Long userId){
         if (!userRepository.existsByIdAndStatus(userId, ALIVE)){
             throw new UserException(NO_SUCH_USER);
+        }
+    }
+
+    private void checkHasUserBlock(Long userId, Long targetId) {
+        if(userBlockRepository.existsByUserIdAndTargetId(userId, targetId)){
+            throw new PrivateRoomException(BLOCK_USER);
         }
     }
 

@@ -61,6 +61,9 @@ dependencies {
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
 	testImplementation 'org.mockito:mockito-core:4.0.0'
 	testImplementation 'org.mockito:mockito-junit-jupiter:4.0.0'
+
+	//s3
+	implementation 'software.amazon.awssdk:s3:2.29.15'
 }
 
 tasks.named('test') {
