@@ -120,8 +120,15 @@ public class FriendService {
         return friend1.getId();
     }
 
+
+    public DataListResDto<DefaultUserResDto> getFriendRequestList(Long userId) {
+        List<DefaultUserResDto> requestReceivers = friendRepository.getFriendRequestList(userId);
+
+        return new DataListResDto<DefaultUserResDto>(0, requestReceivers);
+    }
+
     public DataListResDto<DefaultUserResDto> getFriendWaitList(Long userId) {
-        List<DefaultUserResDto> requestSenders = friendRepository.getFriendRequestList(userId);
+        List<DefaultUserResDto> requestSenders = friendRepository.getFriendWaitList(userId);
 
         return new DataListResDto<DefaultUserResDto>(0, requestSenders);
     }

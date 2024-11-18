@@ -9,6 +9,7 @@ import java.util.List;
 public interface FriendCustomRepository {
 
     List<ActiveUserResDto> getFriendList(Long userId, FriendFilterDto filterDto);
+    List<DefaultUserResDto> getFriendWaitList(Long userId);
     List<DefaultUserResDto> getFriendRequestList(Long userId);
 
     boolean existsFriendRequest(Long userId, Long targetId);
