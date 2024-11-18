@@ -23,7 +23,7 @@ public class UserBlockController {
         return BaseResponse.getSimpleRes(resultId);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{targetId}")
     public BaseResponse<BaseResultDto> cancelBlock(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = userBlockService.cancelBlock(userId, targetId);
