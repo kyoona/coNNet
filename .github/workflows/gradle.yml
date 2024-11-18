@@ -25,17 +25,15 @@ jobs:
         host port: 3306
         container port: 3306
         mysql version: '8.0'
-        mysql database: 'gpt_service'
+        mysql database: 'connet'
         mysql root password: ${{ secrets.MYSQL_PASSWORD }}
     
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
 
     - name: Build with Gradle Wrapper
-      working-directory: gptComm
+      working-directory: connet
       env:
-        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         GPT_API_KEY: ${{ secrets.GPT_API_KEY }}
         JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
@@ -43,6 +41,10 @@ jobs:
         MYSQL_URL: ${{ secrets.MYSQL_URL }}
         GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
         GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
+        AWS_S3_URL_PREFIX: ${{ secrets.AWS_S3_URL_PREFIX }}
         
       run: ./gradlew build
 
@@ -50,11 +52,11 @@ jobs:
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
     
     - name: Build Docker image
-      working-directory: gptComm
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/gpt-service:latest .
+      working-directory: connet
+      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/connet:latest .
 
     - name: Push Docker image to Docker Hub
-      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/gpt-service:latest
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/connet:latest
       
   deploy: 
     runs-on: ubuntu-latest
@@ -69,17 +71,27 @@ jobs:
         key : ${{ secrets.EC2_SSH_KEY }}
         port: 22
         script: |
-          docker pull kyoona/gpt-service:latest
-          docker stop gpt-service || true
-          docker rm gpt-service || true
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/connet:latest
+          docker stop connet || true
+          docker rm connet || true
           
           docker run -d \
-            --name gpt-service \
+            --name connet \
             --log-driver=awslogs \
             --log-opt awslogs-region=ap-northeast-2 \
             --log-opt awslogs-group=house-inception \
             --log-opt awslogs-stream=i-01247077d8dd0e1c2 \
             --log-opt awslogs-multiline-pattern="^\[[a-f0-9-]{36}\]" \
             --network="host" \
-            --env-file ./env.list \
-            kyoona/gpt-service:latest
+            -e GPT_API_KEY=${{ secrets.GPT_API_KEY }} \
+            -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
+            -e MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }} \
+            -e MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }} \
+            -e MYSQL_URL=${{ secrets.MYSQL_URL }} \
+            -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
+            -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
+            -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+            -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+            -e AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }} \
+            -e AWS_S3_URL_PREFIX=${{ secrets.AWS_S3_URL_PREFIX }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/connet:latest
