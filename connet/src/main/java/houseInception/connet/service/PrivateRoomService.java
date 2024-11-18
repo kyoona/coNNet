@@ -5,8 +5,10 @@ import houseInception.connet.domain.User;
 import houseInception.connet.domain.privateRoom.PrivateChat;
 import houseInception.connet.domain.privateRoom.PrivateRoom;
 import houseInception.connet.domain.privateRoom.PrivateRoomUser;
+import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.PrivateChatAddDto;
 import houseInception.connet.dto.PrivateChatAddRestDto;
+import houseInception.connet.dto.PrivateRoomResDto;
 import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
@@ -23,8 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static houseInception.connet.domain.Status.ALIVE;
@@ -110,6 +112,22 @@ public class PrivateRoomService {
         if (!hasMessage && !hasImages) {
             throw new PrivateRoomException(NO_CONTENT_IN_CHAT);
         }
+    }
+
+    public DataListResDto<PrivateRoomResDto> getPrivateRoomList(Long userId, int page) {
+        Map<Long, PrivateRoomResDto> privateRoomMap = privateRoomRepository.getPrivateRoomList(userId, page);
+
+        List<Long> privateRoomIdList = privateRoomMap.values()
+                .stream()
+                .map(PrivateRoomResDto::getChatRoomId)
+                .toList();
+        List<Long> privateRoomIdOfActiveTimeOrder = privateRoomRepository.getLastChatTimeOfPrivateRooms(privateRoomIdList);
+
+        List<PrivateRoomResDto> resultList = privateRoomIdOfActiveTimeOrder.stream()
+                .map(privateRoomId -> privateRoomMap.get(privateRoomId))
+                .toList();
+
+        return new DataListResDto<>(page, resultList);
     }
 
 

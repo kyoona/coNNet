@@ -1,7 +1,9 @@
 package houseInception.connet.contoller;
 
+import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.PrivateChatAddDto;
 import houseInception.connet.dto.PrivateChatAddRestDto;
+import houseInception.connet.dto.PrivateRoomResDto;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.service.PrivateRoomService;
 import lombok.RequiredArgsConstructor;
@@ -22,4 +24,14 @@ public class PrivateRoomController {
 
         return new BaseResponse<>(result);
     }
+
+    @GetMapping
+    public BaseResponse<DataListResDto<PrivateRoomResDto>> getPrivateRoomList(@RequestParam(defaultValue = "1") int page){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        DataListResDto<PrivateRoomResDto> result = privateRoomService.getPrivateRoomList(userId, page);
+
+        return new BaseResponse<>(result);
+    }
+
+
 }
