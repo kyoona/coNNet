@@ -226,6 +226,26 @@ class FriendServiceTest {
     }
 
     @Test
+    void getFriendRequestList() {
+        //given
+        Friend friend1 = Friend.createFriend(user1, user2);
+        friendRepository.save(friend1);
+
+        Friend friend2 = Friend.createFriend(user1, user3);
+        friendRepository.save(friend2);
+
+        Friend friend3 = Friend.createFriend(user4, user1);
+        friendRepository.save(friend3);
+
+        //when
+        List<DefaultUserResDto> result = friendService.getFriendRequestList(user1.getId()).getData();
+
+        //then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).extracting("userId").contains(user2.getId(), user3.getId());
+    }
+
+    @Test
     void getFriendList() {
         //given
         Friend friendA1 = Friend.createFriend(user1, user2);

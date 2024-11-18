@@ -23,12 +23,23 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
     private final JPAQueryFactory query;
 
     @Override
-    public List<DefaultUserResDto> getFriendRequestList(Long userId) {
+    public List<DefaultUserResDto> getFriendWaitList(Long userId) {
         return query.select(Projections.constructor(DefaultUserResDto.class,
                         user.id, user.userName, user.userProfile))
                 .from(friend)
                 .join(user).on(user.id.eq(friend.sender.id))
                 .where(friend.receiver.id.eq(userId),
+                        friend.acceptStatus.eq(WAIT))
+                .fetch();
+    }
+
+    @Override
+    public List<DefaultUserResDto> getFriendRequestList(Long userId) {
+        return query.select(Projections.constructor(DefaultUserResDto.class,
+                        user.id, user.userName, user.userProfile))
+                .from(friend)
+                .join(user).on(user.id.eq(friend.receiver.id))
+                .where(friend.sender.id.eq(userId),
                         friend.acceptStatus.eq(WAIT))
                 .fetch();
     }
