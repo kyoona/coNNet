@@ -27,6 +27,8 @@ public enum BaseErrorCode implements StatusCode{
     NO_SUCH_USER_BLOCK(400011, "차단이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     NO_CONTENT_IN_CHAT(400012, "채팅의 내용이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     NO_VALID_FILE_NAME(400013, "파일 이름이 옳바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    NO_SUCH_CHAT(400014, "채팅이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
+    ALREADY_HAS_EMOJI(400015, "이모지가 이미 존재합니다.", HttpStatus.BAD_REQUEST),
 
     INVALID_GOOGLE_TOKEN(40101, "유효하지 않은 Google Access Token입니다.", HttpStatus.UNAUTHORIZED),
     INVALID_REFRESH_TOKEN(40102, "유효하지 않은 Refresh Token입니다.", HttpStatus.UNAUTHORIZED),

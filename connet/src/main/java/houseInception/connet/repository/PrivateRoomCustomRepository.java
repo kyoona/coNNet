@@ -12,4 +12,7 @@ public interface PrivateRoomCustomRepository {
     Optional<PrivateRoom> findPrivateRoomWithUser(String privateRoomUuid);
     Optional<PrivateRoomUser> findPrivateRoomUser(Long privateRoomId, Long userId);
     List<PrivateChat> findPrivateChatsInPrivateRoom(Long privateRoomId);
+
+    boolean existsAlivePrivateRoomUser(Long userId, Long privateRoomId);
+    Long getPrivateRoomIdOfChat(Long privateChatId);
 }
