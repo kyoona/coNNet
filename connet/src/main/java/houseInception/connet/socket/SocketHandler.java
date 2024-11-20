@@ -1,4 +1,4 @@
-package houseInception.socket;
+package houseInception.connet.socket;
 
 import houseInception.connet.service.UserService;
 import houseInception.connet.socketManager.SocketManager;
@@ -27,7 +27,7 @@ public class SocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
 
-        Long userId = Long.parseLong(MDC.get("socketUserId"));
+        Long userId = (Long) session.getAttributes().get("Socket-User-Id");
         socketManager.addSocket(userId, session);
         userService.setUserActive(userId);
     }
