@@ -24,7 +24,4 @@ public interface PrivateRoomCustomRepository {
     Long getPrivateRoomIdOfChat(Long privateChatId);
 
     List<PrivateChatResDto> getPrivateChatList(Long privateRoomId, int page);
-  
-    boolean existsAlivePrivateRoomUser(Long userId, Long privateRoomId);
-    Long getPrivateRoomIdOfChat(Long privateChatId);
 }
