@@ -2,7 +2,7 @@ package houseInception.connet.socketManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import houseInception.connet.exception.SocketException;
-import houseInception.connet.socketManager.dto.PrivateChatResDto;
+import houseInception.connet.socketManager.dto.PrivateChatSocketDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -19,14 +19,14 @@ public class SocketServiceProvider {
     private final SocketManager socketManager;
     private final ObjectMapper objectMapper;
 
-    public boolean sendMessage(Long userId, PrivateChatResDto privateChatResDto){
+    public boolean sendMessage(Long userId, PrivateChatSocketDto privateChatSocketDto){
         WebSocketSession socketSession = socketManager.getSocketSession(userId);
         if (socketSession == null) {
             return false;
         }
 
         try {
-            TextMessage textMessage = new TextMessage(objectMapper.writeValueAsString(privateChatResDto));
+            TextMessage textMessage = new TextMessage(objectMapper.writeValueAsString(privateChatSocketDto));
             socketSession.sendMessage(textMessage);
 
             return true;

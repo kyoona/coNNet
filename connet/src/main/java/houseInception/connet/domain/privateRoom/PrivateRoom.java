@@ -47,10 +47,13 @@ public class PrivateRoom extends BaseTime {
     }
 
     public PrivateChat addUserToUserChat(String message, String imgUrl, PrivateRoomUser privateRoomUser){
-        PrivateChat chat = PrivateChat.createUserToUserChat(this, privateRoomUser, message, imgUrl);
-        this.privateChats.add(chat);
+        if (privateRoomUser.getPrivateRoom().getId().equals(this.id)) {
+            PrivateChat chat = PrivateChat.createUserToUserChat(this, privateRoomUser, message, imgUrl);
+            this.privateChats.add(chat);
+            return chat;
+        }
 
-        return chat;
+        return null;
     }
 
     public List<PrivateChat> getPrivateChats() {

@@ -25,7 +25,7 @@ public class PrivateChat extends BaseTime {
     private Long id;
 
     @JoinColumn(name = "privateRoomId")
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private PrivateRoom privateRoom;
 
     @JoinColumn(name = "writerId")
