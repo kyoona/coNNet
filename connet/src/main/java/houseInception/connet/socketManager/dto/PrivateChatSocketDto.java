@@ -20,6 +20,7 @@ public class PrivateChatSocketDto {
     private LocalDateTime createAt;
 
     public PrivateChatSocketDto(String chatRoomUuid, String message, String image, ChatterRole writerRole, User user, LocalDateTime createAt) {
+        this.chatRoomUuid = chatRoomUuid;
         this.message = message;
         this.image = image;
         this.writerRole = writerRole;
