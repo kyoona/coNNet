@@ -54,6 +54,27 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     }
 
     @Override
+    public boolean existsAlivePrivateRoomUser(Long userId, Long privateRoomId) {
+        Long count = query.select(privateRoomUser.count())
+                .from(privateRoomUser)
+                .where(privateRoomUser.privateRoom.id.eq(privateRoomId),
+                        privateRoomUser.user.id.eq(userId),
+                        privateRoomUser.status.eq(ALIVE))
+                .fetchOne();
+
+        return count != null && count > 0;
+    }
+
+    @Override
+    public Long getPrivateRoomIdOfChat(Long privateChatId) {
+        return query.select(privateChat.privateRoom.id)
+                .from(privateChat)
+                .where(privateChat.id.eq(privateChatId),
+                        privateChat.status.eq(ALIVE))
+                .fetchOne();
+    }
+
+    @Override
     public Map<Long, PrivateRoomResDto> getPrivateRoomList(Long userId, int page) {
         QPrivateRoomUser subPrivateRoomUser = new QPrivateRoomUser("subPrivateRoomUser");
 
