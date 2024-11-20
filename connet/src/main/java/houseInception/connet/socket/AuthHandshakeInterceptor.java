@@ -1,4 +1,4 @@
-package houseInception.socket;
+package houseInception.connet.socket;
 
 import houseInception.connet.domain.Status;
 import houseInception.connet.domain.User;
@@ -6,6 +6,7 @@ import houseInception.connet.jwt.JwtTokenProvider;
 import houseInception.connet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -23,34 +24,17 @@ public class AuthHandshakeInterceptor implements HandshakeInterceptor {
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        String authHeader = request.getHeaders().getFirst("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return false;
-        }
+        String token = getToken(request.getHeaders());
 
-        String token = authHeader.substring(7);
-        if (isInvalidToken(token) || isInValidUser(token)) {
-            return false;
-        }
-
-        saveUserIdInThreadLocal(token);
-        return true;
-    }
-
-    private void saveUserIdInThreadLocal(String token){
         String userEmail = tokenProvider.getUserPk(token);
         User user = userRepository.findByEmailAndStatus(userEmail, Status.ALIVE).orElseThrow();
 
-        MDC.put("socketUserId", String.valueOf(user.getId()));
+        attributes.put("Socket-User-Id", user.getId());
+        return true;
     }
 
-    private boolean isInvalidToken(String token){
-        return !tokenProvider.validateToken(token);
-    }
-
-    private boolean isInValidUser(String token){
-        String userEmail = tokenProvider.getUserPk(token);
-        return !userRepository.existsByEmailAndStatus(userEmail, Status.ALIVE);
+    private String getToken(HttpHeaders headers){
+        return headers.getFirst("Authorization").substring(7);
     }
 
     @Override
