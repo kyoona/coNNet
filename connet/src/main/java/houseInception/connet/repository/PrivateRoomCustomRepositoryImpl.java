@@ -7,6 +7,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.ChatRoomType;
 import houseInception.connet.domain.QChatEmoji;
+import houseInception.connet.domain.Status;
 import houseInception.connet.domain.privateRoom.*;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.PrivateChatResDto;
