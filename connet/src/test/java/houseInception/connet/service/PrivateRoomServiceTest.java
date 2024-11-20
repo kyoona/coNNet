@@ -1,13 +1,12 @@
 package houseInception.connet.service;
 
-import houseInception.connet.domain.User;
-import houseInception.connet.domain.UserBlock;
-import houseInception.connet.domain.UserBlockType;
+import houseInception.connet.domain.*;
 import houseInception.connet.domain.privateRoom.PrivateChat;
 import houseInception.connet.domain.privateRoom.PrivateRoom;
 import houseInception.connet.domain.privateRoom.PrivateRoomUser;
 import houseInception.connet.dto.PrivateChatAddDto;
 import houseInception.connet.dto.PrivateChatAddRestDto;
+import houseInception.connet.dto.PrivateChatResDto;
 import houseInception.connet.dto.PrivateRoomResDto;
 import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.repository.PrivateRoomRepository;
@@ -19,13 +18,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @Transactional
@@ -140,5 +140,33 @@ class PrivateRoomServiceTest {
         //then
         assertThat(result.size()).isEqualTo(3);
         assertThat(result).extracting("chatRoomId").containsExactly(privateRoom1.getId(), privateRoom3.getId(), privateRoom2.getId());
+    }
+
+    @Test
+    void getPrivateChatList_이모지o() {
+        //given
+        PrivateRoom privateRoom1 = PrivateRoom.create(user1, user2);
+        privateRoomRepository.save(privateRoom1);
+        PrivateChat privateChat1 = privateRoom1.addUserToUserChat("message1", null, privateRoom1.getPrivateRoomUsers().get(0));
+        PrivateChat privateChat2 = privateRoom1.addUserToUserChat("message2", null, privateRoom1.getPrivateRoomUsers().get(1));
+        em.flush();
+
+        ChatEmoji chatEmoji1 = ChatEmoji.createPrivateChatEmoji(user1, privateChat1.getId(), EmojiType.HEART);
+        ChatEmoji chatEmoji2 = ChatEmoji.createPrivateChatEmoji(user2, privateChat1.getId(), EmojiType.HEART);
+        ChatEmoji chatEmoji3 = ChatEmoji.createPrivateChatEmoji(user2, privateChat1.getId(), EmojiType.CHECK);
+        em.persist(chatEmoji1);
+        em.persist(chatEmoji2);
+        em.persist(chatEmoji3);
+
+        //when
+        List<PrivateChatResDto> result = privateRoomService.getPrivateChatList(user1.getId(), privateRoom1.getPrivateRoomUuid(), 1).getData();
+
+        //then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).extracting("chatId").containsExactly(privateChat2.getId(), privateChat1.getId());
+
+        PrivateChatResDto chatDto = result.get(1);
+        assertThat(chatDto.getEmoji()).extracting("emojiType").contains(EmojiType.HEART, EmojiType.CHECK);
+        assertThat(chatDto.getEmoji()).extracting("count").contains(1, 2);
     }
 }

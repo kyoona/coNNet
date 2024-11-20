@@ -5,12 +5,11 @@ import houseInception.connet.domain.User;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static houseInception.connet.socketManager.dto.ChatMessageType.PRIVATE;
 
 @Getter
-public class PrivateChatResDto {
+public class PrivateChatSocketDto {
 
     private ChatMessageType type = PRIVATE;
     private String chatRoomUuid;
@@ -20,7 +19,7 @@ public class PrivateChatResDto {
     private ChatterResDto writer;
     private LocalDateTime createAt;
 
-    public PrivateChatResDto(String chatRoomUuid, String message, String image, ChatterRole writerRole, User user, LocalDateTime createAt) {
+    public PrivateChatSocketDto(String chatRoomUuid, String message, String image, ChatterRole writerRole, User user, LocalDateTime createAt) {
         this.message = message;
         this.image = image;
         this.writerRole = writerRole;

@@ -1,9 +1,15 @@
 package houseInception.connet.repository;
 
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import houseInception.connet.domain.ChatRoomType;
+import houseInception.connet.domain.QChatEmoji;
 import houseInception.connet.domain.privateRoom.*;
+import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.PrivateChatResDto;
 import houseInception.connet.dto.PrivateRoomResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -13,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static houseInception.connet.domain.QChatEmoji.chatEmoji;
 import static houseInception.connet.domain.QUser.user;
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.privateRoom.QPrivateChat.privateChat;
@@ -66,6 +73,19 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     }
 
     @Override
+    public boolean existsAlivePrivateRoomUser(Long userId, String privateRoomUuid) {
+        Long count = query.select(privateRoomUser.count())
+                .from(privateRoomUser)
+                .innerJoin(privateRoom).on(privateRoom.id.eq(privateRoomUser.privateRoom.id))
+                .where(privateRoom.privateRoomUuid.eq(privateRoomUuid),
+                        privateRoomUser.user.id.eq(userId),
+                        privateRoomUser.status.eq(ALIVE))
+                .fetchOne();
+
+        return count != null && count > 0;
+    }
+
+    @Override
     public Long getPrivateRoomIdOfChat(Long privateChatId) {
         return query.select(privateChat.privateRoom.id)
                 .from(privateChat)
@@ -75,6 +95,32 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     }
 
     @Override
+    public List<PrivateChatResDto> getPrivateChatList(Long privateRoomId, int page) {
+        return query.select(Projections.constructor(PrivateChatResDto.class,
+                        privateChat.id,
+                        privateChat.message,
+                        privateChat.image,
+                        privateChat.writerRole,
+                        Projections.constructor(DefaultUserResDto.class,
+                                user.id, user.userName, user.userProfile),
+                        privateChat.createdAt,
+                        ExpressionUtils.as(
+                                JPAExpressions.select(Expressions.stringTemplate("GROUP_CONCAT({0})", chatEmoji.emojiType))
+                                        .from(chatEmoji)
+                                        .where(chatEmoji.chatId.eq(privateChat.id),
+                                                chatEmoji.chatRoomType.eq(ChatRoomType.PRIVATE)),
+                                "emojiAggStr")
+                ))
+                .from(privateChat)
+                .innerJoin(privateRoomUser).on(privateRoomUser.id.eq(privateChat.writer.id))
+                .innerJoin(user).on(user.id.eq(privateRoomUser.user.id))
+                .where(privateChat.privateRoom.id.eq(privateRoomId))
+                .offset((page - 1) * 30)
+                .limit(31)
+                .orderBy(privateChat.createdAt.desc())
+                .fetch();
+    }
+
     public Map<Long, PrivateRoomResDto> getPrivateRoomList(Long userId, int page) {
         QPrivateRoomUser subPrivateRoomUser = new QPrivateRoomUser("subPrivateRoomUser");
 

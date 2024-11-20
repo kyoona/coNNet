@@ -5,10 +5,8 @@ import houseInception.connet.domain.User;
 import houseInception.connet.domain.privateRoom.PrivateChat;
 import houseInception.connet.domain.privateRoom.PrivateRoom;
 import houseInception.connet.domain.privateRoom.PrivateRoomUser;
-import houseInception.connet.dto.DataListResDto;
-import houseInception.connet.dto.PrivateChatAddDto;
-import houseInception.connet.dto.PrivateChatAddRestDto;
-import houseInception.connet.dto.PrivateRoomResDto;
+import houseInception.connet.dto.*;
+import houseInception.connet.exception.ChatEmojiException;
 import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
@@ -16,7 +14,7 @@ import houseInception.connet.repository.PrivateRoomRepository;
 import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
 import houseInception.connet.socketManager.SocketServiceProvider;
-import houseInception.connet.socketManager.dto.PrivateChatResDto;
+import houseInception.connet.socketManager.dto.PrivateChatSocketDto;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -76,9 +74,9 @@ public class PrivateRoomService {
             privateRoom.setPrivateRoomUserAlive(privateRoomReceiver, privateChat.getCreatedAt());
         }
 
-        PrivateChatResDto privateChatResDto =
-                new PrivateChatResDto(privateRoom.getPrivateRoomUuid(), chatAddDto.getMessage(), imgUrl, ChatterRole.USER, user, privateChat.getCreatedAt());
-        socketServiceProvider.sendMessage(targetId, privateChatResDto);
+        PrivateChatSocketDto privateChatSocketDto =
+                new PrivateChatSocketDto(privateRoom.getPrivateRoomUuid(), chatAddDto.getMessage(), imgUrl, ChatterRole.USER, user, privateChat.getCreatedAt());
+        socketServiceProvider.sendMessage(targetId, privateChatSocketDto);
 
         return new PrivateChatAddRestDto(privateRoom.getPrivateRoomUuid());
     }
@@ -130,10 +128,27 @@ public class PrivateRoomService {
         return new DataListResDto<>(page, resultList);
     }
 
+    public DataListResDto<PrivateChatResDto> getPrivateChatList(Long userId, String privateRoomUuid, int page) {
+        Long privateRoomId = checkExistPrivateRoomAndGetId(privateRoomUuid);
+        checkUserInPrivateRoom(userId, privateRoomUuid);
 
-    private void checkExistUser(Long userId){
-        if (!userRepository.existsByIdAndStatus(userId, ALIVE)){
-            throw new UserException(NO_SUCH_USER);
+        List<PrivateChatResDto> privateChatList = privateRoomRepository.getPrivateChatList(privateRoomId, page);
+
+        return new DataListResDto<>(page, privateChatList);
+    }
+
+    private Long checkExistPrivateRoomAndGetId(String privateRoomUuid){
+        Long privateRoomId = privateRoomRepository.findIdByPrivateRoomUuid(privateRoomUuid);
+        if (privateRoomId == null){
+            throw new PrivateRoomException(NO_SUCH_CHATROOM);
+        }
+
+        return privateRoomId;
+    }
+
+    private void checkUserInPrivateRoom(Long userId, String privateRoomUuid) {
+        if (!privateRoomRepository.existsAlivePrivateRoomUser(userId, privateRoomUuid)){
+            throw new ChatEmojiException(NOT_CHATROOM_USER);
         }
     }
 
