@@ -164,29 +164,17 @@ public class FriendService {
     }
 
     private User findUser(Long userId){
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            throw new UserException(NO_SUCH_USER);
-        }
-
-        return user;
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(NO_SUCH_USER));
     }
 
     private User findUserByEmail(String email){
-        User user = userRepository.findByEmailAndStatus(email, ALIVE).orElse(null);
-        if (user == null) {
-            throw new UserException(NO_SUCH_USER);
-        }
-
-        return user;
+        return userRepository.findByEmailAndStatus(email, ALIVE)
+                .orElseThrow(() -> new UserException(NO_SUCH_USER));
     }
 
     private Friend findFriend(Long senderId, Long receiverId, FriendStatus acceptStatus){
-        Friend friend = friendRepository.findBySenderIdAndReceiverIdAndAcceptStatus(senderId, receiverId, acceptStatus).orElse(null);
-        if(friend == null){
-            throw new FriendException(NO_SUCH_FRIEND);
-        }
-
-        return friend;
+        return friendRepository.findBySenderIdAndReceiverIdAndAcceptStatus(senderId, receiverId, acceptStatus)
+                .orElseThrow(() -> new FriendException(NO_SUCH_FRIEND));
     }
 }
