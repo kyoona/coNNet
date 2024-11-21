@@ -81,6 +81,15 @@ public class PrivateRoomService {
         return new PrivateChatAddRestDto(privateRoom.getPrivateRoomUuid());
     }
 
+    @Transactional
+    public Long deletePrivateRoom(Long userId, String privateRoomUuid) {
+        PrivateRoom privateRoom = findPrivateRoom(privateRoomUuid);
+        PrivateRoomUser privateRoomUser = findPrivateRoomUser(privateRoom.getId(), userId);
+
+        privateRoom.setPrivateRoomUserDelete(privateRoomUser);
+        return privateRoomUser.getId();
+    }
+
     private String uploadImages(MultipartFile image){
         if (image == null) {
             return null;

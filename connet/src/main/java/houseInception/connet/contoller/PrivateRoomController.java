@@ -2,6 +2,7 @@ package houseInception.connet.contoller;
 
 import houseInception.connet.dto.*;
 import houseInception.connet.response.BaseResponse;
+import houseInception.connet.response.BaseResultDto;
 import houseInception.connet.service.PrivateRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,14 @@ public class PrivateRoomController {
         PrivateChatAddRestDto result = privateRoomService.addPrivateChat(userId, targetId, chatAddDto);
 
         return new BaseResponse<>(result);
+    }
+
+    @DeleteMapping("/{privateRoomUuid}")
+    public BaseResponse<BaseResultDto> deletePrivateRoom(@PathVariable String privateRoomUuid){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = privateRoomService.deletePrivateRoom(userId, privateRoomUuid);
+
+        return BaseResponse.getSimpleRes(resultId);
     }
 
     @GetMapping

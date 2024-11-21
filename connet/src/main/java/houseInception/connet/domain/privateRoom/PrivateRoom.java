@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static houseInception.connet.domain.Status.ALIVE;
+import static houseInception.connet.domain.Status.DELETED;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
@@ -68,6 +69,12 @@ public class PrivateRoom extends BaseTime {
         if(privateRoomUser.getPrivateRoom().getId().equals(this.id)){
             privateRoomUser.setStatus(ALIVE);
             privateRoomUser.setParticipationTime(participationTime);
+        }
+    }
+
+    public void setPrivateRoomUserDelete(PrivateRoomUser privateRoomUser) {
+        if(privateRoomUser.getPrivateRoom().getId().equals(this.id)) {
+            privateRoomUser.setStatus(DELETED);
         }
     }
 }
