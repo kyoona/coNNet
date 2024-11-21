@@ -211,4 +211,20 @@ class PrivateRoomServiceTest {
         assertThat(result.size()).isEqualTo(2);
         assertThat(result).extracting("chatRoomUuid").contains(chatRoomUuid2, chatRoomUuid3);
     }
+
+    @Test
+    void 채팅방_퇴장후_재입장_채팅목록_조회() {
+        //given
+        String chatRoomUuid1 = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), new PrivateChatAddDto(null, "message", null)).getChatRoomUuid();
+        privateRoomService.deletePrivateRoom(user1.getId(), chatRoomUuid1);
+        privateRoomService.addPrivateChat(user2.getId(), user1.getId(), new PrivateChatAddDto(chatRoomUuid1, "message", null));
+
+        //when
+        List<PrivateChatResDto> data1 = privateRoomService.getPrivateChatList(user1.getId(), chatRoomUuid1, 1).getData();
+        List<PrivateChatResDto> data2 = privateRoomService.getPrivateChatList(user2.getId(), chatRoomUuid1, 1).getData();
+
+        //then
+        assertThat(data1.size()).isEqualTo(1);
+        assertThat(data2.size()).isEqualTo(2);
+    }
 }

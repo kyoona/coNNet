@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -70,15 +71,20 @@ public class PrivateRoomService {
         em.flush();
 
         PrivateRoomUser privateRoomReceiver = findPrivateRoomUser(privateRoom.getId(), targetId);
-        if (privateRoomReceiver.getStatus() == DELETED) {
-            privateRoom.setPrivateRoomUserAlive(privateRoomReceiver, privateChat.getCreatedAt());
-        }
+        checkRoomUserAndSetAlive(privateRoomReceiver, privateRoom, privateChat.getCreatedAt());
+        checkRoomUserAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());
 
         PrivateChatSocketDto privateChatSocketDto =
                 new PrivateChatSocketDto(privateRoom.getPrivateRoomUuid(), chatAddDto.getMessage(), imgUrl, ChatterRole.USER, user, privateChat.getCreatedAt());
         socketServiceProvider.sendMessage(targetId, privateChatSocketDto);
 
         return new PrivateChatAddRestDto(privateRoom.getPrivateRoomUuid());
+    }
+
+    private void checkRoomUserAndSetAlive(PrivateRoomUser privateRoomUser, PrivateRoom privateRoom, LocalDateTime participationTime){
+        if (privateRoomUser.getStatus() == DELETED) {
+            privateRoom.setPrivateRoomUserAlive(privateRoomUser, participationTime);
+        }
     }
 
     @Transactional
@@ -141,7 +147,7 @@ public class PrivateRoomService {
         Long privateRoomId = checkExistPrivateRoomAndGetId(privateRoomUuid);
         checkUserInPrivateRoom(userId, privateRoomUuid);
 
-        List<PrivateChatResDto> privateChatList = privateRoomRepository.getPrivateChatList(privateRoomId, page);
+        List<PrivateChatResDto> privateChatList = privateRoomRepository.getPrivateChatList(userId, privateRoomId, page);
 
         return new DataListResDto<>(page, privateChatList);
     }
@@ -157,7 +163,7 @@ public class PrivateRoomService {
 
     private void checkUserInPrivateRoom(Long userId, String privateRoomUuid) {
         if (!privateRoomRepository.existsAlivePrivateRoomUser(userId, privateRoomUuid)){
-            throw new ChatEmojiException(NOT_CHATROOM_USER);
+            throw new PrivateRoomException(NOT_CHATROOM_USER);
         }
     }
 
