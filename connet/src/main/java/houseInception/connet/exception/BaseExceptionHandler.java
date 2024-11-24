@@ -94,4 +94,11 @@ public class BaseExceptionHandler {
 
         return BaseErrorResponse.get(INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<BaseErrorResponse> handleException(Exception e) {
+        log.error("Exception: {}", e.getMessage(), e);
+
+        return BaseErrorResponse.get(INTERNAL_SERVER_ERROR);
+    }
 }
