@@ -96,7 +96,9 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     }
 
     @Override
-    public List<PrivateChatResDto> getPrivateChatList(Long privateRoomId, int page) {
+    public List<PrivateChatResDto> getPrivateChatList(Long userId, Long privateRoomId, int page) {
+        QPrivateRoomUser subPrivateRoomUser = new QPrivateRoomUser("subPrivateRoomUser");
+
         return query.select(Projections.constructor(PrivateChatResDto.class,
                         privateChat.id,
                         privateChat.message,
@@ -115,7 +117,12 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                 .from(privateChat)
                 .innerJoin(privateRoomUser).on(privateRoomUser.id.eq(privateChat.writer.id))
                 .innerJoin(user).on(user.id.eq(privateRoomUser.user.id))
-                .where(privateChat.privateRoom.id.eq(privateRoomId))
+                .where(privateChat.privateRoom.id.eq(privateRoomId),
+                        privateChat.createdAt.goe(
+                                JPAExpressions.select(subPrivateRoomUser.participationTime)
+                                        .from(subPrivateRoomUser)
+                                        .where(subPrivateRoomUser.user.id.eq(userId))
+                        ))
                 .offset((page - 1) * 30)
                 .limit(31)
                 .orderBy(privateChat.createdAt.desc())

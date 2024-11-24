@@ -67,6 +67,13 @@ public class BaseExceptionHandler {
         return BaseErrorResponse.get(e.getStatus());
     }
 
+    @ExceptionHandler(PrivateRoomException.class)
+    public ResponseEntity<BaseErrorResponse> handlePrivateRoomException(PrivateRoomException e) {
+        log.error("PrivateRoom Exception<{}>: ", e.getStatus().getMessage(), e);
+
+        return BaseErrorResponse.get(e.getStatus());
+    }
+
     @ExceptionHandler(InValidTokenException.class)
     public ResponseEntity<BaseErrorResponse> handleInValidTokenException(InValidTokenException e) {
         log.error("InValidToken Exception: {}", e.getMessage(), e);

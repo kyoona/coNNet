@@ -23,6 +23,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -168,5 +169,62 @@ class PrivateRoomServiceTest {
         PrivateChatResDto chatDto = result.get(1);
         assertThat(chatDto.getEmoji()).extracting("emojiType").contains(EmojiType.HEART, EmojiType.CHECK);
         assertThat(chatDto.getEmoji()).extracting("count").contains(1, 2);
+    }
+
+    @Test
+    void deletePrivateRoom() {
+        //given
+        PrivateRoom privateRoom1 = PrivateRoom.create(user1, user2);
+        privateRoomRepository.save(privateRoom1);
+
+        //when
+        privateRoomService.deletePrivateRoom(user1.getId(), privateRoom1.getPrivateRoomUuid());
+
+        //then
+        PrivateRoomUser privateRoomUser = privateRoomRepository.findPrivateRoomUser(privateRoom1.getId(), user1.getId()).orElse(null);
+        assertThat(privateRoomUser).isNotNull();
+        assertThat(privateRoomUser.getStatus()).isEqualTo(Status.DELETED);
+    }
+
+    @Test
+    void deletePrivateRoom_권한x() {
+        //given
+        PrivateRoom privateRoom1 = PrivateRoom.create(user1, user2);
+        privateRoomRepository.save(privateRoom1);
+
+        //when
+        assertThatThrownBy(() -> privateRoomService.deletePrivateRoom(user3.getId(), privateRoom1.getPrivateRoomUuid())).isInstanceOf(PrivateRoomException.class);
+    }
+
+    @Test
+    void 채팅방_퇴장후_목록_조회() {
+        //given
+        String chatRoomUuid1 = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), new PrivateChatAddDto(null, "message", null)).getChatRoomUuid();
+        String chatRoomUuid2 = privateRoomService.addPrivateChat(user1.getId(), user3.getId(), new PrivateChatAddDto(null, "message", null)).getChatRoomUuid();
+        String chatRoomUuid3 = privateRoomService.addPrivateChat(user1.getId(), user4.getId(), new PrivateChatAddDto(null, "message", null)).getChatRoomUuid();
+        privateRoomService.deletePrivateRoom(user1.getId(), chatRoomUuid1);
+
+        //when
+        List<PrivateRoomResDto> result = privateRoomService.getPrivateRoomList(user1.getId(), 1).getData();
+
+        //then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).extracting("chatRoomUuid").contains(chatRoomUuid2, chatRoomUuid3);
+    }
+
+    @Test
+    void 채팅방_퇴장후_재입장_채팅목록_조회() {
+        //given
+        String chatRoomUuid1 = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), new PrivateChatAddDto(null, "message", null)).getChatRoomUuid();
+        privateRoomService.deletePrivateRoom(user1.getId(), chatRoomUuid1);
+        privateRoomService.addPrivateChat(user2.getId(), user1.getId(), new PrivateChatAddDto(chatRoomUuid1, "message", null));
+
+        //when
+        List<PrivateChatResDto> data1 = privateRoomService.getPrivateChatList(user1.getId(), chatRoomUuid1, 1).getData();
+        List<PrivateChatResDto> data2 = privateRoomService.getPrivateChatList(user2.getId(), chatRoomUuid1, 1).getData();
+
+        //then
+        assertThat(data1.size()).isEqualTo(1);
+        assertThat(data2.size()).isEqualTo(2);
     }
 }
