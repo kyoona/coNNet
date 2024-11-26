@@ -8,4 +8,5 @@ import lombok.Getter;
 public class PrivateChatAddRestDto {
 
     private String chatRoomUuid;
+    private Long chatId;
 }

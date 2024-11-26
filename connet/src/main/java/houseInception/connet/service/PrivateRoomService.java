@@ -75,10 +75,10 @@ public class PrivateRoomService {
         checkRoomUserAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());
 
         PrivateChatSocketDto privateChatSocketDto =
-                new PrivateChatSocketDto(privateRoom.getPrivateRoomUuid(), chatAddDto.getMessage(), imgUrl, ChatterRole.USER, user, privateChat.getCreatedAt());
+                new PrivateChatSocketDto(privateRoom.getPrivateRoomUuid(), privateChat.getId(), chatAddDto.getMessage(), imgUrl, ChatterRole.USER, user, privateChat.getCreatedAt());
         socketServiceProvider.sendMessage(targetId, privateChatSocketDto);
 
-        return new PrivateChatAddRestDto(privateRoom.getPrivateRoomUuid());
+        return new PrivateChatAddRestDto(privateRoom.getPrivateRoomUuid(), privateChat.getId());
     }
 
     private void checkRoomUserAndSetAlive(PrivateRoomUser privateRoomUser, PrivateRoom privateRoom, LocalDateTime participationTime){
