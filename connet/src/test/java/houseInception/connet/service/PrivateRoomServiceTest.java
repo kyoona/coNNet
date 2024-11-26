@@ -5,7 +5,7 @@ import houseInception.connet.domain.privateRoom.PrivateChat;
 import houseInception.connet.domain.privateRoom.PrivateRoom;
 import houseInception.connet.domain.privateRoom.PrivateRoomUser;
 import houseInception.connet.dto.PrivateChatAddDto;
-import houseInception.connet.dto.PrivateChatAddRestDto;
+import houseInception.connet.dto.PrivateChatAddResDto;
 import houseInception.connet.dto.PrivateChatResDto;
 import houseInception.connet.dto.PrivateRoomResDto;
 import houseInception.connet.exception.PrivateRoomException;
@@ -18,12 +18,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -69,7 +66,7 @@ class PrivateRoomServiceTest {
         //when
         String message = "mess1";
         PrivateChatAddDto chatAddDto = new PrivateChatAddDto(null, message, null);
-        PrivateChatAddRestDto result = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), chatAddDto);
+        PrivateChatAddResDto result = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), chatAddDto);
 
         //then
         PrivateRoom privateRoom = privateRoomRepository.findPrivateRoomWithUser(result.getChatRoomUuid()).orElse(null);
@@ -94,7 +91,7 @@ class PrivateRoomServiceTest {
         //when
         String message = "mess1";
         PrivateChatAddDto chatAddDto = new PrivateChatAddDto(privateRoom.getPrivateRoomUuid(), message, null);
-        PrivateChatAddRestDto result = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), chatAddDto);
+        PrivateChatAddResDto result = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), chatAddDto);
 
         //then
         List<PrivateChat> privateChats = privateRoomRepository.findPrivateChatsInPrivateRoom(privateRoom.getId());

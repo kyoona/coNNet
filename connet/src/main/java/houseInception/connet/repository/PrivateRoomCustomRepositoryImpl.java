@@ -88,10 +88,24 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
 
     @Override
     public Long getPrivateRoomIdOfChat(Long privateChatId) {
-        return query.select(privateChat.privateRoom.id)
+        return query
+                .select(privateChat.privateRoom.id)
                 .from(privateChat)
                 .where(privateChat.id.eq(privateChatId),
                         privateChat.status.eq(ALIVE))
+                .fetchOne();
+    }
+
+    @Override
+    public Long getTargetIdInChatRoom(Long userId, Long privateRoomId) {
+        return query
+                .select(user.id)
+                .from(privateRoomUser)
+                .innerJoin(privateRoom).on(privateRoom.id.eq(privateRoomUser.privateRoom.id))
+                .innerJoin(user).on(user.id.eq(privateRoomUser.user.id))
+                .where(user.id.ne(userId),
+                        privateRoom.id.eq(privateRoomId),
+                        privateRoom.status.eq(ALIVE))
                 .fetchOne();
     }
 

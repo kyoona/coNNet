@@ -6,9 +6,9 @@ import houseInception.connet.domain.privateRoom.PrivateChat;
 import houseInception.connet.domain.privateRoom.PrivateRoom;
 import houseInception.connet.domain.privateRoom.PrivateRoomUser;
 import houseInception.connet.dto.*;
-import houseInception.connet.exception.ChatEmojiException;
 import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.exception.UserException;
+import houseInception.connet.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.PrivateRoomRepository;
 import houseInception.connet.repository.UserBlockRepository;
@@ -37,6 +37,7 @@ import static houseInception.connet.response.status.BaseErrorCode.*;
 @Service
 public class PrivateRoomService {
 
+    private final GptApiProvider gptApiProvider;
     private final SocketServiceProvider socketServiceProvider;
     private final S3ServiceProvider s3ServiceProvider;
     private final PrivateRoomRepository privateRoomRepository;
@@ -48,7 +49,7 @@ public class PrivateRoomService {
     private String s3UrlPrefix;
 
     @Transactional
-    public PrivateChatAddRestDto addPrivateChat(Long userId, Long targetId, PrivateChatAddDto chatAddDto) {
+    public PrivateChatAddResDto addPrivateChat(Long userId, Long targetId, PrivateChatAddDto chatAddDto) {
         User targetUser = findUser(targetId);
         User user = findUser(userId);
 
@@ -78,7 +79,7 @@ public class PrivateRoomService {
                 new PrivateChatSocketDto(privateRoom.getPrivateRoomUuid(), privateChat.getId(), chatAddDto.getMessage(), imgUrl, ChatterRole.USER, user, privateChat.getCreatedAt());
         socketServiceProvider.sendMessage(targetId, privateChatSocketDto);
 
-        return new PrivateChatAddRestDto(privateRoom.getPrivateRoomUuid(), privateChat.getId());
+        return new PrivateChatAddResDto(privateRoom.getPrivateRoomUuid(), privateChat.getId());
     }
 
     private void checkRoomUserAndSetAlive(PrivateRoomUser privateRoomUser, PrivateRoom privateRoom, LocalDateTime participationTime){
@@ -125,6 +126,31 @@ public class PrivateRoomService {
         if (!hasMessage && !hasImages) {
             throw new PrivateRoomException(NO_CONTENT_IN_CHAT);
         }
+    }
+
+    @Transactional
+    public GptPrivateChatAddResDto addGptChat(Long userId, String privateRoomUuid, String message) {
+        PrivateRoom privateRoom = findPrivateRoom(privateRoomUuid);
+        PrivateRoomUser privateRoomUser = findPrivateRoomUser(privateRoom.getId(), userId);
+        User user = findUser(userId);
+
+        PrivateChat privateChat = privateRoom.addUserToGptChat(message, privateRoomUser);
+        em.flush();
+
+        Long targetId = privateRoomRepository.getTargetIdInChatRoom(userId, privateRoom.getId());
+        PrivateChatSocketDto privateChatSocketDto =
+                new PrivateChatSocketDto(privateRoomUuid, privateChat.getId(), message, null, ChatterRole.USER, user, privateChat.getCreatedAt());
+        socketServiceProvider.sendMessage(targetId, privateChatSocketDto);
+
+        String gptResponse = gptApiProvider.getChatCompletion(message);
+        PrivateChat gptPrivateChat = privateRoom.addGptToUserChat(gptResponse);
+        em.flush();
+
+        PrivateChatSocketDto gptPrivateChatSocketDto =
+                new PrivateChatSocketDto(privateRoomUuid, gptPrivateChat.getId(), message, null, ChatterRole.USER, user, gptPrivateChat.getCreatedAt());
+        socketServiceProvider.sendMessage(targetId, gptPrivateChatSocketDto);
+
+        return new GptPrivateChatAddResDto(privateChat.getId(), privateChat.getCreatedAt(), gptPrivateChat.getId(), gptPrivateChat.getCreatedAt(), gptResponse);
     }
 
     public DataListResDto<PrivateRoomResDto> getPrivateRoomList(Long userId, int page) {
