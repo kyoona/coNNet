@@ -60,6 +60,15 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     }
 
     @Override
+    public Optional<PrivateChat> findPrivateChatsById(Long privateChatId) {
+        PrivateChat findPrivateChat = query.selectFrom(privateChat)
+                .where(privateChat.id.eq(privateChatId))
+                .fetchOne();
+
+        return Optional.ofNullable(findPrivateChat);
+    }
+
+    @Override
     public boolean existsAlivePrivateRoomUser(Long userId, Long privateRoomId) {
         Long count = query.select(privateRoomUser.count())
                 .from(privateRoomUser)

@@ -4,10 +4,7 @@ import houseInception.connet.domain.*;
 import houseInception.connet.domain.privateRoom.PrivateChat;
 import houseInception.connet.domain.privateRoom.PrivateRoom;
 import houseInception.connet.domain.privateRoom.PrivateRoomUser;
-import houseInception.connet.dto.PrivateChatAddDto;
-import houseInception.connet.dto.PrivateChatAddResDto;
-import houseInception.connet.dto.PrivateChatResDto;
-import houseInception.connet.dto.PrivateRoomResDto;
+import houseInception.connet.dto.*;
 import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.repository.PrivateRoomRepository;
 import houseInception.connet.repository.UserBlockRepository;
@@ -112,6 +109,27 @@ class PrivateRoomServiceTest {
         String message = "mess1";
         PrivateChatAddDto chatAddDto = new PrivateChatAddDto(null, message, null);
         assertThatThrownBy(() -> privateRoomService.addPrivateChat(user1.getId(), user2.getId(), chatAddDto)).isInstanceOf(PrivateRoomException.class);
+    }
+
+    @Test
+    void addGptChat() {
+        //given
+        PrivateRoom privateRoom = PrivateRoom.create(user1, user2);
+        em.persist(privateRoom);
+
+        //when
+        String message = "한국의 위도 경도를 알려줘";
+        GptPrivateChatAddResDto result = privateRoomService.addGptChat(user1.getId(), privateRoom.getPrivateRoomUuid(), message);
+
+        //then
+        PrivateChat userChat = privateRoomRepository.findPrivateChatsById(result.getUserChatId()).orElse(null);
+        assertThat(userChat).isNotNull();
+        assertThat(userChat.getMessage()).isEqualTo(message);
+
+        PrivateChat gptChat = privateRoomRepository.findPrivateChatsById(result.getGptChatId()).orElse(null);
+        assertThat(gptChat).isNotNull();
+        assertThat(gptChat.getMessage()).isEqualTo(result.getMessage());
+        log.info("gpt response = {}", result.getMessage());
     }
 
     @Test
