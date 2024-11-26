@@ -14,7 +14,9 @@ public interface PrivateRoomCustomRepository {
 
     Optional<PrivateRoom> findPrivateRoomWithUser(String privateRoomUuid);
     Optional<PrivateRoomUser> findPrivateRoomUser(Long privateRoomId, Long userId);
+    Optional<PrivateRoomUser> findTargetRoomUserWithUserInChatRoom(Long userId, Long privateRoomId);
     List<PrivateChat> findPrivateChatsInPrivateRoom(Long privateRoomId);
+    Optional<PrivateChat> findPrivateChatsById(Long privateChatId);
 
     Map<Long, PrivateRoomResDto> getPrivateRoomList(Long userId, int page);
     List<Long> getLastChatTimeOfPrivateRooms(List<Long> privateRoomIdList);

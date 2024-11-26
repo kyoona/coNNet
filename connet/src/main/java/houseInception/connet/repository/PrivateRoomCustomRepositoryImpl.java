@@ -6,8 +6,6 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.ChatRoomType;
-import houseInception.connet.domain.QChatEmoji;
-import houseInception.connet.domain.Status;
 import houseInception.connet.domain.privateRoom.*;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.PrivateChatResDto;
@@ -62,6 +60,15 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     }
 
     @Override
+    public Optional<PrivateChat> findPrivateChatsById(Long privateChatId) {
+        PrivateChat findPrivateChat = query.selectFrom(privateChat)
+                .where(privateChat.id.eq(privateChatId))
+                .fetchOne();
+
+        return Optional.ofNullable(findPrivateChat);
+    }
+
+    @Override
     public boolean existsAlivePrivateRoomUser(Long userId, Long privateRoomId) {
         Long count = query.select(privateRoomUser.count())
                 .from(privateRoomUser)
@@ -88,11 +95,25 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
 
     @Override
     public Long getPrivateRoomIdOfChat(Long privateChatId) {
-        return query.select(privateChat.privateRoom.id)
+        return query
+                .select(privateChat.privateRoom.id)
                 .from(privateChat)
                 .where(privateChat.id.eq(privateChatId),
                         privateChat.status.eq(ALIVE))
                 .fetchOne();
+    }
+
+    public Optional<PrivateRoomUser> findTargetRoomUserWithUserInChatRoom(Long userId, Long privateRoomId) {
+        PrivateRoomUser targetPrivateRoomUser = query
+                .selectFrom(privateRoomUser)
+                .innerJoin(privateRoom).on(privateRoom.id.eq(privateRoomUser.privateRoom.id))
+                .innerJoin(privateRoomUser.user, user).fetchJoin()
+                .where(user.id.ne(userId),
+                        privateRoom.id.eq(privateRoomId),
+                        privateRoom.status.eq(ALIVE))
+                .fetchOne();
+
+        return Optional.ofNullable(targetPrivateRoomUser);
     }
 
     @Override
@@ -115,8 +136,8 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                                 "emojiAggStr")
                 ))
                 .from(privateChat)
-                .innerJoin(privateRoomUser).on(privateRoomUser.id.eq(privateChat.writer.id))
-                .innerJoin(user).on(user.id.eq(privateRoomUser.user.id))
+                .leftJoin(privateRoomUser).on(privateRoomUser.id.eq(privateChat.writer.id))
+                .leftJoin(user).on(user.id.eq(privateRoomUser.user.id))
                 .where(privateChat.privateRoom.id.eq(privateRoomId),
                         privateChat.createdAt.goe(
                                 JPAExpressions.select(subPrivateRoomUser.participationTime)

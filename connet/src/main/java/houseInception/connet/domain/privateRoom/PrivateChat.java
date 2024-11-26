@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static houseInception.connet.domain.ChatterRole.GPT;
 import static houseInception.connet.domain.ChatterRole.USER;
 import static houseInception.connet.domain.Status.ALIVE;
 
@@ -38,6 +39,7 @@ public class PrivateChat extends BaseTime {
     @Enumerated(EnumType.STRING)
     private ChatterRole chatTarget;
 
+    @Lob
     private String message;
     private String image;
 
@@ -53,6 +55,27 @@ public class PrivateChat extends BaseTime {
         privateChat.chatTarget = USER;
         privateChat.message =  message;
         privateChat.image = imgUrl;
+
+        return privateChat;
+    }
+
+    protected static PrivateChat createUserToGptChat(PrivateRoom privateRoom, PrivateRoomUser privateRoomUser, String message) {
+        PrivateChat privateChat = new PrivateChat();
+        privateChat.privateRoom = privateRoom;
+        privateChat.writer = privateRoomUser;
+        privateChat.writerRole = USER;
+        privateChat.chatTarget = GPT;
+        privateChat.message =  message;
+
+        return privateChat;
+    }
+
+    protected static PrivateChat createGptToUserChat(PrivateRoom privateRoom, String message) {
+        PrivateChat privateChat = new PrivateChat();
+        privateChat.privateRoom = privateRoom;
+        privateChat.writerRole = GPT;
+        privateChat.chatTarget = USER;
+        privateChat.message =  message;
 
         return privateChat;
     }
