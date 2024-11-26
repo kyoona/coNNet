@@ -17,6 +17,7 @@ import houseInception.connet.socketManager.SocketServiceProvider;
 import houseInception.connet.socketManager.dto.PrivateChatSocketDto;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.Status.DELETED;
 import static houseInception.connet.response.status.BaseErrorCode.*;
 
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
@@ -144,7 +146,7 @@ public class PrivateRoomService {
         PrivateChat gptPrivateChat = privateRoom.addGptToUserChat(gptResponse);
         em.flush();
 
-        sendMessageThrowSocket(targetId, privateRoomUuid, gptPrivateChat.getId(), message, null, ChatterRole.USER, user, gptPrivateChat.getCreatedAt());
+        sendMessageThrowSocket(targetId, privateRoomUuid, gptPrivateChat.getId(), gptResponse, null, ChatterRole.GPT, user, gptPrivateChat.getCreatedAt());
 
         checkRoomUserAndSetAlive(privateRoomReceiver, privateRoom, privateChat.getCreatedAt());
         checkRoomUserAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());

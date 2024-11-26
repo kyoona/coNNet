@@ -39,6 +39,7 @@ public class PrivateChat extends BaseTime {
     @Enumerated(EnumType.STRING)
     private ChatterRole chatTarget;
 
+    @Lob
     private String message;
     private String image;
 
