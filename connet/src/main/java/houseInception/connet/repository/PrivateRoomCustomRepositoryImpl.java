@@ -136,8 +136,8 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                                 "emojiAggStr")
                 ))
                 .from(privateChat)
-                .innerJoin(privateRoomUser).on(privateRoomUser.id.eq(privateChat.writer.id))
-                .innerJoin(user).on(user.id.eq(privateRoomUser.user.id))
+                .leftJoin(privateRoomUser).on(privateRoomUser.id.eq(privateChat.writer.id))
+                .leftJoin(user).on(user.id.eq(privateRoomUser.user.id))
                 .where(privateChat.privateRoom.id.eq(privateRoomId),
                         privateChat.createdAt.goe(
                                 JPAExpressions.select(subPrivateRoomUser.participationTime)
