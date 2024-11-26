@@ -15,7 +15,6 @@ import java.util.UUID;
 
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.Status.DELETED;
-import static houseInception.connet.domain.privateRoom.QPrivateRoomUser.privateRoomUser;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)

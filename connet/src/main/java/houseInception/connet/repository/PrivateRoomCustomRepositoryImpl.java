@@ -6,8 +6,6 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.ChatRoomType;
-import houseInception.connet.domain.QChatEmoji;
-import houseInception.connet.domain.Status;
 import houseInception.connet.domain.privateRoom.*;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.PrivateChatResDto;
@@ -96,17 +94,17 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                 .fetchOne();
     }
 
-    @Override
-    public Long getTargetIdInChatRoom(Long userId, Long privateRoomId) {
-        return query
-                .select(user.id)
-                .from(privateRoomUser)
+    public Optional<PrivateRoomUser> findTargetRoomUserWithUserInChatRoom(Long userId, Long privateRoomId) {
+        PrivateRoomUser targetPrivateRoomUser = query
+                .selectFrom(privateRoomUser)
                 .innerJoin(privateRoom).on(privateRoom.id.eq(privateRoomUser.privateRoom.id))
-                .innerJoin(user).on(user.id.eq(privateRoomUser.user.id))
+                .innerJoin(privateRoomUser.user, user).fetchJoin()
                 .where(user.id.ne(userId),
                         privateRoom.id.eq(privateRoomId),
                         privateRoom.status.eq(ALIVE))
                 .fetchOne();
+
+        return Optional.ofNullable(targetPrivateRoomUser);
     }
 
     @Override

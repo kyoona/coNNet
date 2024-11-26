@@ -75,9 +75,7 @@ public class PrivateRoomService {
         checkRoomUserAndSetAlive(privateRoomReceiver, privateRoom, privateChat.getCreatedAt());
         checkRoomUserAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());
 
-        PrivateChatSocketDto privateChatSocketDto =
-                new PrivateChatSocketDto(privateRoom.getPrivateRoomUuid(), privateChat.getId(), chatAddDto.getMessage(), imgUrl, ChatterRole.USER, user, privateChat.getCreatedAt());
-        socketServiceProvider.sendMessage(targetId, privateChatSocketDto);
+        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), privateChat.getId(), chatAddDto.getMessage(), imgUrl, ChatterRole.USER, user, privateChat.getCreatedAt());
 
         return new PrivateChatAddResDto(privateRoom.getPrivateRoomUuid(), privateChat.getId());
     }
@@ -131,26 +129,33 @@ public class PrivateRoomService {
     @Transactional
     public GptPrivateChatAddResDto addGptChat(Long userId, String privateRoomUuid, String message) {
         PrivateRoom privateRoom = findPrivateRoom(privateRoomUuid);
-        PrivateRoomUser privateRoomUser = findPrivateRoomUser(privateRoom.getId(), userId);
+        PrivateRoomUser privateRoomSender = findPrivateRoomUser(privateRoom.getId(), userId);
         User user = findUser(userId);
 
-        PrivateChat privateChat = privateRoom.addUserToGptChat(message, privateRoomUser);
+        PrivateChat privateChat = privateRoom.addUserToGptChat(message, privateRoomSender);
         em.flush();
 
-        Long targetId = privateRoomRepository.getTargetIdInChatRoom(userId, privateRoom.getId());
-        PrivateChatSocketDto privateChatSocketDto =
-                new PrivateChatSocketDto(privateRoomUuid, privateChat.getId(), message, null, ChatterRole.USER, user, privateChat.getCreatedAt());
-        socketServiceProvider.sendMessage(targetId, privateChatSocketDto);
+        PrivateRoomUser privateRoomReceiver = privateRoomRepository.findTargetRoomUserWithUserInChatRoom(userId, privateRoom.getId())
+                .orElseThrow(() -> new PrivateRoomException(INTERNAL_SERVER_ERROR, "개인 채팅방에 상대 유저가 존재하지 않습니다."));
+        Long targetId = privateRoomReceiver.getUser().getId();
+        sendMessageThrowSocket(targetId, privateRoomUuid, privateChat.getId(), message, null, ChatterRole.USER, user, privateChat.getCreatedAt());
 
         String gptResponse = gptApiProvider.getChatCompletion(message);
         PrivateChat gptPrivateChat = privateRoom.addGptToUserChat(gptResponse);
         em.flush();
 
-        PrivateChatSocketDto gptPrivateChatSocketDto =
-                new PrivateChatSocketDto(privateRoomUuid, gptPrivateChat.getId(), message, null, ChatterRole.USER, user, gptPrivateChat.getCreatedAt());
-        socketServiceProvider.sendMessage(targetId, gptPrivateChatSocketDto);
+        sendMessageThrowSocket(targetId, privateRoomUuid, gptPrivateChat.getId(), message, null, ChatterRole.USER, user, gptPrivateChat.getCreatedAt());
+
+        checkRoomUserAndSetAlive(privateRoomReceiver, privateRoom, privateChat.getCreatedAt());
+        checkRoomUserAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());
 
         return new GptPrivateChatAddResDto(privateChat.getId(), privateChat.getCreatedAt(), gptPrivateChat.getId(), gptPrivateChat.getCreatedAt(), gptResponse);
+    }
+
+    private void sendMessageThrowSocket(Long targetId, String roomUuid, Long chatId, String message, String image, ChatterRole chatterRole, User sender, LocalDateTime createdAt){
+        PrivateChatSocketDto chatSocketDto =
+                new PrivateChatSocketDto(roomUuid, chatId, message, image, chatterRole, sender, createdAt);
+        socketServiceProvider.sendMessage(targetId, chatSocketDto);
     }
 
     public DataListResDto<PrivateRoomResDto> getPrivateRoomList(Long userId, int page) {

@@ -14,6 +14,7 @@ public interface PrivateRoomCustomRepository {
 
     Optional<PrivateRoom> findPrivateRoomWithUser(String privateRoomUuid);
     Optional<PrivateRoomUser> findPrivateRoomUser(Long privateRoomId, Long userId);
+    Optional<PrivateRoomUser> findTargetRoomUserWithUserInChatRoom(Long userId, Long privateRoomId);
     List<PrivateChat> findPrivateChatsInPrivateRoom(Long privateRoomId);
 
     Map<Long, PrivateRoomResDto> getPrivateRoomList(Long userId, int page);
@@ -22,7 +23,6 @@ public interface PrivateRoomCustomRepository {
     boolean existsAlivePrivateRoomUser(Long userId, Long privateRoomId);
     boolean existsAlivePrivateRoomUser(Long userId, String privateRoomUuid);
     Long getPrivateRoomIdOfChat(Long privateChatId);
-    Long getTargetIdInChatRoom(Long userId, Long privateRoomId);
 
     List<PrivateChatResDto> getPrivateChatList(Long userId, Long privateRoomId, int page);
 }
