@@ -57,6 +57,24 @@ public class PrivateRoom extends BaseTime {
         return null;
     }
 
+    public PrivateChat addUserToGptChat(String message, PrivateRoomUser privateRoomUser) {
+        if (privateRoomUser.getPrivateRoom().getId().equals(this.id)) {
+            PrivateChat chat = PrivateChat.createUserToGptChat(this, privateRoomUser, message);
+            this.privateChats.add(chat);
+
+            return chat;
+        }
+
+        return null;
+    }
+
+    public PrivateChat addGptToUserChat(String message) {
+        PrivateChat chat = PrivateChat.createGptToUserChat(this, message);
+        this.privateChats.add(chat);
+
+        return chat;
+    }
+
     public List<PrivateChat> getPrivateChats() {
         return new ArrayList<>(privateChats);
     }

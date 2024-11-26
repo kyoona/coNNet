@@ -5,7 +5,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class PrivateChatAddRestDto {
+public class PrivateChatAddResDto {
 
     private String chatRoomUuid;
+    private Long chatId;
 }

@@ -15,10 +15,19 @@ public class PrivateRoomController {
     private final PrivateRoomService privateRoomService;
 
     @PostMapping("/{targetId}")
-    public BaseResponse<PrivateChatAddRestDto> addPrivateChat(@PathVariable Long targetId,
-                                                              @ModelAttribute PrivateChatAddDto chatAddDto){
+    public BaseResponse<PrivateChatAddResDto> addPrivateChat(@PathVariable Long targetId,
+                                                             @ModelAttribute PrivateChatAddDto chatAddDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        PrivateChatAddRestDto result = privateRoomService.addPrivateChat(userId, targetId, chatAddDto);
+        PrivateChatAddResDto result = privateRoomService.addPrivateChat(userId, targetId, chatAddDto);
+
+        return new BaseResponse<>(result);
+    }
+
+    @PostMapping("/{privateRoomUuid}/gpt")
+    public BaseResponse<GptPrivateChatAddResDto> addGptChat(@PathVariable String privateRoomUuid,
+                                                            @RequestBody PrivateGptChatAddDto gptChatAddDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        GptPrivateChatAddResDto result = privateRoomService.addGptChat(userId, privateRoomUuid, gptChatAddDto.getMessage());
 
         return new BaseResponse<>(result);
     }
@@ -40,7 +49,8 @@ public class PrivateRoomController {
     }
 
     @GetMapping("/{privateRoomUuid}/chats")
-    public BaseResponse<DataListResDto<PrivateChatResDto>> getPrivateChatList(@PathVariable String privateRoomUuid, @RequestParam(defaultValue = "1") int page){
+    public BaseResponse<DataListResDto<PrivateChatResDto>> getPrivateChatList(@PathVariable String privateRoomUuid,
+                                                                              @RequestParam(defaultValue = "1") int page){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         DataListResDto<PrivateChatResDto> result = privateRoomService.getPrivateChatList(userId, privateRoomUuid, page);
 
