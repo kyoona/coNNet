@@ -31,6 +31,7 @@ public class SpringConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(POST, "/login/sign-in").permitAll()
                         .requestMatchers(POST, "/refresh/check").permitAll()
+                        .requestMatchers("/connetSocket").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(mdcFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
