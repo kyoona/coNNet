@@ -29,13 +29,8 @@ class PrivateRoomServiceTest {
 
     @Autowired
     PrivateRoomService privateRoomService;
-
-    @Autowired
-    UserRepository userRepository;
     @Autowired
     PrivateRoomRepository privateRoomRepository;
-    @Autowired
-    UserBlockRepository userBlockRepository;
 
     @Autowired
     EntityManager em;
@@ -52,10 +47,10 @@ class PrivateRoomServiceTest {
         user3 = User.create("user3", null, null, null);
         user4 = User.create("user4", null, null, null);
 
-        userRepository.save(user1);
-        userRepository.save(user2);
-        userRepository.save(user3);
-        userRepository.save(user4);
+        em.persist(user1);
+        em.persist(user2);
+        em.persist(user3);
+        em.persist(user4);
     }
 
     @Test
@@ -102,8 +97,8 @@ class PrivateRoomServiceTest {
         UserBlock userBlock = UserBlock.create(user2, user1, UserBlockType.REQUEST);
         UserBlock reverseUserBlock = UserBlock.create(user1, user2, UserBlockType.ACCEPT);
 
-        userBlockRepository.save(userBlock);
-        userBlockRepository.save(reverseUserBlock);
+        em.persist(userBlock);
+        em.persist(reverseUserBlock);
 
         //when
         String message = "mess1";
