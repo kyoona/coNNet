@@ -48,42 +48,70 @@ public class BaseExceptionHandler {
 
     @ExceptionHandler(UserException.class)
     public ResponseEntity<BaseErrorResponse> handleUserException(UserException e) {
-        log.error("User Exception<{}>: {}", e.getStatus().getMessage(), e);
+        log.error("{}}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
 
         return BaseErrorResponse.get(e.getStatus());
     }
 
     @ExceptionHandler(GptRoomException.class)
     public ResponseEntity<BaseErrorResponse> handleChatRoomException(GptRoomException e) {
-        log.error("GptRoom Exception<{}>: {}", e.getStatus().getMessage(), e);
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e));
 
         return BaseErrorResponse.get(e.getStatus());
     }
 
     @ExceptionHandler(FriendException.class)
-    public ResponseEntity<BaseErrorResponse> handleFriendExceptionn(FriendException e) {
-        log.error("Friend Exception<{}>: {}", e.getStatus().getMessage(), e);
+    public ResponseEntity<BaseErrorResponse> handleFriendException(FriendException e) {
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
+
+        return BaseErrorResponse.get(e.getStatus());
+    }
+
+    @ExceptionHandler(UserBlockException.class)
+    public ResponseEntity<BaseErrorResponse> handleUserBlockException(UserBlockException e) {
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
 
         return BaseErrorResponse.get(e.getStatus());
     }
 
     @ExceptionHandler(PrivateRoomException.class)
     public ResponseEntity<BaseErrorResponse> handlePrivateRoomException(PrivateRoomException e) {
-        log.error("PrivateRoom Exception<{}>: ", e.getStatus().getMessage(), e);
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
+
+        return BaseErrorResponse.get(e.getStatus());
+    }
+
+    @ExceptionHandler(ChatEmojiException.class)
+    public ResponseEntity<BaseErrorResponse> handleChatEmojiException(ChatEmojiException e) {
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
 
         return BaseErrorResponse.get(e.getStatus());
     }
 
     @ExceptionHandler(InValidTokenException.class)
     public ResponseEntity<BaseErrorResponse> handleInValidTokenException(InValidTokenException e) {
-        log.error("InValidToken Exception: {}", e.getMessage(), e);
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
 
         return BaseErrorResponse.get(e.getStatus());
     }
 
     @ExceptionHandler(JsonParseException.class)
     public ResponseEntity<BaseErrorResponse> handleJsonParseException(JsonParseException e) {
-        log.error("JsonParse Exception: {}", e.getMessage(), e);
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
+
+        return BaseErrorResponse.get(e.getStatus());
+    }
+
+    @ExceptionHandler(SocketException.class)
+    public ResponseEntity<BaseErrorResponse> handleSocketException(SocketException e) {
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
+
+        return BaseErrorResponse.get(e.getStatus());
+    }
+
+    @ExceptionHandler(S3UploadException.class)
+    public ResponseEntity<BaseErrorResponse> handleS3UploadException(S3UploadException e) {
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
 
         return BaseErrorResponse.get(e.getStatus());
     }
