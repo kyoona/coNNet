@@ -102,4 +102,42 @@ class ChatEmojiServiceTest {
         EmojiDto emojiDto = new EmojiDto(EmojiType.HEART);
         assertThatThrownBy(() -> chatEmojiService.addEmojiToPrivateChat(user3.getId(), privateChat.getId(), emojiDto)).isInstanceOf(ChatEmojiException.class);
     }
+
+    @Test
+    void removeEmojiToPrivateChat() {
+        //given
+        PrivateRoom privateRoom = PrivateRoom.create(user1, user2);
+        em.persist(privateRoom);
+
+        PrivateRoomUser privateRoomUser1 = privateRoomRepository.findPrivateRoomUser(privateRoom.getId(), user1.getId()).orElseThrow();
+        PrivateChat privateChat = privateRoom.addUserToUserChat("mess", null, privateRoomUser1);
+        em.flush();
+
+        ChatEmoji chatEmoji = ChatEmoji.createPrivateChatEmoji(user1, privateChat.getId(), EmojiType.HEART);
+        em.persist(chatEmoji);
+
+        //when
+        chatEmojiService.removeEmojiToPrivateChat(user1.getId(), privateChat.getId(), new EmojiDto(EmojiType.HEART));
+
+        //then
+        assertThat(chatEmojiRepository.findById(chatEmoji.getId())).isEmpty();
+    }
+
+    @Test
+    void removeEmojiToPrivateChat_권한X() {
+        //given
+        PrivateRoom privateRoom = PrivateRoom.create(user1, user2);
+        em.persist(privateRoom);
+
+        PrivateRoomUser privateRoomUser1 = privateRoomRepository.findPrivateRoomUser(privateRoom.getId(), user1.getId()).orElseThrow();
+        PrivateChat privateChat = privateRoom.addUserToUserChat("mess", null, privateRoomUser1);
+        em.flush();
+
+        ChatEmoji chatEmoji = ChatEmoji.createPrivateChatEmoji(user1, privateChat.getId(), EmojiType.HEART);
+        em.persist(chatEmoji);
+
+        //when
+        assertThatThrownBy(() -> chatEmojiService.removeEmojiToPrivateChat(user2.getId(), privateChat.getId(), new EmojiDto(EmojiType.HEART)))
+                .isInstanceOf(ChatEmojiException.class);
+    }
 }

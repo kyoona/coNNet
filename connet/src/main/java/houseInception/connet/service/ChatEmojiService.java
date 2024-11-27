@@ -47,7 +47,7 @@ public class ChatEmojiService {
         ChatEmoji chatEmoji = findChatEmoji(userId, chatId, emojiDto.getEmojiType(), ChatRoomType.PRIVATE);
         chatEmojiRepository.delete(chatEmoji);
 
-        return null;
+        return chatEmoji.getId();
     }
 
     private User findUser(Long userId){
