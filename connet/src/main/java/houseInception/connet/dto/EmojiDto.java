@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmojiAddDto {
+public class EmojiDto {
 
     @NotNull
     private EmojiType emojiType;
