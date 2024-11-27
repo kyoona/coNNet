@@ -4,7 +4,7 @@ import houseInception.connet.domain.ChatEmoji;
 import houseInception.connet.domain.ChatRoomType;
 import houseInception.connet.domain.EmojiType;
 import houseInception.connet.domain.User;
-import houseInception.connet.dto.EmojiAddDto;
+import houseInception.connet.dto.EmojiDto;
 import houseInception.connet.exception.ChatEmojiException;
 import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.exception.UserException;
@@ -26,21 +26,38 @@ public class ChatEmojiService {
     private final UserRepository userRepository;
     private final PrivateRoomRepository privateRoomRepository;
 
-    public Long addEmojiToPrivateChat(Long userId, Long chatId, EmojiAddDto emojiAddDto){
+    @Transactional
+    public Long addEmojiToPrivateChat(Long userId, Long chatId, EmojiDto emojiDto){
         Long privateRoomId = checkExistsPrivateChatAndGetChatRoomID(chatId);
         checkUserInPrivateRoom(userId, privateRoomId);
-        checkUserAlreadyHasEmoji(userId, chatId, emojiAddDto.getEmojiType(), ChatRoomType.PRIVATE);
+        checkUserAlreadyHasEmoji(userId, chatId, emojiDto.getEmojiType(), ChatRoomType.PRIVATE);
         User user = findUser(userId);
 
-        ChatEmoji chatEmoji = ChatEmoji.createPrivateChatEmoji(user, chatId, emojiAddDto.getEmojiType());
+        ChatEmoji chatEmoji = ChatEmoji.createPrivateChatEmoji(user, chatId, emojiDto.getEmojiType());
         chatEmojiRepository.save(chatEmoji);
 
         return chatEmoji.getId();
     }
 
+    @Transactional
+    public Long removeEmojiToPrivateChat(Long userId, Long chatId, EmojiDto emojiDto) {
+        Long privateRoomId = checkExistsPrivateChatAndGetChatRoomID(chatId);
+        checkUserInPrivateRoom(userId, privateRoomId);
+
+        ChatEmoji chatEmoji = findChatEmoji(userId, chatId, emojiDto.getEmojiType(), ChatRoomType.PRIVATE);
+        chatEmojiRepository.delete(chatEmoji);
+
+        return null;
+    }
+
     private User findUser(Long userId){
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(NO_SUCH_USER));
+    }
+
+    private ChatEmoji findChatEmoji(Long userId, Long chatId, EmojiType emojiType, ChatRoomType chatRoomType) {
+        return chatEmojiRepository.findChatEmoji(userId, chatId, emojiType, chatRoomType)
+                .orElseThrow(() -> new ChatEmojiException(NO_SUCH_EMOJI));
     }
 
     private void checkUserAlreadyHasEmoji(Long userId, Long chatId, EmojiType emojiType, ChatRoomType chatRoomType) {
