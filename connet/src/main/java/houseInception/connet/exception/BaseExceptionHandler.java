@@ -55,7 +55,7 @@ public class BaseExceptionHandler {
 
     @ExceptionHandler(GptRoomException.class)
     public ResponseEntity<BaseErrorResponse> handleChatRoomException(GptRoomException e) {
-        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e));
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
 
         return BaseErrorResponse.get(e.getStatus());
     }
