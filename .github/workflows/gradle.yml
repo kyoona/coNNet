@@ -81,7 +81,7 @@ jobs:
             --log-opt awslogs-region=ap-northeast-2 \
             --log-opt awslogs-group=house-inception \
             --log-opt awslogs-stream=i-01247077d8dd0e1c2 \
-            --log-opt awslogs-multiline-pattern="^\[[a-f0-9-]{36}\]" \
+            --log-opt awslogs-multiline-pattern="^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}" \
             --network="host" \
             -e GPT_API_KEY=${{ secrets.GPT_API_KEY }} \
             -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} \
