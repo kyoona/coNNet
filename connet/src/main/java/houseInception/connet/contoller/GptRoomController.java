@@ -48,7 +48,7 @@ public class GptRoomController {
         return BaseResponse.getSimpleRes(resultId);
     }
 
-    @GetMapping("/gpt/{gptRoomUuid}")
+    @GetMapping("/{gptRoomUuid}")
     public BaseResponse<GptChatRoomChatListResDto> getGptRoomChatList(@PathVariable String gptRoomUuid,
                                                                       @RequestParam(defaultValue = "1") int page){
         Long userId = UserAuthorizationUtil.getLoginUserId();
