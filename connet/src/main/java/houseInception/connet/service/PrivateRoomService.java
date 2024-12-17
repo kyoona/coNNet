@@ -150,7 +150,7 @@ public class PrivateRoomService {
 
         sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), gptPrivateChat.getId(), gptResponse, null, ChatterRole.GPT, user, gptPrivateChat.getCreatedAt());
 
-        return new GptPrivateChatAddResDto(privateChat.getId(), privateChat.getCreatedAt(), gptPrivateChat.getId(), gptPrivateChat.getCreatedAt(), gptResponse);
+        return new GptPrivateChatAddResDto(privateRoom.getPrivateRoomUuid(), privateChat.getId(), privateChat.getCreatedAt(), gptPrivateChat.getId(), gptPrivateChat.getCreatedAt(), gptResponse);
     }
     
     private PrivateRoom getOrCreatePrivateRoom(Optional<PrivateRoom> nullablePrivateRoom, User user, User targetUser){
