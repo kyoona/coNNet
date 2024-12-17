@@ -108,14 +108,14 @@ class PrivateRoomServiceTest {
     }
 
     @Test
-    void addGptChat() {
+    void addGptChat_채팅방_존재() {
         //given
         PrivateRoom privateRoom = PrivateRoom.create(user1, user2);
         em.persist(privateRoom);
 
         //when
         String message = "한국의 위도 경도를 알려줘";
-        GptPrivateChatAddResDto result = privateRoomService.addGptChat(user1.getId(), privateRoom.getPrivateRoomUuid(), message);
+        GptPrivateChatAddResDto result = privateRoomService.addGptChat(user1.getId(), user2.getId(), message);
 
         //then
         PrivateChat userChat = privateRoomRepository.findPrivateChatsById(result.getUserChatId()).orElse(null);
