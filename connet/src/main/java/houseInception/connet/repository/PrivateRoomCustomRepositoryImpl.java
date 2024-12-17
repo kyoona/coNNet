@@ -43,6 +43,22 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     }
 
     @Override
+    public Optional<PrivateRoom> findPrivateRoomByUsers(Long userId, Long targetId) {
+        QPrivateRoomUser subPrivateUser = new QPrivateRoomUser("subPrivateUser");
+        PrivateRoom fetchedPrivateRoom = query
+                .select(privateRoom)
+                .from(privateRoomUser)
+                .innerJoin(subPrivateUser).on(privateRoomUser.privateRoom.id.eq(subPrivateUser.privateRoom.id))
+                .innerJoin(privateRoomUser.privateRoom, privateRoom)
+                .where(privateRoomUser.user.id.eq(userId),
+                        subPrivateUser.user.id.eq(targetId),
+                        privateRoom.status.eq(ALIVE))
+                .fetchOne();
+
+        return Optional.ofNullable(fetchedPrivateRoom);
+    }
+
+    @Override
     public Optional<PrivateRoomUser> findPrivateRoomUser(Long privateRoomId, Long userId) {
         PrivateRoomUser findPrivateRoomUser = query.selectFrom(privateRoomUser)
                 .where(privateRoomUser.privateRoom.id.eq(privateRoomId),
@@ -103,12 +119,11 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                 .fetchOne();
     }
 
-    public Optional<PrivateRoomUser> findTargetRoomUserWithUserInChatRoom(Long userId, Long privateRoomId) {
+    public Optional<PrivateRoomUser> findTargetRoomUserInChatRoom(Long userId, Long privateRoomId) {
         PrivateRoomUser targetPrivateRoomUser = query
                 .selectFrom(privateRoomUser)
                 .innerJoin(privateRoom).on(privateRoom.id.eq(privateRoomUser.privateRoom.id))
-                .innerJoin(privateRoomUser.user, user).fetchJoin()
-                .where(user.id.ne(userId),
+                .where(privateRoomUser.user.id.ne(userId),
                         privateRoom.id.eq(privateRoomId),
                         privateRoom.status.eq(ALIVE))
                 .fetchOne();

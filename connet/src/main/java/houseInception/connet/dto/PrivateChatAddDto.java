@@ -11,7 +11,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PrivateChatAddDto {
 
-    private String chatRoomUuid;
     private String message;
     private MultipartFile image;
 }

@@ -13,8 +13,9 @@ import java.util.Optional;
 public interface PrivateRoomCustomRepository {
 
     Optional<PrivateRoom> findPrivateRoomWithUser(String privateRoomUuid);
+    Optional<PrivateRoom> findPrivateRoomByUsers(Long userId, Long targetId);
     Optional<PrivateRoomUser> findPrivateRoomUser(Long privateRoomId, Long userId);
-    Optional<PrivateRoomUser> findTargetRoomUserWithUserInChatRoom(Long userId, Long privateRoomId);
+    Optional<PrivateRoomUser> findTargetRoomUserInChatRoom(Long userId, Long privateRoomId);
     List<PrivateChat> findPrivateChatsInPrivateRoom(Long privateRoomId);
     Optional<PrivateChat> findPrivateChatsById(Long privateChatId);
 

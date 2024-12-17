@@ -23,11 +23,11 @@ public class PrivateRoomController {
         return new BaseResponse<>(result);
     }
 
-    @PostMapping("/{privateRoomUuid}/gpt")
-    public BaseResponse<GptPrivateChatAddResDto> addGptChat(@PathVariable String privateRoomUuid,
+    @PostMapping("/{targetId}/gpt")
+    public BaseResponse<GptPrivateChatAddResDto> addGptChat(@PathVariable Long targetId,
                                                             @RequestBody PrivateGptChatAddDto gptChatAddDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        GptPrivateChatAddResDto result = privateRoomService.addGptChat(userId, privateRoomUuid, gptChatAddDto.getMessage());
+        GptPrivateChatAddResDto result = privateRoomService.addGptChat(userId, targetId, gptChatAddDto.getMessage());
 
         return new BaseResponse<>(result);
     }

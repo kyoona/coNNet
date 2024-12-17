@@ -54,10 +54,10 @@ class PrivateRoomServiceTest {
     }
 
     @Test
-    void addPrivateChat_채팅방X_파일X() {
+    void addPrivateChat_채팅방_생성_파일X() {
         //when
         String message = "mess1";
-        PrivateChatAddDto chatAddDto = new PrivateChatAddDto(null, message, null);
+        PrivateChatAddDto chatAddDto = new PrivateChatAddDto(message, null);
         PrivateChatAddResDto result = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), chatAddDto);
 
         //then
@@ -65,30 +65,29 @@ class PrivateRoomServiceTest {
         assertThat(privateRoom).isNotNull();
 
         List<PrivateRoomUser> privateRoomUsers = privateRoom.getPrivateRoomUsers();
-        assertThat(privateRoomUsers.size()).isEqualTo(2);
-        assertThat(privateRoomUsers.stream().map(PrivateRoomUser::getUser))
-                .extracting("id").contains(user1.getId(), user2.getId());
+        assertThat(privateRoomUsers).hasSize(2);
+        assertThat(privateRoomUsers)
+                .extracting(roomUser -> roomUser.getUser().getId())
+                .containsExactlyInAnyOrder(user1.getId(), user2.getId());
+
 
         List<PrivateChat> privateChats = privateRoomRepository.findPrivateChatsInPrivateRoom(privateRoom.getId());
-        assertThat(privateChats.size()).isEqualTo(1);
+        assertThat(privateChats).hasSize(1);
         assertThat(privateChats.get(0).getMessage()).isEqualTo(message);
     }
 
     @Test
-    void addPrivateChat_채팅방O_파일X() {
+    void addPrivateChat_채팅방_존재() {
         //given
         PrivateRoom privateRoom = PrivateRoom.create(user1, user2);
         privateRoomRepository.save(privateRoom);
 
         //when
-        String message = "mess1";
-        PrivateChatAddDto chatAddDto = new PrivateChatAddDto(privateRoom.getPrivateRoomUuid(), message, null);
+        PrivateChatAddDto chatAddDto = new PrivateChatAddDto("mess1", null);
         PrivateChatAddResDto result = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), chatAddDto);
 
         //then
-        List<PrivateChat> privateChats = privateRoomRepository.findPrivateChatsInPrivateRoom(privateRoom.getId());
-        assertThat(privateChats.size()).isEqualTo(1);
-        assertThat(privateChats.get(0).getMessage()).isEqualTo(message);
+        assertThat(result.getChatRoomUuid()).isEqualTo(privateRoom.getPrivateRoomUuid());
     }
 
     @Test
@@ -101,20 +100,22 @@ class PrivateRoomServiceTest {
         em.persist(reverseUserBlock);
 
         //when
-        String message = "mess1";
-        PrivateChatAddDto chatAddDto = new PrivateChatAddDto(null, message, null);
-        assertThatThrownBy(() -> privateRoomService.addPrivateChat(user1.getId(), user2.getId(), chatAddDto)).isInstanceOf(PrivateRoomException.class);
+        PrivateChatAddDto chatAddDto = new PrivateChatAddDto("mess1", null);
+        assertThatThrownBy(() -> privateRoomService.addPrivateChat(user1.getId(), user2.getId(), chatAddDto))
+                .isInstanceOf(PrivateRoomException.class);
+        assertThatThrownBy(() -> privateRoomService.addPrivateChat(user2.getId(), user1.getId(), chatAddDto))
+                .isInstanceOf(PrivateRoomException.class);
     }
 
     @Test
-    void addGptChat() {
+    void addGptChat_채팅방_존재() {
         //given
         PrivateRoom privateRoom = PrivateRoom.create(user1, user2);
         em.persist(privateRoom);
 
         //when
         String message = "한국의 위도 경도를 알려줘";
-        GptPrivateChatAddResDto result = privateRoomService.addGptChat(user1.getId(), privateRoom.getPrivateRoomUuid(), message);
+        GptPrivateChatAddResDto result = privateRoomService.addGptChat(user1.getId(), user2.getId(), message);
 
         //then
         PrivateChat userChat = privateRoomRepository.findPrivateChatsById(result.getUserChatId()).orElse(null);
@@ -149,8 +150,9 @@ class PrivateRoomServiceTest {
         List<PrivateRoomResDto> result = privateRoomService.getPrivateRoomList(user1.getId(), 1).getData();
 
         //then
-        assertThat(result.size()).isEqualTo(3);
-        assertThat(result).extracting("chatRoomId").containsExactly(privateRoom1.getId(), privateRoom3.getId(), privateRoom2.getId());
+        assertThat(result).hasSize(3);
+        assertThat(result).extracting(PrivateRoomResDto::getChatRoomId)
+                .containsExactly(privateRoom1.getId(), privateRoom3.getId(), privateRoom2.getId());
     }
 
     @Test
@@ -173,12 +175,18 @@ class PrivateRoomServiceTest {
         List<PrivateChatResDto> result = privateRoomService.getPrivateChatList(user1.getId(), privateRoom1.getPrivateRoomUuid(), 1).getData();
 
         //then
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result).extracting("chatId").containsExactly(privateChat2.getId(), privateChat1.getId());
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(PrivateChatResDto::getChatId)
+                .containsExactly(privateChat2.getId(), privateChat1.getId());
 
-        PrivateChatResDto chatDto = result.get(1);
-        assertThat(chatDto.getEmoji()).extracting("emojiType").contains(EmojiType.HEART, EmojiType.CHECK);
-        assertThat(chatDto.getEmoji()).extracting("count").contains(1, 2);
+        List<ChatEmojiResDto> emojiList = result.get(1).getEmoji();
+        assertThat(emojiList)
+                .extracting(ChatEmojiResDto::getEmojiType)
+                .contains(EmojiType.HEART, EmojiType.CHECK);
+        assertThat(emojiList)
+                .extracting(ChatEmojiResDto::getCount)
+                .contains(1, 2);
     }
 
     @Test
@@ -203,38 +211,40 @@ class PrivateRoomServiceTest {
         privateRoomRepository.save(privateRoom1);
 
         //when
-        assertThatThrownBy(() -> privateRoomService.deletePrivateRoom(user3.getId(), privateRoom1.getPrivateRoomUuid())).isInstanceOf(PrivateRoomException.class);
+        assertThatThrownBy(() -> privateRoomService.deletePrivateRoom(user3.getId(), privateRoom1.getPrivateRoomUuid()))
+                .isInstanceOf(PrivateRoomException.class);
     }
 
     @Test
     void 채팅방_퇴장후_목록_조회() {
         //given
-        String chatRoomUuid1 = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), new PrivateChatAddDto(null, "message", null)).getChatRoomUuid();
-        String chatRoomUuid2 = privateRoomService.addPrivateChat(user1.getId(), user3.getId(), new PrivateChatAddDto(null, "message", null)).getChatRoomUuid();
-        String chatRoomUuid3 = privateRoomService.addPrivateChat(user1.getId(), user4.getId(), new PrivateChatAddDto(null, "message", null)).getChatRoomUuid();
+        String chatRoomUuid1 = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), new PrivateChatAddDto("message", null)).getChatRoomUuid();
+        String chatRoomUuid2 = privateRoomService.addPrivateChat(user1.getId(), user3.getId(), new PrivateChatAddDto("message", null)).getChatRoomUuid();
+        String chatRoomUuid3 = privateRoomService.addPrivateChat(user1.getId(), user4.getId(), new PrivateChatAddDto("message", null)).getChatRoomUuid();
         privateRoomService.deletePrivateRoom(user1.getId(), chatRoomUuid1);
 
         //when
         List<PrivateRoomResDto> result = privateRoomService.getPrivateRoomList(user1.getId(), 1).getData();
 
         //then
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result).extracting("chatRoomUuid").contains(chatRoomUuid2, chatRoomUuid3);
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting(PrivateRoomResDto::getChatRoomUuid)
+                .contains(chatRoomUuid2, chatRoomUuid3);
     }
 
     @Test
     void 채팅방_퇴장후_재입장_채팅목록_조회() {
         //given
-        String chatRoomUuid1 = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), new PrivateChatAddDto(null, "message", null)).getChatRoomUuid();
+        String chatRoomUuid1 = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), new PrivateChatAddDto("message", null)).getChatRoomUuid();
         privateRoomService.deletePrivateRoom(user1.getId(), chatRoomUuid1);
-        privateRoomService.addPrivateChat(user2.getId(), user1.getId(), new PrivateChatAddDto(chatRoomUuid1, "message", null));
+        privateRoomService.addPrivateChat(user2.getId(), user1.getId(), new PrivateChatAddDto("message", null));
 
         //when
         List<PrivateChatResDto> data1 = privateRoomService.getPrivateChatList(user1.getId(), chatRoomUuid1, 1).getData();
         List<PrivateChatResDto> data2 = privateRoomService.getPrivateChatList(user2.getId(), chatRoomUuid1, 1).getData();
 
         //then
-        assertThat(data1.size()).isEqualTo(1);
-        assertThat(data2.size()).isEqualTo(2);
+        assertThat(data1).hasSize(1);
+        assertThat(data2).hasSize(2);
     }
 }
