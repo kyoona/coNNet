@@ -119,12 +119,11 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                 .fetchOne();
     }
 
-    public Optional<PrivateRoomUser> findTargetRoomUserWithUserInChatRoom(Long userId, Long privateRoomId) {
+    public Optional<PrivateRoomUser> findTargetRoomUserInChatRoom(Long userId, Long privateRoomId) {
         PrivateRoomUser targetPrivateRoomUser = query
                 .selectFrom(privateRoomUser)
                 .innerJoin(privateRoom).on(privateRoom.id.eq(privateRoomUser.privateRoom.id))
-                .innerJoin(privateRoomUser.user, user).fetchJoin()
-                .where(user.id.ne(userId),
+                .where(privateRoomUser.user.id.ne(userId),
                         privateRoom.id.eq(privateRoomId),
                         privateRoom.status.eq(ALIVE))
                 .fetchOne();

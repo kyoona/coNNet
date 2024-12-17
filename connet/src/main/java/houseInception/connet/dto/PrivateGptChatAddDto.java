@@ -1,5 +1,6 @@
 package houseInception.connet.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,5 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PrivateGptChatAddDto {
 
+    @NotBlank
     private String message;
 }

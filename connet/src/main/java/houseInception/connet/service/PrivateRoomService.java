@@ -60,14 +60,7 @@ public class PrivateRoomService {
         checkHasUserBlock(userId, targetId);
 
         Optional<PrivateRoom> nullablePrivateRoom = privateRoomRepository.findPrivateRoomByUsers(userId, targetId);
-        PrivateRoom privateRoom;
-
-        if (nullablePrivateRoom.isEmpty()) {
-            privateRoom = PrivateRoom.create(user, targetUser);
-            privateRoomRepository.save(privateRoom);
-        } else {
-            privateRoom = nullablePrivateRoom.get();
-        }
+        PrivateRoom privateRoom = getOrCreatePrivateRoom(nullablePrivateRoom, user, targetUser);
 
         String imgUrl = uploadImages(chatAddDto.getImage());
 
@@ -131,29 +124,46 @@ public class PrivateRoomService {
     }
 
     @Transactional
-    public GptPrivateChatAddResDto addGptChat(Long userId, String privateRoomUuid, String message) {
-        PrivateRoom privateRoom = findPrivateRoom(privateRoomUuid);
-        PrivateRoomUser privateRoomSender = findPrivateRoomUser(privateRoom.getId(), userId);
+    public GptPrivateChatAddResDto addGptChat(Long userId, Long targetId, String message) {
+        User targetUser = findUser(targetId);
         User user = findUser(userId);
 
+        checkHasUserBlock(userId, targetId);
+
+        Optional<PrivateRoom> nullablePrivateRoom = privateRoomRepository.findPrivateRoomByUsers(userId, targetId);
+        PrivateRoom privateRoom = getOrCreatePrivateRoom(nullablePrivateRoom, user, targetUser);
+
+        PrivateRoomUser privateRoomSender = findPrivateRoomUser(privateRoom.getId(), userId);
         PrivateChat privateChat = privateRoom.addUserToGptChat(message, privateRoomSender);
         em.flush();
 
-        PrivateRoomUser privateRoomReceiver = privateRoomRepository.findTargetRoomUserWithUserInChatRoom(userId, privateRoom.getId())
+        PrivateRoomUser privateRoomReceiver = privateRoomRepository.findPrivateRoomUser(privateRoom.getId(), targetId)
                 .orElseThrow(() -> new PrivateRoomException(INTERNAL_SERVER_ERROR, "개인 채팅방에 상대 유저가 존재하지 않습니다."));
-        Long targetId = privateRoomReceiver.getUser().getId();
-        sendMessageThrowSocket(targetId, privateRoomUuid, privateChat.getId(), message, null, ChatterRole.USER, user, privateChat.getCreatedAt());
+        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), privateChat.getId(), message, null, ChatterRole.USER, user, privateChat.getCreatedAt());
+
+        checkRoomUserDeletedAndSetAlive(privateRoomReceiver, privateRoom, privateChat.getCreatedAt());
+        checkRoomUserDeletedAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());
 
         String gptResponse = gptApiProvider.getChatCompletion(message);
         PrivateChat gptPrivateChat = privateRoom.addGptToUserChat(gptResponse);
         em.flush();
 
-        sendMessageThrowSocket(targetId, privateRoomUuid, gptPrivateChat.getId(), gptResponse, null, ChatterRole.GPT, user, gptPrivateChat.getCreatedAt());
-
-        checkRoomUserDeletedAndSetAlive(privateRoomReceiver, privateRoom, privateChat.getCreatedAt());
-        checkRoomUserDeletedAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());
+        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), gptPrivateChat.getId(), gptResponse, null, ChatterRole.GPT, user, gptPrivateChat.getCreatedAt());
 
         return new GptPrivateChatAddResDto(privateChat.getId(), privateChat.getCreatedAt(), gptPrivateChat.getId(), gptPrivateChat.getCreatedAt(), gptResponse);
+    }
+    
+    private PrivateRoom getOrCreatePrivateRoom(Optional<PrivateRoom> nullablePrivateRoom, User user, User targetUser){
+        PrivateRoom privateRoom;
+        
+        if (nullablePrivateRoom.isEmpty()) {
+            privateRoom = PrivateRoom.create(user, targetUser);
+            privateRoomRepository.save(privateRoom);
+        } else {
+            privateRoom = nullablePrivateRoom.get();
+        }
+        
+        return privateRoom;
     }
 
     private void sendMessageThrowSocket(Long targetId, String roomUuid, Long chatId, String message, String image, ChatterRole chatterRole, User sender, LocalDateTime createdAt){
