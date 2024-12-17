@@ -151,7 +151,8 @@ class PrivateRoomServiceTest {
 
         //then
         assertThat(result).hasSize(3);
-        assertThat(result).extracting("chatRoomId").containsExactly(privateRoom1.getId(), privateRoom3.getId(), privateRoom2.getId());
+        assertThat(result).extracting(PrivateRoomResDto::getChatRoomId)
+                .containsExactly(privateRoom1.getId(), privateRoom3.getId(), privateRoom2.getId());
     }
 
     @Test
@@ -175,11 +176,17 @@ class PrivateRoomServiceTest {
 
         //then
         assertThat(result).hasSize(2);
-        assertThat(result).extracting("chatId").containsExactly(privateChat2.getId(), privateChat1.getId());
+        assertThat(result)
+                .extracting(PrivateChatResDto::getChatId)
+                .containsExactly(privateChat2.getId(), privateChat1.getId());
 
-        PrivateChatResDto chatDto = result.get(1);
-        assertThat(chatDto.getEmoji()).extracting("emojiType").contains(EmojiType.HEART, EmojiType.CHECK);
-        assertThat(chatDto.getEmoji()).extracting("count").contains(1, 2);
+        List<ChatEmojiResDto> emojiList = result.get(1).getEmoji();
+        assertThat(emojiList)
+                .extracting(ChatEmojiResDto::getEmojiType)
+                .contains(EmojiType.HEART, EmojiType.CHECK);
+        assertThat(emojiList)
+                .extracting(ChatEmojiResDto::getCount)
+                .contains(1, 2);
     }
 
     @Test
@@ -204,7 +211,8 @@ class PrivateRoomServiceTest {
         privateRoomRepository.save(privateRoom1);
 
         //when
-        assertThatThrownBy(() -> privateRoomService.deletePrivateRoom(user3.getId(), privateRoom1.getPrivateRoomUuid())).isInstanceOf(PrivateRoomException.class);
+        assertThatThrownBy(() -> privateRoomService.deletePrivateRoom(user3.getId(), privateRoom1.getPrivateRoomUuid()))
+                .isInstanceOf(PrivateRoomException.class);
     }
 
     @Test
@@ -220,7 +228,8 @@ class PrivateRoomServiceTest {
 
         //then
         assertThat(result).hasSize(2);
-        assertThat(result).extracting("chatRoomUuid").contains(chatRoomUuid2, chatRoomUuid3);
+        assertThat(result).extracting(PrivateRoomResDto::getChatRoomUuid)
+                .contains(chatRoomUuid2, chatRoomUuid3);
     }
 
     @Test
