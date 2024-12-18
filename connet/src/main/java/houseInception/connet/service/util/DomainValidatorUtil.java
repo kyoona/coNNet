@@ -14,7 +14,7 @@ import static houseInception.connet.response.status.BaseErrorCode.BLOCK_USER;
 import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_USER;
 
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Service
 public class DomainValidatorUtil {
 
