@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class GptPrivateChatAddResDto {
 
+    private String chatRoomUuId;
     private Long userChatId;
     private LocalDateTime userChatCreateAt;
     private Long gptChatId;
