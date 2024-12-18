@@ -146,13 +146,20 @@ class PrivateRoomServiceTest {
         privateRoom1.addUserToUserChat("message", null, privateRoom1.getPrivateRoomUsers().get(0));
         em.flush();
 
+        UserBlock userBlock = UserBlock.create(user1, user4, UserBlockType.REQUEST);
+        em.persist(userBlock);
+
         //when
         List<PrivateRoomResDto> result = privateRoomService.getPrivateRoomList(user1.getId(), 1).getData();
 
         //then
         assertThat(result).hasSize(3);
-        assertThat(result).extracting(PrivateRoomResDto::getChatRoomId)
+        assertThat(result)
+                .extracting(PrivateRoomResDto::getChatRoomId)
                 .containsExactly(privateRoom1.getId(), privateRoom3.getId(), privateRoom2.getId());
+        assertThat(result)
+                .extracting(PrivateRoomResDto::isBlock)
+                .containsExactly(false, true, false);
     }
 
     @Test
