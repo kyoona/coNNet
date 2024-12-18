@@ -7,6 +7,7 @@ import houseInception.connet.domain.privateRoom.PrivateRoomUser;
 import houseInception.connet.dto.*;
 import houseInception.connet.dto.chatEmoji.ChatEmojiResDto;
 import houseInception.connet.exception.PrivateRoomException;
+import houseInception.connet.exception.UserBlockException;
 import houseInception.connet.repository.PrivateRoomRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
@@ -101,9 +102,9 @@ class PrivateRoomServiceTest {
         //when
         PrivateChatAddDto chatAddDto = new PrivateChatAddDto("mess1", null);
         assertThatThrownBy(() -> privateRoomService.addPrivateChat(user1.getId(), user2.getId(), chatAddDto))
-                .isInstanceOf(PrivateRoomException.class);
+                .isInstanceOf(UserBlockException.class);
         assertThatThrownBy(() -> privateRoomService.addPrivateChat(user2.getId(), user1.getId(), chatAddDto))
-                .isInstanceOf(PrivateRoomException.class);
+                .isInstanceOf(UserBlockException.class);
     }
 
     @Test
