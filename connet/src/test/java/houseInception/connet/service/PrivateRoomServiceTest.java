@@ -146,13 +146,20 @@ class PrivateRoomServiceTest {
         privateRoom1.addUserToUserChat("message", null, privateRoom1.getPrivateRoomUsers().get(0));
         em.flush();
 
+        UserBlock userBlock = UserBlock.create(user1, user4, UserBlockType.REQUEST);
+        em.persist(userBlock);
+
         //when
         List<PrivateRoomResDto> result = privateRoomService.getPrivateRoomList(user1.getId(), 1).getData();
 
         //then
         assertThat(result).hasSize(3);
-        assertThat(result).extracting(PrivateRoomResDto::getChatRoomId)
+        assertThat(result)
+                .extracting(PrivateRoomResDto::getChatRoomId)
                 .containsExactly(privateRoom1.getId(), privateRoom3.getId(), privateRoom2.getId());
+        assertThat(result)
+                .extracting(PrivateRoomResDto::isBlock)
+                .containsExactly(false, true, false);
     }
 
     @Test
@@ -172,7 +179,7 @@ class PrivateRoomServiceTest {
         em.persist(chatEmoji3);
 
         //when
-        List<PrivateChatResDto> result = privateRoomService.getPrivateChatList(user1.getId(), privateRoom1.getPrivateRoomUuid(), 1).getData();
+        List<PrivateChatResDto> result = privateRoomService.getPrivateChatList(user1.getId(), user2.getId(), 1).getData();
 
         //then
         assertThat(result).hasSize(2);
@@ -240,8 +247,8 @@ class PrivateRoomServiceTest {
         privateRoomService.addPrivateChat(user2.getId(), user1.getId(), new PrivateChatAddDto("message", null));
 
         //when
-        List<PrivateChatResDto> data1 = privateRoomService.getPrivateChatList(user1.getId(), chatRoomUuid1, 1).getData();
-        List<PrivateChatResDto> data2 = privateRoomService.getPrivateChatList(user2.getId(), chatRoomUuid1, 1).getData();
+        List<PrivateChatResDto> data1 = privateRoomService.getPrivateChatList(user1.getId(), user2.getId(), 1).getData();
+        List<PrivateChatResDto> data2 = privateRoomService.getPrivateChatList(user2.getId(), user1.getId(), 1).getData();
 
         //then
         assertThat(data1).hasSize(1);

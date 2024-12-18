@@ -25,10 +25,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.Status.DELETED;
@@ -188,28 +185,15 @@ public class PrivateRoomService {
         return new DataListResDto<>(page, resultList);
     }
 
-    public DataListResDto<PrivateChatResDto> getPrivateChatList(Long userId, String privateRoomUuid, int page) {
-        Long privateRoomId = checkExistPrivateRoomAndGetId(privateRoomUuid);
-        checkUserInPrivateRoom(userId, privateRoomUuid);
+    public DataListResDto<PrivateChatResDto> getPrivateChatList(Long userId, Long targetId, int page) {
+        Optional<PrivateRoom> privateRoom = privateRoomRepository.findPrivateRoomByUsers(userId, targetId);
+        if(privateRoom.isEmpty()){
+            return new DataListResDto<>(page, new ArrayList<>());
+        }
 
-        List<PrivateChatResDto> privateChatList = privateRoomRepository.getPrivateChatList(userId, privateRoomId, page);
+        List<PrivateChatResDto> privateChatList = privateRoomRepository.getPrivateChatList(userId, privateRoom.get().getId(), page);
 
         return new DataListResDto<>(page, privateChatList);
-    }
-
-    private Long checkExistPrivateRoomAndGetId(String privateRoomUuid){
-        Long privateRoomId = privateRoomRepository.findIdByPrivateRoomUuid(privateRoomUuid);
-        if (privateRoomId == null){
-            throw new PrivateRoomException(NO_SUCH_CHATROOM);
-        }
-
-        return privateRoomId;
-    }
-
-    private void checkUserInPrivateRoom(Long userId, String privateRoomUuid) {
-        if (!privateRoomRepository.existsAlivePrivateRoomUser(userId, privateRoomUuid)){
-            throw new PrivateRoomException(NOT_CHATROOM_USER);
-        }
     }
 
     private void checkHasUserBlock(Long userId, Long targetId) {
