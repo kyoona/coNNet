@@ -6,6 +6,8 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.ChatRoomType;
+import houseInception.connet.domain.QUserBlock;
+import houseInception.connet.domain.UserBlockType;
 import houseInception.connet.domain.privateRoom.*;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.PrivateChatResDto;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 import static houseInception.connet.domain.QChatEmoji.chatEmoji;
 import static houseInception.connet.domain.QUser.user;
+import static houseInception.connet.domain.QUserBlock.userBlock;
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.privateRoom.QPrivateChat.privateChat;
 import static houseInception.connet.domain.privateRoom.QPrivateRoom.privateRoom;
@@ -155,17 +158,28 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     public Map<Long, PrivateRoomResDto> getPrivateRoomList(Long userId, int page) {
         QPrivateRoomUser subPrivateRoomUser = new QPrivateRoomUser("subPrivateRoomUser");
 
-        List<PrivateRoomResDto> privateRoomList = query.select(Projections.constructor(PrivateRoomResDto.class,
-                        privateRoom.id, privateRoom.privateRoomUuid, user.id, user.userName, user.userProfile, user.isActive))
-                .from(privateRoom)
-                .rightJoin(privateRoomUser).on(privateRoomUser.privateRoom.id.eq(privateRoom.id))
-                .innerJoin(user).on(user.id.eq(privateRoomUser.user.id))
-                .where(privateRoom.id.in(
-                                JPAExpressions.select(subPrivateRoomUser.privateRoom.id)
-                                        .from(subPrivateRoomUser)
-                                        .where(subPrivateRoomUser.user.id.eq(userId),
-                                                subPrivateRoomUser.status.eq(ALIVE))
-                        ), privateRoomUser.user.id.ne(userId),
+        List<PrivateRoomResDto> privateRoomList = query
+                .select(Projections.constructor(
+                        PrivateRoomResDto.class,
+                        privateRoom.id,
+                        privateRoom.privateRoomUuid,
+                        user.id,
+                        user.userName,
+                        user.userProfile,
+                        user.isActive,
+                        userBlock.id))
+                .from(privateRoomUser)
+                .innerJoin(subPrivateRoomUser).on(
+                        subPrivateRoomUser.privateRoom.id.eq(privateRoomUser.privateRoom.id),
+                        subPrivateRoomUser.id.ne(privateRoomUser.id))
+                .innerJoin(subPrivateRoomUser.user, user)
+                .innerJoin(privateRoomUser.privateRoom, privateRoom)
+                .leftJoin(userBlock).on(
+                        userBlock.user.id.eq(privateRoomUser.user.id),
+                        userBlock.target.id.eq(subPrivateRoomUser.user.id),
+                        userBlock.blockType.eq(UserBlockType.REQUEST))
+                .where(privateRoomUser.user.id.eq(userId),
+                        privateRoomUser.status.eq(ALIVE),
                         privateRoom.status.eq(ALIVE))
                 .offset((page - 1) * 30)
                 .limit(31)
