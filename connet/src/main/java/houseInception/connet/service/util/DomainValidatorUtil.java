@@ -13,16 +13,16 @@ import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_USER;
 @RequiredArgsConstructor
 @Transactional
 @Service
-public class DomainValidator {
+public class DomainValidatorUtil {
 
     private final UserRepository userRepository;
 
-    private User findUser(Long userId){
+    public User findUser(Long userId){
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(NO_SUCH_USER));
     }
 
-    private void checkExistUser(Long userId){
+    public void checkExistUser(Long userId){
         if(!userRepository.existsByIdAndStatus(userId, ALIVE)){
             throw new UserException(NO_SUCH_USER);
         }
