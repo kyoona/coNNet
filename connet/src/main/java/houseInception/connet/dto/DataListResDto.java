@@ -2,6 +2,7 @@ package houseInception.connet.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -9,6 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 public class DataListResDto<T> {
 
-    private int page;
+    private int page = 0;
     private List<T> data;
 }
