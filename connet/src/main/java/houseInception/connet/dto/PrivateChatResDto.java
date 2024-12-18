@@ -3,6 +3,7 @@ package houseInception.connet.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import houseInception.connet.domain.ChatterRole;
 import houseInception.connet.domain.EmojiType;
+import houseInception.connet.dto.chatEmoji.ChatEmojiResDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter

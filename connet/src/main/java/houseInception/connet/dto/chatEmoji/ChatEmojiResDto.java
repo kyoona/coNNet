@@ -1,4 +1,4 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.chatEmoji;
 
 import houseInception.connet.domain.EmojiType;
 import lombok.AllArgsConstructor;
