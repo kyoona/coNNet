@@ -29,7 +29,6 @@ import static houseInception.connet.response.status.BaseErrorCode.*;
 public class UserBlockService {
 
     private final UserBlockRepository userBlockRepository;
-    private final UserRepository userRepository;
     private final UserBlockEventPublisher userBlockEventPublisher;
     private final DomainValidatorUtil validator;
 

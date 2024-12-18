@@ -40,7 +40,6 @@ public class PrivateRoomService {
     private final SocketServiceProvider socketServiceProvider;
     private final S3ServiceProvider s3ServiceProvider;
     private final PrivateRoomRepository privateRoomRepository;
-    private final UserBlockRepository userBlockRepository;
     private final EntityManager em;
     private final DomainValidatorUtil validator;
 
