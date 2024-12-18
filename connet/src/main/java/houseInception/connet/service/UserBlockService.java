@@ -10,6 +10,7 @@ import houseInception.connet.exception.UserBlockException;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
+import houseInception.connet.service.util.DomainValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,13 +30,13 @@ public class UserBlockService {
 
     private final UserBlockRepository userBlockRepository;
     private final UserRepository userRepository;
-
     private final UserBlockEventPublisher userBlockEventPublisher;
+    private final DomainValidatorUtil validator;
 
     @Transactional
     public Long blockUser(Long userId, Long targetId) {
-        User targetUser = findUser(targetId);
-        User user = findUser(userId);
+        User targetUser = validator.findUser(targetId);
+        User user = validator.findUser(userId);
 
         UserBlock findUserBlock = userBlockRepository.findByUserIdAndTargetId(userId, targetId).orElse(null);
         checkAlreadyRequestBlock(findUserBlock);
@@ -59,7 +60,7 @@ public class UserBlockService {
 
     @Transactional
     public Long cancelBlock(Long userId, Long targetId) {
-        checkUser(targetId);
+        validator.checkExistUser(targetId);
         UserBlock userBlock = findUserBlock(userId, targetId);
         UserBlock reverseUserBlock = findUserBlock(targetId, userId);
 
@@ -79,15 +80,6 @@ public class UserBlockService {
         return new DataListResDto<DefaultUserResDto>(0, blockUserList);
     }
 
-    private User findUser(Long userId){
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null || user.getStatus() == DELETED) {
-            throw new UserException(NO_SUCH_USER);
-        }
-
-        return user;
-    }
-
     private UserBlock findUserBlock(Long userId, Long targetId){
         UserBlock userBlock = userBlockRepository.findByUserIdAndTargetId(userId, targetId).orElse(null);
         if (userBlock == null) {
@@ -95,12 +87,6 @@ public class UserBlockService {
         }
 
         return userBlock;
-    }
-
-    private void checkUser(Long userId){
-        if(!userRepository.existsByIdAndStatus(userId, ALIVE)){
-            throw new UserException(NO_SUCH_USER);
-        }
     }
 
     private void checkAlreadyRequestBlock(UserBlock findUserBlock) {

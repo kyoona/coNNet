@@ -8,10 +8,10 @@ import houseInception.connet.dto.chatEmoji.EmojiDto;
 import houseInception.connet.dto.chatEmoji.ChatEmojiUserResDto;
 import houseInception.connet.exception.ChatEmojiException;
 import houseInception.connet.exception.PrivateRoomException;
-import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.ChatEmojiRepository;
 import houseInception.connet.repository.PrivateRoomRepository;
 import houseInception.connet.repository.UserRepository;
+import houseInception.connet.service.util.DomainValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,15 +26,15 @@ import static houseInception.connet.response.status.BaseErrorCode.*;
 public class ChatEmojiService {
 
     private final ChatEmojiRepository chatEmojiRepository;
-    private final UserRepository userRepository;
     private final PrivateRoomRepository privateRoomRepository;
+    private final DomainValidatorUtil validator;
 
     @Transactional
     public Long addEmojiToPrivateChat(Long userId, Long chatId, EmojiDto emojiDto){
         Long privateRoomId = checkExistsPrivateChatAndGetChatRoomID(chatId);
         checkUserInPrivateRoom(userId, privateRoomId);
         checkUserAlreadyHasEmoji(userId, chatId, emojiDto.getEmojiType(), ChatRoomType.PRIVATE);
-        User user = findUser(userId);
+        User user = validator.findUser(userId);
 
         ChatEmoji chatEmoji = ChatEmoji.createPrivateChatEmoji(user, chatId, emojiDto.getEmojiType());
         chatEmojiRepository.save(chatEmoji);
@@ -60,11 +60,6 @@ public class ChatEmojiService {
         List<ChatEmojiUserResDto> emojiUsers = chatEmojiRepository.getEmojiUsers(chatId, emojiType, ChatRoomType.PRIVATE);
 
         return emojiUsers;
-    }
-
-    private User findUser(Long userId){
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(NO_SUCH_USER));
     }
 
     private ChatEmoji findChatEmoji(Long userId, Long chatId, EmojiType emojiType, ChatRoomType chatRoomType) {

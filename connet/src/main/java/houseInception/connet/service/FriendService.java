@@ -12,6 +12,7 @@ import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.FriendRepository;
 import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
+import houseInception.connet.service.util.DomainValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,12 +34,13 @@ public class FriendService {
     private final FriendRepository friendRepository;
     private final UserRepository userRepository;
     private final UserBlockRepository userBlockRepository;
+    private final DomainValidatorUtil validator;
 
     @Transactional
     public Long requestFriendById(Long userId, Long targetId) {
-        User targetUser = findUser(targetId);
-        checkUserBlock(userId, targetId);
-        User user = findUser(userId);
+        User targetUser = validator.findUser(targetId);
+        validator.checkNotUserBlock(userId, targetId);
+        User user = validator.findUser(userId);
 
         if(userId.equals(targetId)){
             throw new FriendException(CANT_NOT_REQUEST_SELF);
@@ -55,8 +57,8 @@ public class FriendService {
     @Transactional
     public Long requestFriendByEmail(Long userId, String email) {
         User targetUser = findUserByEmail(email);
-        checkUserBlock(userId, targetUser.getId());
-        User user = findUser(userId);
+        validator.checkNotUserBlock(userId, targetUser.getId());
+        User user = validator.findUser(userId);
 
         if(userId.equals(targetUser.getId())){
             throw new FriendException(CANT_NOT_REQUEST_SELF);
@@ -72,7 +74,7 @@ public class FriendService {
 
     @Transactional
     public Long cancelFriendRequest(Long userId, Long targetId){
-        checkExistUser(targetId);
+        validator.checkExistUser(targetId);
 
         Friend friend = findFriend(userId, targetId, WAIT);
         friendRepository.delete(friend);
@@ -82,9 +84,9 @@ public class FriendService {
 
     @Transactional
     public Long acceptFriendRequest(Long userId, Long targetId) {
-        User targetUser = findUser(targetId);
+        User targetUser = validator.findUser(targetId);
         checkHasFriendRequestOfOneWay(targetId, userId);
-        User user = findUser(userId);
+        User user = validator.findUser(userId);
 
         Friend requestFriend = findFriend(targetId, userId, WAIT);
         requestFriend.accept();
@@ -98,7 +100,7 @@ public class FriendService {
 
     @Transactional
     public Long denyFriendRequest(Long userId, Long targetId) {
-        checkExistUser(targetId);
+        validator.checkExistUser(targetId);
         checkHasFriendRequestOfOneWay(targetId, userId);
 
         Friend friend = findFriend(targetId, userId, WAIT);
@@ -109,7 +111,7 @@ public class FriendService {
 
     @Transactional
     public Long deleteFriend(Long userId, Long targetId) {
-        checkExistUser(targetId);
+        validator.checkExistUser(targetId);
 
         Friend friend1 = findFriend(userId, targetId, ACCEPT);
         friendRepository.delete(friend1);
@@ -149,23 +151,6 @@ public class FriendService {
         if(!friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(senderId, receiverId, WAIT)){
             throw new FriendException(NO_SUCH_FRIEND_REQUEST);
         }
-    }
-
-    private void checkExistUser(Long userId){
-        if (!userRepository.existsById(userId)){
-            throw new UserException(NO_SUCH_USER);
-        }
-    }
-
-    private void checkUserBlock(Long userId, Long targetId){
-        if (userBlockRepository.existsByUserIdAndTargetId(userId, targetId)){
-            throw new FriendException(BLOCK_USER);
-        }
-    }
-
-    private User findUser(Long userId){
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(NO_SUCH_USER));
     }
 
     private User findUserByEmail(String email){
