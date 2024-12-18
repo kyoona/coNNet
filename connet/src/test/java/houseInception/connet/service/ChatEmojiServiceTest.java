@@ -88,7 +88,8 @@ class ChatEmojiServiceTest {
 
         //when
         EmojiDto emojiDto = new EmojiDto(EmojiType.HEART);
-        assertThatThrownBy(() -> chatEmojiService.addEmojiToPrivateChat(user1.getId(), privateChat.getId(), emojiDto)).isInstanceOf(ChatEmojiException.class);
+        assertThatThrownBy(() -> chatEmojiService.addEmojiToPrivateChat(user1.getId(), privateChat.getId(), emojiDto))
+                .isInstanceOf(ChatEmojiException.class);
     }
 
     @Test
@@ -103,7 +104,8 @@ class ChatEmojiServiceTest {
 
         //when
         EmojiDto emojiDto = new EmojiDto(EmojiType.HEART);
-        assertThatThrownBy(() -> chatEmojiService.addEmojiToPrivateChat(user3.getId(), privateChat.getId(), emojiDto)).isInstanceOf(ChatEmojiException.class);
+        assertThatThrownBy(() -> chatEmojiService.addEmojiToPrivateChat(user3.getId(), privateChat.getId(), emojiDto))
+                .isInstanceOf(ChatEmojiException.class);
     }
 
     @Test
