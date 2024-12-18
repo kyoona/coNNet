@@ -48,11 +48,11 @@ public class PrivateRoomController {
         return new BaseResponse<>(result);
     }
 
-    @GetMapping("/{privateRoomUuid}/chats")
-    public BaseResponse<DataListResDto<PrivateChatResDto>> getPrivateChatList(@PathVariable String privateRoomUuid,
+    @GetMapping("/{targetId}/chats")
+    public BaseResponse<DataListResDto<PrivateChatResDto>> getPrivateChatList(@PathVariable Long targetId,
                                                                               @RequestParam(defaultValue = "1") int page){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        DataListResDto<PrivateChatResDto> result = privateRoomService.getPrivateChatList(userId, privateRoomUuid, page);
+        DataListResDto<PrivateChatResDto> result = privateRoomService.getPrivateChatList(userId, targetId, page);
 
         return new BaseResponse<>(result);
     }
