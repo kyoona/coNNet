@@ -5,6 +5,7 @@ import houseInception.connet.domain.ChatRoomType;
 import houseInception.connet.domain.EmojiType;
 import houseInception.connet.domain.User;
 import houseInception.connet.dto.EmojiDto;
+import houseInception.connet.dto.chatEmoji.ChatEmojiUserResDto;
 import houseInception.connet.exception.ChatEmojiException;
 import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.exception.UserException;
@@ -14,6 +15,8 @@ import houseInception.connet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static houseInception.connet.response.status.BaseErrorCode.*;
 
@@ -48,6 +51,15 @@ public class ChatEmojiService {
         chatEmojiRepository.delete(chatEmoji);
 
         return chatEmoji.getId();
+    }
+
+    public List<ChatEmojiUserResDto> getEmojiInfoInPrivateRoom(Long userId, Long chatId, EmojiType emojiType) {
+        Long privateRoomId = checkExistsPrivateChatAndGetChatRoomID(chatId);
+        checkUserInPrivateRoom(userId, privateRoomId);
+
+        List<ChatEmojiUserResDto> emojiUsers = chatEmojiRepository.getEmojiUsers(chatId, emojiType, ChatRoomType.PRIVATE);
+
+        return emojiUsers;
     }
 
     private User findUser(Long userId){
