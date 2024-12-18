@@ -1,7 +1,7 @@
 package houseInception.connet.contoller;
 
 import houseInception.connet.domain.EmojiType;
-import houseInception.connet.dto.EmojiDto;
+import houseInception.connet.dto.chatEmoji.EmojiDto;
 import houseInception.connet.dto.chatEmoji.ChatEmojiUserResDto;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.BaseResultDto;

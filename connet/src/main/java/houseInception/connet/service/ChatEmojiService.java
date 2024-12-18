@@ -4,7 +4,7 @@ import houseInception.connet.domain.ChatEmoji;
 import houseInception.connet.domain.ChatRoomType;
 import houseInception.connet.domain.EmojiType;
 import houseInception.connet.domain.User;
-import houseInception.connet.dto.EmojiDto;
+import houseInception.connet.dto.chatEmoji.EmojiDto;
 import houseInception.connet.dto.chatEmoji.ChatEmojiUserResDto;
 import houseInception.connet.exception.ChatEmojiException;
 import houseInception.connet.exception.PrivateRoomException;
