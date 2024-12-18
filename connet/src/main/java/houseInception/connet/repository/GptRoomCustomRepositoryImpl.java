@@ -58,7 +58,7 @@ public class GptRoomCustomRepositoryImpl implements GptRoomCustomRepository {
                         gptRoomUser.status.eq(ALIVE),
                         gptRoom.status.eq(ALIVE))
                 .orderBy(gptRoom.createdAt.desc())
-                .offset((page - 1) * 5)
+                .offset((page - 1) * 30)
                 .limit(6)
                 .fetch();
     }
