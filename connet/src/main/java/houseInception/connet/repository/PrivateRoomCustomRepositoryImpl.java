@@ -97,19 +97,6 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     }
 
     @Override
-    public boolean existsAlivePrivateRoomUser(Long userId, String privateRoomUuid) {
-        Long count = query.select(privateRoomUser.count())
-                .from(privateRoomUser)
-                .innerJoin(privateRoom).on(privateRoom.id.eq(privateRoomUser.privateRoom.id))
-                .where(privateRoom.privateRoomUuid.eq(privateRoomUuid),
-                        privateRoomUser.user.id.eq(userId),
-                        privateRoomUser.status.eq(ALIVE))
-                .fetchOne();
-
-        return count != null && count > 0;
-    }
-
-    @Override
     public Long getPrivateRoomIdOfChat(Long privateChatId) {
         return query
                 .select(privateChat.privateRoom.id)

@@ -11,7 +11,4 @@ import java.util.Optional;
 public interface PrivateRoomRepository extends JpaRepository<PrivateRoom, Long>, PrivateRoomCustomRepository {
 
     Optional<PrivateRoom> findByPrivateRoomUuidAndStatus(String privateRoomUuid, Status status);
-
-    @Query("SELECT p.id FROM PrivateRoom p WHERE p.privateRoomUuid = :privateRoomUuid AND p.status = ALIVE")
-    Long findIdByPrivateRoomUuid(@Param("privateRoomUuid") String privateRoomUuid);
 }

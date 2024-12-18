@@ -196,21 +196,6 @@ public class PrivateRoomService {
         return new DataListResDto<>(page, privateChatList);
     }
 
-    private Long checkExistPrivateRoomAndGetId(String privateRoomUuid){
-        Long privateRoomId = privateRoomRepository.findIdByPrivateRoomUuid(privateRoomUuid);
-        if (privateRoomId == null){
-            throw new PrivateRoomException(NO_SUCH_CHATROOM);
-        }
-
-        return privateRoomId;
-    }
-
-    private void checkUserInPrivateRoom(Long userId, String privateRoomUuid) {
-        if (!privateRoomRepository.existsAlivePrivateRoomUser(userId, privateRoomUuid)){
-            throw new PrivateRoomException(NOT_CHATROOM_USER);
-        }
-    }
-
     private void checkHasUserBlock(Long userId, Long targetId) {
         if(userBlockRepository.existsByUserIdAndTargetId(userId, targetId)){
             throw new PrivateRoomException(BLOCK_USER);
