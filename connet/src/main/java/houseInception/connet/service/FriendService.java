@@ -6,7 +6,7 @@ import houseInception.connet.domain.User;
 import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
-import houseInception.connet.dto.FriendFilterDto;
+import houseInception.connet.dto.friend.FriendFilterDto;
 import houseInception.connet.exception.FriendException;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.FriendRepository;

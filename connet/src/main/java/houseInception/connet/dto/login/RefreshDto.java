@@ -1,4 +1,4 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.login;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GptRoomUpdateDto {
+public class RefreshDto {
 
     @NotBlank
-    private String title;
+    private String refreshToken;
 }

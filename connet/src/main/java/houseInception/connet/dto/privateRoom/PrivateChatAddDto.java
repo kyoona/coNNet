@@ -1,9 +1,7 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.privateRoom;
 
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Setter
 @Getter

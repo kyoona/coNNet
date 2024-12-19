@@ -1,8 +1,8 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
-import houseInception.connet.dto.TokenResDto;
-import houseInception.connet.dto.SignInDto;
+import houseInception.connet.dto.login.TokenResDto;
+import houseInception.connet.dto.login.SignInDto;
 import houseInception.connet.exception.InValidTokenException;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.externalServiceProvider.google.GoogleOathProvider;

@@ -4,8 +4,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.Status;
 import houseInception.connet.domain.gptRoom.*;
-import houseInception.connet.dto.GptRoomChatResDto;
-import houseInception.connet.dto.GptRoomListResDto;
+import houseInception.connet.dto.GptRoom.GptRoomChatResDto;
+import houseInception.connet.dto.GptRoom.GptRoomListResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

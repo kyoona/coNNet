@@ -1,4 +1,4 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.GptRoom;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;

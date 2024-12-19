@@ -1,4 +1,4 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.privateRoom;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.querydsl.core.annotations.QueryProjection;

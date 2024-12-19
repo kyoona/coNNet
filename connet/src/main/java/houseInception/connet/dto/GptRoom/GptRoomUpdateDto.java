@@ -1,4 +1,4 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.GptRoom;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SignInDto {
+public class GptRoomUpdateDto {
 
     @NotBlank
-    private String googleToken;
+    private String title;
 }

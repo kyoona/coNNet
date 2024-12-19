@@ -6,12 +6,11 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.ChatRoomType;
-import houseInception.connet.domain.QUserBlock;
 import houseInception.connet.domain.UserBlockType;
 import houseInception.connet.domain.privateRoom.*;
 import houseInception.connet.dto.DefaultUserResDto;
-import houseInception.connet.dto.PrivateChatResDto;
-import houseInception.connet.dto.PrivateRoomResDto;
+import houseInception.connet.dto.privateRoom.PrivateChatResDto;
+import houseInception.connet.dto.privateRoom.PrivateRoomResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

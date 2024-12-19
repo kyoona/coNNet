@@ -1,4 +1,4 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.login;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PrivateGptChatAddDto {
+public class SignInDto {
 
     @NotBlank
-    private String message;
+    private String googleToken;
 }

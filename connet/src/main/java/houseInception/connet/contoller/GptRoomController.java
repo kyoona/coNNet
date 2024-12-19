@@ -1,6 +1,7 @@
 package houseInception.connet.contoller;
 
 import houseInception.connet.dto.*;
+import houseInception.connet.dto.GptRoom.*;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.BaseResultDto;
 import houseInception.connet.service.GptRoomService;

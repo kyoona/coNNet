@@ -7,7 +7,7 @@ import houseInception.connet.domain.UserBlockType;
 import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
-import houseInception.connet.dto.FriendFilterDto;
+import houseInception.connet.dto.friend.FriendFilterDto;
 import houseInception.connet.exception.FriendException;
 import houseInception.connet.exception.UserBlockException;
 import houseInception.connet.repository.FriendRepository;

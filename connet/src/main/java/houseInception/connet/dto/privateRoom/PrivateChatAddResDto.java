@@ -1,4 +1,4 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.privateRoom;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
