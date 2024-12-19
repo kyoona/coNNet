@@ -12,7 +12,6 @@ import houseInception.connet.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.PrivateRoomRepository;
 import houseInception.connet.service.util.DomainValidatorUtil;
-import houseInception.connet.service.util.FileUtil;
 import houseInception.connet.socketManager.SocketServiceProvider;
 import houseInception.connet.socketManager.dto.PrivateChatSocketDto;
 import jakarta.persistence.EntityManager;
@@ -31,7 +30,7 @@ import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.Status.DELETED;
 import static houseInception.connet.response.status.BaseErrorCode.*;
 import static houseInception.connet.service.util.FileUtil.getUniqueFileName;
-import static houseInception.connet.service.util.FileUtil.isValidFile;
+import static houseInception.connet.service.util.FileUtil.isInValidFile;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -91,7 +90,7 @@ public class PrivateRoomService {
     }
 
     private String uploadImages(MultipartFile image){
-        if (isValidFile(image)) {
+        if (isInValidFile(image)) {
             return null;
         }
 
