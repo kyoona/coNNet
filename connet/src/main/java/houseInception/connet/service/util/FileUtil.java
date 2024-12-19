@@ -11,8 +11,8 @@ import static houseInception.connet.response.status.BaseErrorCode.NO_VALID_FILE_
 @Component
 public class FileUtil {
 
-    public static boolean isValidFile(MultipartFile file){
-        return file != null && !file.getOriginalFilename().isBlank();
+    public static boolean isInValidFile(MultipartFile file){
+        return file == null || file.getOriginalFilename() == null || file.getOriginalFilename().isBlank();
     }
 
     public static String getUniqueFileName(String originalFileName){
