@@ -3,10 +3,8 @@ package houseInception.connet.service;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.dto.group.GroupAddDto;
-import houseInception.connet.exception.UserException;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.GroupRepository;
-import houseInception.connet.repository.UserRepository;
 import houseInception.connet.service.util.DomainValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_USER;
 import static houseInception.connet.service.util.FileUtil.getUniqueFileName;
-import static houseInception.connet.service.util.FileUtil.isValidFile;
+import static houseInception.connet.service.util.FileUtil.isInValidFile;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -50,7 +47,7 @@ public class GroupService {
     }
 
     private String uploadImages(MultipartFile image){
-        if (isValidFile(image)) {
+        if (isInValidFile(image)) {
             return null;
         }
 
