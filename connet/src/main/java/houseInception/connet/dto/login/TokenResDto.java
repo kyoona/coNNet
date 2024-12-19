@@ -1,4 +1,4 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.login;
 
 import lombok.Getter;
 

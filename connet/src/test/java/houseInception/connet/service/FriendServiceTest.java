@@ -7,8 +7,9 @@ import houseInception.connet.domain.UserBlockType;
 import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
-import houseInception.connet.dto.FriendFilterDto;
+import houseInception.connet.dto.friend.FriendFilterDto;
 import houseInception.connet.exception.FriendException;
+import houseInception.connet.exception.UserBlockException;
 import houseInception.connet.repository.FriendRepository;
 import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
@@ -91,7 +92,8 @@ class FriendServiceTest {
         userBlockRepository.save(userBlock);
 
         //when
-        assertThatThrownBy(() -> friendService.requestFriendById(user1.getId(), user2.getId())).isInstanceOf(FriendException.class);
+        assertThatThrownBy(() -> friendService.requestFriendById(user1.getId(), user2.getId()))
+                .isInstanceOf(UserBlockException.class);
     }
 
     @Test

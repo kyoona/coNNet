@@ -1,4 +1,4 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.privateRoom;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RefreshDto {
+public class PrivateGptChatAddDto {
 
     @NotBlank
-    private String refreshToken;
+    private String message;
 }

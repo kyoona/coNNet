@@ -116,6 +116,13 @@ public class BaseExceptionHandler {
         return BaseErrorResponse.get(e.getStatus());
     }
 
+    @ExceptionHandler(FileException.class)
+    public ResponseEntity<BaseErrorResponse> handleFileException(FileException e) {
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
+
+        return BaseErrorResponse.get(e.getStatus());
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<BaseErrorResponse> handleRuntimeException(RuntimeException e) {
         log.error("Runtime Exception: {}", e.getMessage(), e);

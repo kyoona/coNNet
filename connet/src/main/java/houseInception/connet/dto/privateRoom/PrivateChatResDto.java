@@ -1,8 +1,9 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.privateRoom;
 
 import com.querydsl.core.annotations.QueryProjection;
 import houseInception.connet.domain.ChatterRole;
 import houseInception.connet.domain.EmojiType;
+import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.chatEmoji.ChatEmojiResDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

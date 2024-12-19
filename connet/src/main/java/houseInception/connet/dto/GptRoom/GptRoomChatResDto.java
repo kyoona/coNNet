@@ -1,7 +1,8 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.GptRoom;
 
 import com.querydsl.core.annotations.QueryProjection;
 import houseInception.connet.domain.ChatterRole;
+import houseInception.connet.dto.DefaultUserResDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;

@@ -1,14 +1,15 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
-import houseInception.connet.dto.TokenResDto;
-import houseInception.connet.dto.SignInDto;
+import houseInception.connet.dto.login.TokenResDto;
+import houseInception.connet.dto.login.SignInDto;
 import houseInception.connet.exception.InValidTokenException;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.externalServiceProvider.google.GoogleOathProvider;
 import houseInception.connet.externalServiceProvider.google.GoogleUserInfo;
 import houseInception.connet.jwt.JwtTokenProvider;
 import houseInception.connet.repository.UserRepository;
+import houseInception.connet.service.util.DomainValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class LoginService {
     private final UserRepository userRepository;
     private final GoogleOathProvider googleOathProvider;
     private final JwtTokenProvider tokenProvider;
+    private final DomainValidatorUtil validator;
 
     @Transactional
     public TokenResDto signIn(SignInDto signInDto) {
@@ -50,7 +52,7 @@ public class LoginService {
 
     @Transactional
     public TokenResDto refresh(Long userId, String refreshToken) {
-        User user = findUser(userId);
+        User user = validator.findUser(userId);
         if(!user.equals(refreshToken)){
             throw new InValidTokenException(INVALID_REFRESH_TOKEN);
         }
@@ -72,7 +74,7 @@ public class LoginService {
 
     @Transactional
     public Long signOut(Long userId) {
-        User user = findUser(userId);
+        User user = validator.findUser(userId);
         user.deleteRefreshToken();
 
         return user.getId();
@@ -81,15 +83,6 @@ public class LoginService {
     private boolean isNotServiceUser(String email){
 
         return !userRepository.existsByEmailAndStatus(email, ALIVE);
-    }
-
-    private User findUser(Long userId){
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            throw new UserException(NO_SUCH_USER);
-        }
-
-        return user;
     }
 
     private User findUser(String email){

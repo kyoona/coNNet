@@ -2,7 +2,7 @@ package houseInception.connet.service;
 
 import houseInception.connet.domain.Friend;
 import houseInception.connet.domain.User;
-import houseInception.connet.dto.FriendType;
+import houseInception.connet.dto.friend.FriendType;
 import houseInception.connet.dto.UserResDto;
 import houseInception.connet.repository.FriendRepository;
 import houseInception.connet.repository.UserRepository;

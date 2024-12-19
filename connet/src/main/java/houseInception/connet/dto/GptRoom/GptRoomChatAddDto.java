@@ -1,4 +1,4 @@
-package houseInception.connet.dto;
+package houseInception.connet.dto.GptRoom;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

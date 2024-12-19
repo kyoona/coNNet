@@ -5,6 +5,7 @@ import houseInception.connet.domain.gptRoom.GptRoom;
 import houseInception.connet.domain.gptRoom.GptRoomChat;
 import houseInception.connet.domain.gptRoom.GptRoomUser;
 import houseInception.connet.dto.*;
+import houseInception.connet.dto.GptRoom.*;
 import houseInception.connet.exception.GptRoomException;
 import houseInception.connet.repository.GptRoomRepository;
 import houseInception.connet.repository.UserRepository;

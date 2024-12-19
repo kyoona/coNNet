@@ -3,8 +3,8 @@ package houseInception.connet.repository;
 import houseInception.connet.domain.privateRoom.PrivateChat;
 import houseInception.connet.domain.privateRoom.PrivateRoom;
 import houseInception.connet.domain.privateRoom.PrivateRoomUser;
-import houseInception.connet.dto.PrivateChatResDto;
-import houseInception.connet.dto.PrivateRoomResDto;
+import houseInception.connet.dto.privateRoom.PrivateChatResDto;
+import houseInception.connet.dto.privateRoom.PrivateRoomResDto;
 
 import java.util.List;
 import java.util.Map;

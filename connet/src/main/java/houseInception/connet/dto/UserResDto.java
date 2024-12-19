@@ -3,10 +3,11 @@ package houseInception.connet.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import houseInception.connet.domain.FriendStatus;
 import houseInception.connet.domain.User;
+import houseInception.connet.dto.friend.FriendType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static houseInception.connet.dto.FriendType.*;
+import static houseInception.connet.dto.friend.FriendType.*;
 
 @Getter
 @NoArgsConstructor
