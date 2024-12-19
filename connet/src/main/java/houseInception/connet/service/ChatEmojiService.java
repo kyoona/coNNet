@@ -53,7 +53,6 @@ public class ChatEmojiService {
         return chatEmoji.getId();
     }
 
-<<<<<<< Updated upstream
     public List<ChatEmojiUserResDto> getEmojiInfoInPrivateRoom(Long userId, Long chatId, EmojiType emojiType) {
         Long privateRoomId = checkExistsPrivateChatAndGetChatRoomID(chatId);
         checkUserInPrivateRoom(userId, privateRoomId);
@@ -61,13 +60,6 @@ public class ChatEmojiService {
         List<ChatEmojiUserResDto> emojiUsers = chatEmojiRepository.getEmojiUsers(chatId, emojiType, ChatRoomType.PRIVATE);
 
         return emojiUsers;
-=======
-    public Long getEmojiDetailOfPrivate(Long userId, Long chatId, EmojiType emojiType) {
-        Long privateRoomId = checkExistsPrivateChatAndGetChatRoomID(chatId);
-        checkUserInPrivateRoom(userId, privateRoomId);
-
-
->>>>>>> Stashed changes
     }
 
     private ChatEmoji findChatEmoji(Long userId, Long chatId, EmojiType emojiType, ChatRoomType chatRoomType) {
