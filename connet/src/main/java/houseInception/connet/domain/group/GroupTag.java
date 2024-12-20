@@ -20,4 +20,9 @@ public class GroupTag {
     @JoinColumn(name = "groupId")
     @ManyToOne(fetch = FetchType.LAZY)
     private Group group;
+
+    protected GroupTag(String tagName, Group group) {
+        this.tagName = tagName;
+        this.group = group;
+    }
 }

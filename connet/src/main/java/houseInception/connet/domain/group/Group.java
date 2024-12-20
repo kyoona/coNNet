@@ -28,6 +28,9 @@ public class Group extends BaseTime {
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupUser> groupUserList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GroupTag> groupTagList = new ArrayList<>();
+
     private String groupUuid;
     private String groupName;
     private String groupProfile;
@@ -57,7 +60,24 @@ public class Group extends BaseTime {
         this.groupUserList.add(groupUser);
     }
 
+    public boolean addTag(List<String> tags){
+        if(!isValidTag(tags)){
+            return false;
+        }
+
+        tags.forEach(tag -> this.groupTagList.add(new GroupTag(tag, this)));
+        return true;
+    }
+
+    private boolean isValidTag(List<String> tags){
+        return tags.stream().noneMatch(tag -> tag.contains(" "));
+    }
+
     public List<GroupUser> getGroupUserList() {
         return List.copyOf(groupUserList);
+    }
+
+    public List<GroupTag> getGroupTagList() {
+        return List.copyOf(groupTagList);
     }
 }

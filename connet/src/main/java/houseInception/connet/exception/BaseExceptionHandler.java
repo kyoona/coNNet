@@ -1,5 +1,6 @@
 package houseInception.connet.exception;
 
+import houseInception.connet.domain.group.Group;
 import houseInception.connet.response.BaseErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TypeMismatchException;
@@ -83,6 +84,13 @@ public class BaseExceptionHandler {
 
     @ExceptionHandler(ChatEmojiException.class)
     public ResponseEntity<BaseErrorResponse> handleChatEmojiException(ChatEmojiException e) {
+        log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
+
+        return BaseErrorResponse.get(e.getStatus());
+    }
+
+    @ExceptionHandler(GroupException.class)
+    public ResponseEntity<BaseErrorResponse> handleGroupException(GroupException e) {
         log.error("{}<{}>: {}", e.getMessage(), e.getStatus().getMessage(), e);
 
         return BaseErrorResponse.get(e.getStatus());

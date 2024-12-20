@@ -30,6 +30,7 @@ public enum BaseErrorCode implements StatusCode{
     NO_SUCH_CHAT(400014, "채팅이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     ALREADY_HAS_EMOJI(400015, "이모지가 이미 존재합니다.", HttpStatus.BAD_REQUEST),
     NO_SUCH_EMOJI(400016, "이모지가 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_GROUP_TAG(400018, "유효하지 않은 태그입니다.", HttpStatus.BAD_REQUEST),
 
     INVALID_GOOGLE_TOKEN(40101, "유효하지 않은 Google Access Token입니다.", HttpStatus.UNAUTHORIZED),
     INVALID_REFRESH_TOKEN(40102, "유효하지 않은 Refresh Token입니다.", HttpStatus.UNAUTHORIZED),
