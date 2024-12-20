@@ -50,7 +50,7 @@ public class GroupInviteService {
     }
 
     private void checkGroupInviteOfUser(Long userId, String groupUuid, boolean isInvite){
-        if(groupInviteRepository.existsByGroupUuidAndInvitee(groupUuid, userId) != isInvite){
+        if(groupInviteRepository.existsByGroupUuidAndInviteeId(groupUuid, userId) != isInvite){
             if(isInvite){
                 throw new GroupInviteException(NO_SUCH_GROUP_INVITE);
             }else{

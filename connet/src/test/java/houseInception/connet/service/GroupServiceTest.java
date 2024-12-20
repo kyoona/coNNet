@@ -76,10 +76,10 @@ class GroupServiceTest {
                 true
         );
 
-        Long groupId = groupService.addGroup(user1.getId(), groupAddDto);
+        String groupUuid = groupService.addGroup(user1.getId(), groupAddDto);
 
         //then
-        Group group = groupRepository.findById(groupId).orElseThrow();
+        Group group = groupRepository.findByGroupUuid(groupUuid).orElseThrow();
         assertThat(group.getGroupName()).isEqualTo(groupName);
 
         List<GroupUser> groupUserList = group.getGroupUserList();
