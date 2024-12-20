@@ -9,14 +9,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/groups/{groupUuid}/invite")
+@RequestMapping("/groups")
 @RequiredArgsConstructor
 @RestController
 public class GroupInviteController {
 
     private final GroupInviteService groupInviteService;
 
-    @PostMapping
+    @PostMapping("/{groupUuid}/invite")
     public BaseResponse<DefaultIdDto> inviteGroup(@PathVariable String groupUuid,
                                                   @RequestBody @Valid GroupInviteDto inviteDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
@@ -25,7 +25,7 @@ public class GroupInviteController {
         return BaseResponse.getSimpleRes(resultId);
     }
 
-    @PostMapping("/accept")
+    @PostMapping("/{groupUuid}/invite/accept")
     public BaseResponse<DefaultUuidDto> acceptInvite(@PathVariable String groupUuid){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         String groupUuId = groupInviteService.acceptInvite(userId, groupUuid);
@@ -33,7 +33,7 @@ public class GroupInviteController {
         return BaseResponse.getSimpleRes(groupUuId);
     }
 
-    @PostMapping("/deny")
+    @PostMapping("/{groupUuid}/invite/deny")
     public BaseResponse<DefaultUuidDto> denyInvite(@PathVariable String groupUuid){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         String groupUuId = groupInviteService.denyInvite(userId, groupUuid);
