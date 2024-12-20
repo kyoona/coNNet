@@ -3,6 +3,7 @@ package houseInception.connet.service;
 import houseInception.connet.domain.GroupInvite;
 import houseInception.connet.domain.User;
 import houseInception.connet.dto.group_invite.GroupInviteDto;
+import houseInception.connet.event.publisher.GroupInviteEventPublisher;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.exception.GroupInviteException;
 import houseInception.connet.repository.GroupInviteRepository;
@@ -22,7 +23,9 @@ public class GroupInviteService {
     private final DomainValidatorUtil validator;
     private final GroupInviteRepository groupInviteRepository;
     private final GroupRepository groupRepository;
+    private final GroupInviteEventPublisher groupInviteEventPublisher;
 
+    @Transactional
     public Long inviteGroup(Long userId, String groupUuid, GroupInviteDto inviteDto) {
         User user = validator.findUser(userId);
         User targetUser = validator.findUser(inviteDto.getTargetId());
@@ -37,7 +40,17 @@ public class GroupInviteService {
         return groupInvite.getId();
     }
 
-    public void checkUserInGroup(Long userId, String groupUuid){
+    @Transactional
+    public String acceptInvite(Long userId, String groupUuid) {
+        checkGroupInviteOfUser(userId, groupUuid, true);
+        groupInviteRepository.deleteByGroupUuidAndInviteeId(groupUuid, userId);
+
+        groupInviteEventPublisher.publishGroupInviteAcceptEvent(userId, groupUuid);
+
+        return groupUuid;
+    }
+
+    private void checkUserInGroup(Long userId, String groupUuid){
         if (!groupRepository.existUserInGroup(userId, groupUuid)) {
             throw new GroupException(NOT_IN_GROUP);
         }
