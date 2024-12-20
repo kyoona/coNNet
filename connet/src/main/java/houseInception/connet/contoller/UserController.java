@@ -1,7 +1,5 @@
 package houseInception.connet.contoller;
 
-import houseInception.connet.dto.UserResDto;
-import houseInception.connet.response.BaseResponse;
 import houseInception.connet.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

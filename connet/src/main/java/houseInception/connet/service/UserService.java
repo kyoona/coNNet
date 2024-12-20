@@ -1,18 +1,11 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
-import houseInception.connet.domain.UserBlock;
-import houseInception.connet.dto.UserResDto;
-import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.UserRepository;
 import houseInception.connet.service.util.DomainValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static houseInception.connet.domain.Status.ALIVE;
-import static houseInception.connet.domain.Status.DELETED;
-import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_USER;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
