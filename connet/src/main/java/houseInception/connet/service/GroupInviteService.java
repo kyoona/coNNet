@@ -43,9 +43,19 @@ public class GroupInviteService {
     @Transactional
     public String acceptInvite(Long userId, String groupUuid) {
         checkGroupInviteOfUser(userId, groupUuid, true);
+        
         groupInviteRepository.deleteByGroupUuidAndInviteeId(groupUuid, userId);
 
         groupInviteEventPublisher.publishGroupInviteAcceptEvent(userId, groupUuid);
+
+        return groupUuid;
+    }
+
+    @Transactional
+    public String denyInvite(Long userId, String groupUuid) {
+        checkGroupInviteOfUser(userId, groupUuid, true);
+
+        groupInviteRepository.deleteByGroupUuidAndInviteeId(groupUuid, userId);
 
         return groupUuid;
     }

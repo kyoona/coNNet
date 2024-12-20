@@ -32,4 +32,12 @@ public class GroupInviteController {
 
         return BaseResponse.getSimpleRes(groupUuId);
     }
+
+    @PostMapping("/deny")
+    public BaseResponse<DefaultUuidDto> denyInvite(@PathVariable String groupUuid){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        String groupUuId = groupInviteService.denyInvite(userId, groupUuid);
+
+        return BaseResponse.getSimpleRes(groupUuId);
+    }
 }
