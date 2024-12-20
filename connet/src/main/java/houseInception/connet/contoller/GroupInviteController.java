@@ -15,7 +15,7 @@ public class GroupInviteController {
 
     private final GroupInviteService groupInviteService;
 
-    @GetMapping
+    @PostMapping
     public BaseResponse<DefaultIdDto> inviteGroup(@PathVariable String groupUuid,
                                                   @RequestBody @Valid GroupInviteDto inviteDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
