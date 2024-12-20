@@ -89,4 +89,28 @@ class GroupInviteServiceTest {
         assertThatThrownBy(() -> groupInviteService.inviteGroup(groupOwner.getId(), group.getGroupUuid(), groupInviteDto))
                 .isInstanceOf(GroupInviteException.class);
     }
+
+    @Test
+    void acceptInvite() {
+        //given
+        GroupInvite groupInvite = GroupInvite.create(group.getGroupUuid(), groupOwner, user1);
+        em.persist(groupInvite);
+
+        //when
+        groupInviteService.acceptInvite(user1.getId(), group.getGroupUuid());
+
+        //then
+        assertThat(groupInviteRepository.findById(groupInvite.getId())).isEmpty();
+    }
+
+    @Test
+    void acceptInvite_초대_받지_않음() {
+        //given
+        GroupInvite groupInvite = GroupInvite.create(group.getGroupUuid(), groupOwner, user1);
+        em.persist(groupInvite);
+
+        //when
+        assertThatThrownBy(() -> groupInviteService.acceptInvite(user2.getId(), group.getGroupUuid()))
+                .isInstanceOf(GroupInviteException.class);
+    }
 }
