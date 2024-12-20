@@ -22,14 +22,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final DomainValidatorUtil validator;
 
-    public UserResDto getUserInfo(Long userId, String email) {
-        if (email == null) {
-            return new UserResDto(validator.findUser(userId));
-        }else {
-            return userRepository.findUserByEmailWithFriendRelation(userId, email);
-        }
-    }
-
     @Transactional
     public void setUserActive(Long userId){
         User user = validator.findUser(userId);

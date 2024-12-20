@@ -12,12 +12,4 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-
-    @GetMapping
-    public BaseResponse<UserResDto> getUserInfo(@RequestParam(required = false) String email){
-        Long userId = UserAuthorizationUtil.getLoginUserId();
-        UserResDto result = userService.getUserInfo(userId, email);
-
-        return new BaseResponse<>(result);
-    }
 }
