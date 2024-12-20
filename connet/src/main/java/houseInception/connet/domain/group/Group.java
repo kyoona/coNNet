@@ -16,7 +16,7 @@ import static houseInception.connet.domain.Status.ALIVE;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "groups")
+@Table(name = "team")
 @Entity
 public class Group extends BaseTime {
 
