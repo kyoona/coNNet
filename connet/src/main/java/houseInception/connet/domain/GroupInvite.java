@@ -23,4 +23,13 @@ public class GroupInvite extends BaseTime{
     @JoinColumn(name = "invitee_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private User invitee;
+
+    public static GroupInvite create(String groupUuid, User inviter, User invitee) {
+        GroupInvite groupInvite = new GroupInvite();
+        groupInvite.groupUuid = groupUuid;
+        groupInvite.inviter = inviter;
+        groupInvite.invitee = invitee;
+
+        return groupInvite;
+    }
 }
