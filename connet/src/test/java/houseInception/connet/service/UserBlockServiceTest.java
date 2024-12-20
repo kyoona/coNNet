@@ -6,7 +6,9 @@ import houseInception.connet.domain.UserBlockType;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,8 @@ class UserBlockServiceTest {
     UserBlockRepository userBlockRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    EntityManager em;
 
     User user1;
     User user2;
@@ -40,16 +44,19 @@ class UserBlockServiceTest {
     @BeforeEach
     void beforeEach(){
         user1 = User.create("user1", null, null, null);
-        userRepository.save(user1);
-
         user2 = User.create("user2", null, null, null);
-        userRepository.save(user2);
-
         user3 = User.create("user3", null, null, null);
-        userRepository.save(user3);
-
         user4 = User.create("user4", null, null, null);
-        userRepository.save(user4);
+
+        em.persist(user1);
+        em.persist(user2);
+        em.persist(user3);
+        em.persist(user4);
+    }
+
+    @AfterEach
+    void afterEach(){
+        userRepository.deleteAll();
     }
 
     @Test
@@ -66,29 +73,25 @@ class UserBlockServiceTest {
     void blockUser_양방향() {
         //given
         UserBlock userBlock = UserBlock.create(user1, user2, REQUEST);
-        userBlockRepository.save(userBlock);
-
         UserBlock reverseUserBlock = UserBlock.create(user2, user1, ACCEPT);
-        userBlockRepository.save(reverseUserBlock);
+        em.persist(userBlock);
+        em.persist(reverseUserBlock);
 
         //when
         userBlockService.blockUser(user2.getId(), user1.getId());
 
         //then
-        assertThat(userBlockRepository
-                .existsByUserIdAndTargetIdAndBlockType(user1.getId(), user2.getId(), REQUEST)).isTrue();
-        assertThat(userBlockRepository
-                .existsByUserIdAndTargetIdAndBlockType(user2.getId(), user1.getId(), REQUEST)).isTrue();
+        assertThat(userBlockRepository.existsByUserIdAndTargetIdAndBlockType(user1.getId(), user2.getId(), REQUEST)).isTrue();
+        assertThat(userBlockRepository.existsByUserIdAndTargetIdAndBlockType(user2.getId(), user1.getId(), REQUEST)).isTrue();
     }
 
     @Test
     void cancelBlock_단방향_차단중() {
         //given
         UserBlock userBlock = UserBlock.create(user1, user2, REQUEST);
-        userBlockRepository.save(userBlock);
-
         UserBlock reverseUserBlock = UserBlock.create(user2, user1, ACCEPT);
-        userBlockRepository.save(reverseUserBlock);
+        em.persist(userBlock);
+        em.persist(reverseUserBlock);
 
         //when
         userBlockService.cancelBlock(user1.getId(), user2.getId());
@@ -102,38 +105,35 @@ class UserBlockServiceTest {
     void cancelBlock_양방향_차단중() {
         //given
         UserBlock userBlock = UserBlock.create(user1, user2, REQUEST);
-        userBlockRepository.save(userBlock);
-
         UserBlock reverseUserBlock = UserBlock.create(user2, user1, REQUEST);
-        userBlockRepository.save(reverseUserBlock);
+        em.persist(userBlock);
+        em.persist(reverseUserBlock);
 
         //when
         userBlockService.cancelBlock(user1.getId(), user2.getId());
 
         //then
-        assertThat(userBlockRepository
-                .existsByUserIdAndTargetIdAndBlockType(user1.getId(), user2.getId(), ACCEPT)).isTrue();
-        assertThat(userBlockRepository
-                .existsByUserIdAndTargetIdAndBlockType(user2.getId(), user1.getId(), REQUEST)).isTrue();
+        assertThat(userBlockRepository.existsByUserIdAndTargetIdAndBlockType(user1.getId(), user2.getId(), ACCEPT)).isTrue();
+        assertThat(userBlockRepository.existsByUserIdAndTargetIdAndBlockType(user2.getId(), user1.getId(), REQUEST)).isTrue();
     }
 
     @Test
     void getBlockUserList() {
         //given
         UserBlock userBlock1 = UserBlock.create(user1, user2, REQUEST);
-        userBlockRepository.save(userBlock1);
-
         UserBlock userBlock2 = UserBlock.create(user1, user3, REQUEST);
-        userBlockRepository.save(userBlock2);
-
         UserBlock userBlock3 = UserBlock.create(user1, user4, ACCEPT);
-        userBlockRepository.save(userBlock3);
+        em.persist(userBlock1);
+        em.persist(userBlock2);
+        em.persist(userBlock3);
 
         //when
         List<DefaultUserResDto> result = userBlockService.getBlockUserList(user1.getId()).getData();
 
         //then
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result).extracting("userId").contains(user2.getId(), user3.getId());
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(DefaultUserResDto::getUserId)
+                .contains(user2.getId(), user3.getId());
     }
 }

@@ -50,7 +50,6 @@ class GroupServiceTest {
         user2 = User.create("user2", null, null, null);
         user3 = User.create("user3", null, null, null);
         user4 = User.create("user4", null, null, null);
-
         em.persist(user1);
         em.persist(user2);
         em.persist(user3);

@@ -6,6 +6,7 @@ import houseInception.connet.dto.friend.FriendType;
 import houseInception.connet.dto.UserResDto;
 import houseInception.connet.repository.FriendRepository;
 import houseInception.connet.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,8 @@ class UserServiceTest {
     UserRepository userRepository;
     @Autowired
     FriendRepository friendRepository;
+    @Autowired
+    EntityManager em;
 
     User user1;
     User user2;
@@ -35,10 +38,9 @@ class UserServiceTest {
     @BeforeEach
     void beforeEach(){
         user1 = User.create("user1", null, UUID.randomUUID().toString(), null);
-        userRepository.save(user1);
-
         user2 = User.create("user2", null, UUID.randomUUID().toString(), null);
-        userRepository.save(user2);
+        em.persist(user1);
+        em.persist(user2);
     }
 
     @AfterEach
