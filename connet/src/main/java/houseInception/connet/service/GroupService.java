@@ -32,7 +32,7 @@ public class GroupService {
     private String s3UrlPrefix;
 
     @Transactional
-    public Long addGroup(Long userId, GroupAddDto groupAddDto) {
+    public String addGroup(Long userId, GroupAddDto groupAddDto) {
         User user = validator.findUser(userId);
 
         String groupProfileUrl = uploadImages(groupAddDto.getGroupProfile());
@@ -52,7 +52,7 @@ public class GroupService {
 
         groupRepository.save(group);
 
-        return group.getId();
+        return group.getGroupUuid();
     }
 
     private String uploadImages(MultipartFile image){

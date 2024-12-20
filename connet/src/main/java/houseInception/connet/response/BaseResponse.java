@@ -18,7 +18,11 @@ public class BaseResponse<T> {
         this.result = result;
     }
 
-    public static BaseResponse<BaseResultDto> getSimpleRes(Long id) {
-        return new BaseResponse<>(MDC.get("request_id"), BaseResultDto.get(id));
+    public static BaseResponse<DefaultIdDto> getSimpleRes(Long id) {
+        return new BaseResponse<>(MDC.get("request_id"), DefaultIdDto.get(id));
+    }
+
+    public static BaseResponse<DefaultUuidDto> getSimpleRes(String uuid) {
+        return new BaseResponse<>(MDC.get("request_id"), DefaultUuidDto.get(uuid));
     }
 }

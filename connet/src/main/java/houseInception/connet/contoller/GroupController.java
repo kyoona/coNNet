@@ -2,7 +2,8 @@ package houseInception.connet.contoller;
 
 import houseInception.connet.dto.group.GroupAddDto;
 import houseInception.connet.response.BaseResponse;
-import houseInception.connet.response.BaseResultDto;
+import houseInception.connet.response.DefaultIdDto;
+import houseInception.connet.response.DefaultUuidDto;
 import houseInception.connet.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,10 +19,10 @@ public class GroupController {
     private final GroupService groupService;
 
     @PostMapping
-    public BaseResponse<BaseResultDto> addGroup(@RequestBody GroupAddDto groupAddDto){
+    public BaseResponse<DefaultUuidDto> addGroup(@RequestBody GroupAddDto groupAddDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        Long resultId = groupService.addGroup(userId, groupAddDto);
+        String resultUuid = groupService.addGroup(userId, groupAddDto);
 
-        return BaseResponse.getSimpleRes(resultId);
+        return BaseResponse.getSimpleRes(resultUuid);
     }
 }

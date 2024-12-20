@@ -4,7 +4,7 @@ import houseInception.connet.dto.login.TokenResDto;
 import houseInception.connet.dto.login.RefreshDto;
 import houseInception.connet.dto.login.SignInDto;
 import houseInception.connet.response.BaseResponse;
-import houseInception.connet.response.BaseResultDto;
+import houseInception.connet.response.DefaultIdDto;
 import houseInception.connet.service.LoginService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ public class LoginController {
     }
 
     @PostMapping("/sign-out")
-    public BaseResponse<BaseResultDto> signOut(){
+    public BaseResponse<DefaultIdDto> signOut(){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = loginService.signOut(userId);
 
