@@ -4,6 +4,7 @@ import houseInception.connet.domain.Status;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.dto.group.GroupAddDto;
+import houseInception.connet.dto.group.GroupUserResDto;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.GroupRepository;
@@ -74,6 +75,12 @@ public class GroupService {
         Group group = findGroup(groupUuid);
 
         group.addUser(user);
+    }
+
+    public List<GroupUserResDto> getGroupUserList(Long userId, String groupUuid) {
+        List<GroupUserResDto> result = groupRepository.getGroupUserList(groupUuid);
+
+        return result;
     }
 
     private Group findGroup(String groupUuid){
