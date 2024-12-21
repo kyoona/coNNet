@@ -17,8 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static houseInception.connet.response.status.BaseErrorCode.INVALID_GROUP_TAG;
-import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_GROUP;
+import static houseInception.connet.response.status.BaseErrorCode.*;
 import static houseInception.connet.service.util.FileUtil.getUniqueFileName;
 import static houseInception.connet.service.util.FileUtil.isInValidFile;
 
@@ -78,9 +77,17 @@ public class GroupService {
     }
 
     public List<GroupUserResDto> getGroupUserList(Long userId, String groupUuid) {
+        checkUserInGroup(userId, groupUuid);
+
         List<GroupUserResDto> result = groupRepository.getGroupUserList(groupUuid);
 
         return result;
+    }
+
+    private void checkUserInGroup(Long userId, String groupUuid){
+        if (!groupRepository.existUserInGroup(userId, groupUuid)) {
+            throw new GroupException(NOT_IN_GROUP);
+        }
     }
 
     private Group findGroup(String groupUuid){
