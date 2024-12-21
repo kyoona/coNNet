@@ -3,6 +3,7 @@ package houseInception.connet.service;
 import houseInception.connet.domain.GroupInvite;
 import houseInception.connet.domain.User;
 import houseInception.connet.dto.group_invite.GroupInviteDto;
+import houseInception.connet.dto.group_invite.GroupInviteResDto;
 import houseInception.connet.event.publisher.GroupInviteEventPublisher;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.exception.GroupInviteException;
@@ -12,6 +13,8 @@ import houseInception.connet.service.util.DomainValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static houseInception.connet.response.status.BaseErrorCode.*;
 
@@ -58,6 +61,12 @@ public class GroupInviteService {
         groupInviteRepository.deleteByGroupUuidAndInviteeId(groupUuid, userId);
 
         return groupUuid;
+    }
+
+    public List<GroupInviteResDto> getGroupInviteList(Long userId) {
+        List<GroupInviteResDto> result = groupInviteRepository.getGroupInviteListOfUser(userId);
+
+        return result;
     }
 
     private void checkUserInGroup(Long userId, String groupUuid){

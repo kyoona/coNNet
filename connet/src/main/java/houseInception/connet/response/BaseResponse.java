@@ -10,6 +10,7 @@ import org.slf4j.MDC;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class BaseResponse<T> {
+
     private String requestId;
     private T result;
 

@@ -1,6 +1,7 @@
 package houseInception.connet.contoller;
 
 import houseInception.connet.dto.group_invite.GroupInviteDto;
+import houseInception.connet.dto.group_invite.GroupInviteResDto;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.DefaultIdDto;
 import houseInception.connet.response.DefaultUuidDto;
@@ -8,6 +9,8 @@ import houseInception.connet.service.GroupInviteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/groups")
 @RequiredArgsConstructor
@@ -39,5 +42,13 @@ public class GroupInviteController {
         String groupUuId = groupInviteService.denyInvite(userId, groupUuid);
 
         return BaseResponse.getSimpleRes(groupUuId);
+    }
+
+    @GetMapping("/invite")
+    public BaseResponse<List<GroupInviteResDto>> getGroupInviteList(){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        List<GroupInviteResDto> result = groupInviteService.getGroupInviteList(userId);
+
+        return new BaseResponse<>(result);
     }
 }
