@@ -3,6 +3,7 @@ package houseInception.connet.contoller;
 import houseInception.connet.dto.group.GroupAddDto;
 import houseInception.connet.dto.group.GroupUserResDto;
 import houseInception.connet.response.BaseResponse;
+import houseInception.connet.response.DefaultIdDto;
 import houseInception.connet.response.DefaultUuidDto;
 import houseInception.connet.service.GroupService;
 import jakarta.validation.Valid;
@@ -40,5 +41,13 @@ public class GroupController {
         String resultUuid = groupService.enterGroup(userId, groupUuid);
 
         return BaseResponse.getSimpleRes(resultUuid);
+    }
+
+    @PostMapping("/{groupUuid}/exit")
+    public BaseResponse<DefaultIdDto> exitGroup(@PathVariable String groupUuid){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = groupService.exitGroup(userId, groupUuid);
+
+        return BaseResponse.getSimpleRes(resultId);
     }
 }

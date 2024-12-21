@@ -3,6 +3,7 @@ package houseInception.connet.service;
 import houseInception.connet.domain.Status;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.Group;
+import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.dto.group.GroupAddDto;
 import houseInception.connet.dto.group.GroupUserResDto;
 import houseInception.connet.exception.GroupException;
@@ -82,11 +83,15 @@ public class GroupService {
         return groupUuid;
     }
 
-    private void checkGroupLimit(Group group) {
-        Long count = groupRepository.countOfGroupUsers(group.getId());
-        if (count != null && count >= group.getUserLimit()) {
-            throw new GroupException(GROUP_USER_LIMIT);
-        }
+    @Transactional
+    public Long exitGroup(Long userId, String groupUuid) {
+        Group group = findGroup(groupUuid);
+        GroupUser groupUser = groupRepository.findGroupUser(group.getId(), userId)
+                .orElseThrow(() -> new GroupException(NOT_IN_GROUP));
+
+        group.removeUser(groupUser);
+
+        return groupUser.getId();
     }
 
     @Transactional
@@ -131,5 +136,12 @@ public class GroupService {
     private Group findGroupWithLock(String groupUuid){
         return groupRepository.findByGroupUuidAndStatusWithLock(groupUuid, Status.ALIVE)
                 .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
+    }
+
+    private void checkGroupLimit(Group group) {
+        Long count = groupRepository.countOfGroupUsers(group.getId());
+        if (count != null && count >= group.getUserLimit()) {
+            throw new GroupException(GROUP_USER_LIMIT);
+        }
     }
 }

@@ -65,6 +65,12 @@ public class Group extends BaseTime {
         this.groupUserList.add(groupUser);
     }
 
+    public void removeUser(GroupUser groupUser){
+        if(isGroupUser(groupUser)){
+            groupUser.delete();
+        }
+    }
+
     public boolean addTag(List<String> tags){
         if(!isValidTag(tags)){
             return false;
@@ -84,5 +90,9 @@ public class Group extends BaseTime {
 
     public List<GroupTag> getGroupTagList() {
         return List.copyOf(groupTagList);
+    }
+
+    private boolean isGroupUser(GroupUser groupUser){
+        return groupUser.getGroup().getId().equals(this.id);
     }
 }
