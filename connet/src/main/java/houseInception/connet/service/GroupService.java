@@ -70,8 +70,7 @@ public class GroupService {
 
     @Transactional
     public String enterGroup(Long userId, String groupUuid) {
-        Group group = groupRepository.findByGroupUuidAndStatusWithLock(groupUuid, Status.ALIVE)
-                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
+        Group group = findGroupWithLock(groupUuid);
         checkOpenGroup(group);
         checkGroupLimit(group);
 
@@ -93,7 +92,9 @@ public class GroupService {
     @Transactional
     public void addGroupUser(Long userId, String groupUuid) {
         User user = validator.findUser(userId);
-        Group group = findGroup(groupUuid);
+
+        Group group = findGroupWithLock(groupUuid);
+        checkGroupLimit(group);
 
         group.addUser(user);
     }
@@ -124,6 +125,11 @@ public class GroupService {
 
     private Group findGroup(String groupUuid){
         return groupRepository.findByGroupUuidAndStatus(groupUuid, Status.ALIVE)
+                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
+    }
+
+    private Group findGroupWithLock(String groupUuid){
+        return groupRepository.findByGroupUuidAndStatusWithLock(groupUuid, Status.ALIVE)
                 .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
     }
 }
