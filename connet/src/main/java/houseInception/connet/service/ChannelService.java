@@ -44,6 +44,17 @@ public class ChannelService {
         return channelId;
     }
 
+    @Transactional
+    public Long deleteChannel(Long userId, String groupUuid, Long channelId) {
+        Long groupId = findGroupIdByUuid(groupUuid);
+        checkGroupOwner(userId, groupId);
+        Channel channel = findChannel(channelId);
+
+        channelRepository.delete(channel);
+
+        return channelId;
+    }
+
     private Channel findChannel(Long channelId){
         return channelRepository.findById(channelId)
                 .orElseThrow(() -> new ChannelException(NO_SUCH_CHANNEL));

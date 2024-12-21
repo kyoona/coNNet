@@ -33,4 +33,13 @@ public class ChannelController {
 
         return BaseResponse.getSimpleRes(resultId);
     }
+
+    @DeleteMapping("/{channelId}")
+    public BaseResponse<DefaultIdDto> deleteChannel(@PathVariable String groupUuid,
+                                                    @PathVariable Long channelId){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = channelService.deleteChannel(userId, groupUuid, channelId);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
 }
