@@ -1,5 +1,6 @@
 package houseInception.connet.service;
 
+import houseInception.connet.domain.Status;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.group.GroupTag;
@@ -10,7 +11,6 @@ import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,11 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @Transactional
@@ -78,7 +76,7 @@ class GroupServiceTest {
         String groupUuid = groupService.addGroup(user1.getId(), groupAddDto);
 
         //then
-        Group group = groupRepository.findByGroupUuid(groupUuid).orElseThrow();
+        Group group = groupRepository.findByGroupUuidAndStatus(groupUuid, Status.ALIVE).orElseThrow();
         assertThat(group.getGroupName()).isEqualTo(groupName);
 
         List<GroupUser> groupUserList = group.getGroupUserList();

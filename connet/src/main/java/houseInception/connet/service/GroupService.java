@@ -1,5 +1,6 @@
 package houseInception.connet.service;
 
+import houseInception.connet.domain.Status;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.dto.group.GroupAddDto;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 import static houseInception.connet.response.status.BaseErrorCode.INVALID_GROUP_TAG;
+import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_GROUP;
 import static houseInception.connet.service.util.FileUtil.getUniqueFileName;
 import static houseInception.connet.service.util.FileUtil.isInValidFile;
 
@@ -64,5 +66,18 @@ public class GroupService {
         s3ServiceProvider.uploadImage(newFileName, image);
 
         return s3UrlPrefix + newFileName;
+    }
+
+    @Transactional
+    public void addGroupUser(Long userId, String groupUuid) {
+        User user = validator.findUser(userId);
+        Group group = findGroup(groupUuid);
+
+        group.addUser(user);
+    }
+
+    private Group findGroup(String groupUuid){
+        return groupRepository.findByGroupUuidAndStatus(groupUuid, Status.ALIVE)
+                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
     }
 }

@@ -60,6 +60,11 @@ public class Group extends BaseTime {
         this.groupUserList.add(groupUser);
     }
 
+    public void addUser(User user){
+        GroupUser groupUser = new GroupUser(user, this, false);
+        this.groupUserList.add(groupUser);
+    }
+
     public boolean addTag(List<String> tags){
         if(!isValidTag(tags)){
             return false;

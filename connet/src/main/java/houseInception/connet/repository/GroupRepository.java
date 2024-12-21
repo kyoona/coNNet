@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface GroupRepository extends JpaRepository<Group, Long>, GroupCustomRepository {
 
-    Optional<Group> findByGroupUuid(String groupUuid);
+    Optional<Group> findByGroupUuidAndStatus(String groupUuid, Status status);
 
     boolean existsByGroupUuidAndStatus(String groupUuid, Status status);
 }
