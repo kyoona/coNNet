@@ -3,7 +3,7 @@ package houseInception.connet.contoller;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.response.BaseResponse;
-import houseInception.connet.response.BaseResultDto;
+import houseInception.connet.response.DefaultIdDto;
 import houseInception.connet.service.UserBlockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ public class UserBlockController {
     private final UserBlockService userBlockService;
 
     @PostMapping("/{targetId}")
-    public BaseResponse<BaseResultDto> blockUser(@PathVariable Long targetId){
+    public BaseResponse<DefaultIdDto> blockUser(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = userBlockService.blockUser(userId, targetId);
 
@@ -24,7 +24,7 @@ public class UserBlockController {
     }
 
     @DeleteMapping("/{targetId}")
-    public BaseResponse<BaseResultDto> cancelBlock(@PathVariable Long targetId){
+    public BaseResponse<DefaultIdDto> cancelBlock(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = userBlockService.cancelBlock(userId, targetId);
 

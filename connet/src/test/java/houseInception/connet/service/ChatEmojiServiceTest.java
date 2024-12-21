@@ -12,7 +12,9 @@ import houseInception.connet.dto.chatEmoji.ChatEmojiUserResDto;
 import houseInception.connet.exception.ChatEmojiException;
 import houseInception.connet.repository.ChatEmojiRepository;
 import houseInception.connet.repository.PrivateRoomRepository;
+import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,8 @@ class ChatEmojiServiceTest {
     @Autowired
     PrivateRoomRepository privateRoomRepository;
     @Autowired
+    UserRepository userRepository;
+    @Autowired
     EntityManager em;
 
     User user1;
@@ -49,6 +53,11 @@ class ChatEmojiServiceTest {
         em.persist(user1);
         em.persist(user2);
         em.persist(user3);
+    }
+
+    @AfterEach
+    void afterEach(){
+        userRepository.deleteAll();
     }
 
     @Test
@@ -157,9 +166,8 @@ class ChatEmojiServiceTest {
         em.flush();
 
         ChatEmoji chatEmoji1 = ChatEmoji.createPrivateChatEmoji(user1, privateChat.getId(), EmojiType.HEART);
-        em.persist(chatEmoji1);
-
         ChatEmoji chatEmoji2 = ChatEmoji.createPrivateChatEmoji(user2, privateChat.getId(), EmojiType.HEART);
+        em.persist(chatEmoji1);
         em.persist(chatEmoji2);
 
         //when

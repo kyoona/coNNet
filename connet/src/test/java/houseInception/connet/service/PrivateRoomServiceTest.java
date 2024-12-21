@@ -9,8 +9,10 @@ import houseInception.connet.dto.privateRoom.*;
 import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.exception.UserBlockException;
 import houseInception.connet.repository.PrivateRoomRepository;
+import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,8 @@ class PrivateRoomServiceTest {
     PrivateRoomService privateRoomService;
     @Autowired
     PrivateRoomRepository privateRoomRepository;
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     EntityManager em;
@@ -46,11 +50,15 @@ class PrivateRoomServiceTest {
         user2 = User.create("user2", null, null, null);
         user3 = User.create("user3", null, null, null);
         user4 = User.create("user4", null, null, null);
-
         em.persist(user1);
         em.persist(user2);
         em.persist(user3);
         em.persist(user4);
+    }
+
+    @AfterEach
+    void afterEach(){
+        userRepository.deleteAll();
     }
 
     @Test
@@ -61,9 +69,7 @@ class PrivateRoomServiceTest {
         PrivateChatAddResDto result = privateRoomService.addPrivateChat(user1.getId(), user2.getId(), chatAddDto);
 
         //then
-        PrivateRoom privateRoom = privateRoomRepository.findPrivateRoomWithUser(result.getChatRoomUuid()).orElse(null);
-        assertThat(privateRoom).isNotNull();
-
+        PrivateRoom privateRoom = privateRoomRepository.findPrivateRoomWithUser(result.getChatRoomUuid()).orElseThrow();
         List<PrivateRoomUser> privateRoomUsers = privateRoom.getPrivateRoomUsers();
         assertThat(privateRoomUsers).hasSize(2);
         assertThat(privateRoomUsers)
@@ -80,7 +86,7 @@ class PrivateRoomServiceTest {
     void addPrivateChat_채팅방_존재() {
         //given
         PrivateRoom privateRoom = PrivateRoom.create(user1, user2);
-        privateRoomRepository.save(privateRoom);
+        em.persist(privateRoom);
 
         //when
         PrivateChatAddDto chatAddDto = new PrivateChatAddDto("mess1", null);
@@ -118,12 +124,10 @@ class PrivateRoomServiceTest {
         GptPrivateChatAddResDto result = privateRoomService.addGptChat(user1.getId(), user2.getId(), message);
 
         //then
-        PrivateChat userChat = privateRoomRepository.findPrivateChatsById(result.getUserChatId()).orElse(null);
-        assertThat(userChat).isNotNull();
+        PrivateChat userChat = privateRoomRepository.findPrivateChatsById(result.getUserChatId()).orElseThrow();
         assertThat(userChat.getMessage()).isEqualTo(message);
 
-        PrivateChat gptChat = privateRoomRepository.findPrivateChatsById(result.getGptChatId()).orElse(null);
-        assertThat(gptChat).isNotNull();
+        PrivateChat gptChat = privateRoomRepository.findPrivateChatsById(result.getGptChatId()).orElseThrow();
         assertThat(gptChat.getMessage()).isEqualTo(result.getMessage());
         log.info("gpt response = {}", result.getMessage());
     }
@@ -134,10 +138,9 @@ class PrivateRoomServiceTest {
         PrivateRoom privateRoom1 = PrivateRoom.create(user1, user2);
         PrivateRoom privateRoom2 = PrivateRoom.create(user1, user3);
         PrivateRoom privateRoom3 = PrivateRoom.create(user1, user4);
-
-        privateRoomRepository.save(privateRoom1);
-        privateRoomRepository.save(privateRoom2);
-        privateRoomRepository.save(privateRoom3);
+        em.persist(privateRoom1);
+        em.persist(privateRoom2);
+        em.persist(privateRoom3);
 
         privateRoom2.addUserToUserChat("message", null, privateRoom2.getPrivateRoomUsers().get(0));
         em.flush();
@@ -166,7 +169,7 @@ class PrivateRoomServiceTest {
     void getPrivateChatList_이모지o() {
         //given
         PrivateRoom privateRoom1 = PrivateRoom.create(user1, user2);
-        privateRoomRepository.save(privateRoom1);
+        em.persist(privateRoom1);
         PrivateChat privateChat1 = privateRoom1.addUserToUserChat("message1", null, privateRoom1.getPrivateRoomUsers().get(0));
         PrivateChat privateChat2 = privateRoom1.addUserToUserChat("message2", null, privateRoom1.getPrivateRoomUsers().get(1));
         em.flush();
@@ -200,14 +203,13 @@ class PrivateRoomServiceTest {
     void deletePrivateRoom() {
         //given
         PrivateRoom privateRoom1 = PrivateRoom.create(user1, user2);
-        privateRoomRepository.save(privateRoom1);
+        em.persist(privateRoom1);
 
         //when
         privateRoomService.deletePrivateRoom(user1.getId(), privateRoom1.getPrivateRoomUuid());
 
         //then
-        PrivateRoomUser privateRoomUser = privateRoomRepository.findPrivateRoomUser(privateRoom1.getId(), user1.getId()).orElse(null);
-        assertThat(privateRoomUser).isNotNull();
+        PrivateRoomUser privateRoomUser = privateRoomRepository.findPrivateRoomUser(privateRoom1.getId(), user1.getId()).orElseThrow();
         assertThat(privateRoomUser.getStatus()).isEqualTo(Status.DELETED);
     }
 
@@ -215,7 +217,7 @@ class PrivateRoomServiceTest {
     void deletePrivateRoom_권한x() {
         //given
         PrivateRoom privateRoom1 = PrivateRoom.create(user1, user2);
-        privateRoomRepository.save(privateRoom1);
+        em.persist(privateRoom1);
 
         //when
         assertThatThrownBy(() -> privateRoomService.deletePrivateRoom(user3.getId(), privateRoom1.getPrivateRoomUuid()))

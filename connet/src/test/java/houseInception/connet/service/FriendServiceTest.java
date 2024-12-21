@@ -55,19 +55,15 @@ class FriendServiceTest {
     @BeforeEach
     void beforeEach(){
         user1 = User.create("user1", null, UUID.randomUUID().toString(), null);
-        userRepository.save(user1);
-
         user2 = User.create("user2", null, UUID.randomUUID().toString(), null);
-        userRepository.save(user2);
-
         user3 = User.create("user3", null, UUID.randomUUID().toString(), null);
-        userRepository.save(user3);
-
         user4 = User.create("user4", null, UUID.randomUUID().toString(), null);
-        userRepository.save(user4);
-
         user5 = User.create("user5", null, UUID.randomUUID().toString(), null);
-        userRepository.save(user5);
+        em.persist(user1);
+        em.persist(user2);
+        em.persist(user3);
+        em.persist(user4);
+        em.persist(user5);
     }
 
     @AfterEach
@@ -103,7 +99,8 @@ class FriendServiceTest {
         friendRepository.save(friend);
 
         //when
-        assertThatThrownBy(() -> friendService.requestFriendById(user1.getId(), user2.getId())).isInstanceOf(FriendException.class);
+        assertThatThrownBy(() -> friendService.requestFriendById(user1.getId(), user2.getId()))
+                .isInstanceOf(FriendException.class);
     }
 
     @Test
@@ -118,7 +115,8 @@ class FriendServiceTest {
 
     @Test
     void requestFriend_ById_스스로에게_친구_요청() {
-        assertThatThrownBy(() -> friendService.requestFriendById(user1.getId(), user1.getId())).isInstanceOf(FriendException.class);
+        assertThatThrownBy(() -> friendService.requestFriendById(user1.getId(), user1.getId()))
+                .isInstanceOf(FriendException.class);
     }
 
     @Test
@@ -127,7 +125,8 @@ class FriendServiceTest {
         friendService.requestFriendByEmail(user1.getId(), user2.getEmail());
 
         //then
-        assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user1.getId(), user2.getId(), WAIT)).isTrue();
+        assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user1.getId(), user2.getId(), WAIT))
+                .isTrue();
     }
 
     @Test
@@ -151,7 +150,8 @@ class FriendServiceTest {
         friendRepository.save(friend);
 
         //when
-        assertThatThrownBy(() -> friendService.cancelFriendRequest(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
+        assertThatThrownBy(() -> friendService.cancelFriendRequest(user2.getId(), user1.getId()))
+                .isInstanceOf(FriendException.class);
     }
 
     @Test
@@ -171,7 +171,8 @@ class FriendServiceTest {
     @Test
     void acceptFriendRequest_요청존재x() {
         //when
-        assertThatThrownBy(() -> friendService.acceptFriendRequest(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
+        assertThatThrownBy(() -> friendService.acceptFriendRequest(user2.getId(), user1.getId()))
+                .isInstanceOf(FriendException.class);
     }
 
     @Test
@@ -182,7 +183,8 @@ class FriendServiceTest {
         friendRepository.save(friend);
 
         //when
-        assertThatThrownBy(() -> friendService.acceptFriendRequest(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
+        assertThatThrownBy(() -> friendService.acceptFriendRequest(user2.getId(), user1.getId()))
+                .isInstanceOf(FriendException.class);
     }
 
     @Test
@@ -195,13 +197,15 @@ class FriendServiceTest {
         Long friendId = friendService.denyFriendRequest(user2.getId(), user1.getId());
 
         //then
-        assertThatThrownBy(() -> friendRepository.findById(friendId).orElseThrow()).isInstanceOf(NoSuchElementException.class);
+        assertThatThrownBy(() -> friendRepository.findById(friendId).orElseThrow())
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void denyFriendRequest_요청존재x() {
         //when
-        assertThatThrownBy(() -> friendService.denyFriendRequest(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
+        assertThatThrownBy(() -> friendService.denyFriendRequest(user2.getId(), user1.getId()))
+                .isInstanceOf(FriendException.class);
     }
 
     @Test
@@ -222,8 +226,10 @@ class FriendServiceTest {
 
         //then
         List<DefaultUserResDto> senderList = result.getData();
-        assertThat(senderList.size()).isEqualTo(2);
-        assertThat(senderList).extracting("userId").contains(user2.getId(), user3.getId());
+        assertThat(senderList).hasSize(2);
+        assertThat(senderList)
+                .extracting(DefaultUserResDto::getUserId)
+                .contains(user2.getId(), user3.getId());
 
     }
 
@@ -243,8 +249,10 @@ class FriendServiceTest {
         List<DefaultUserResDto> result = friendService.getFriendRequestList(user1.getId()).getData();
 
         //then
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result).extracting("userId").contains(user2.getId(), user3.getId());
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(DefaultUserResDto::getUserId)
+                .contains(user2.getId(), user3.getId());
     }
 
     @Test
