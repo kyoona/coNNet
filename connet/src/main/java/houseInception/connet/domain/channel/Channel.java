@@ -20,7 +20,15 @@ public class Channel {
 
     private Long groupId;
     private String channelName;
-    
+
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChannelTap> tapList = new ArrayList<>();
+
+    public static Channel create(Long groupId, String channelName) {
+        Channel channel = new Channel();
+        channel.groupId = groupId;
+        channel.channelName = channelName;
+
+        return channel;
+    }
 }

@@ -19,4 +19,5 @@ public interface GroupRepository extends JpaRepository<Group, Long>, GroupCustom
     Optional<Group> findByGroupUuidAndStatusWithLock(@Param("groupUuid") String groupUuid, @Param("status") Status status);
 
     boolean existsByGroupUuidAndStatus(String groupUuid, Status status);
+    Long findIdByGroupUuidAndStatus(String groupUuid, Status status);
 }
