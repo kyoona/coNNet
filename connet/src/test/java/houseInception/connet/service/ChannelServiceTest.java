@@ -114,4 +114,31 @@ class ChannelServiceTest {
         assertThatThrownBy(() -> channelService.updateChannel(user1.getId(), group.getGroupUuid(), channel.getId(), channelDto))
                 .isInstanceOf(ChannelException.class);
     }
+
+    @Test
+    void deleteChannel() {
+        //given
+        Channel channel = Channel.create(group.getId(), "channel");
+        em.persist(channel);
+
+        //when
+        Long resultId = channelService.deleteChannel(groupOwner.getId(), group.getGroupUuid(), channel.getId());
+
+        //then
+        assertThat(channelRepository.findById(resultId)).isEmpty();
+    }
+
+    @Test
+    void deleteChannel_그룹멤버o_방장x() {
+        //given
+        group.addUser(user1);
+        em.flush();
+
+        Channel channel = Channel.create(group.getId(), "channel");
+        em.persist(channel);
+
+        //when
+        assertThatThrownBy(() -> channelService.deleteChannel(user1.getId(), group.getGroupUuid(), channel.getId()))
+                .isInstanceOf(ChannelException.class);
+    }
 }
