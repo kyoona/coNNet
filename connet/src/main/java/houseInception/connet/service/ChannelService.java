@@ -39,8 +39,7 @@ public class ChannelService {
 
     @Transactional
     public Long updateChannel(Long userId, String groupUuid, Long channelId, ChannelDto channelDto) {
-        Long groupId = findGroupIdByUuid(groupUuid);
-        checkGroupOwner(userId, groupId);
+        checkGroupOwner(userId, groupUuid);
         Channel channel = findChannel(channelId);
 
         channel.update(channelDto.getChannelName());
@@ -50,8 +49,7 @@ public class ChannelService {
 
     @Transactional
     public Long deleteChannel(Long userId, String groupUuid, Long channelId) {
-        Long groupId = findGroupIdByUuid(groupUuid);
-        checkGroupOwner(userId, groupId);
+        checkGroupOwner(userId, groupUuid);
         Channel channel = findChannel(channelId);
 
         channelRepository.delete(channel);
@@ -61,8 +59,7 @@ public class ChannelService {
 
     @Transactional
     public Long addTap(Long userId, String groupUuid, Long channelId, TapDto tapDto) {
-        Long groupId = findGroupIdByUuid(groupUuid);
-        checkGroupOwner(userId, groupId);
+        checkGroupOwner(userId, groupUuid);
         Channel channel = findChannel(channelId);
 
         ChannelTap tap = channel.addTap(tapDto.getTapName());
@@ -83,6 +80,12 @@ public class ChannelService {
 
     private void checkGroupOwner(Long userId, Long groupId){
         if(!groupRepository.existGroupOwner(userId, groupId)){
+            throw new ChannelException(ONLY_GROUP_OWNER);
+        }
+    }
+
+    private void checkGroupOwner(Long userId, String groupUuid){
+        if(!groupRepository.existGroupOwner(userId, groupUuid)){
             throw new ChannelException(ONLY_GROUP_OWNER);
         }
     }
