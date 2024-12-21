@@ -3,13 +3,12 @@ package houseInception.connet.service;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.channel.Channel;
 import houseInception.connet.domain.group.Group;
-import houseInception.connet.dto.channel.ChannelAddDto;
+import houseInception.connet.dto.channel.ChannelDto;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,13 +64,13 @@ class ChannelServiceTest {
     @Test
     void addChannel() {
         //when
-        ChannelAddDto channelAddDto = new ChannelAddDto("channel");
-        Long resultId = channelService.addChannel(groupOwner.getId(), group.getGroupUuid(), channelAddDto);
+        ChannelDto channelDto = new ChannelDto("channel");
+        Long resultId = channelService.addChannel(groupOwner.getId(), group.getGroupUuid(), channelDto);
 
         //then
         Channel channel = channelRepository.findById(resultId).orElseThrow();
         assertThat(channel.getGroupId()).isEqualTo(group.getId());
-        assertThat(channel.getChannelName()).isEqualTo(channelAddDto.getChannelName());
+        assertThat(channel.getChannelName()).isEqualTo(channelDto.getChannelName());
     }
 
     @Test
@@ -81,8 +80,8 @@ class ChannelServiceTest {
         em.flush();
 
         //when
-        ChannelAddDto channelAddDto = new ChannelAddDto("channel");
-        assertThatThrownBy(() -> channelService.addChannel(user1.getId(), group.getGroupUuid(), channelAddDto))
+        ChannelDto channelDto = new ChannelDto("channel");
+        assertThatThrownBy(() -> channelService.addChannel(user1.getId(), group.getGroupUuid(), channelDto))
                 .isInstanceOf(ChannelException.class);
     }
 }

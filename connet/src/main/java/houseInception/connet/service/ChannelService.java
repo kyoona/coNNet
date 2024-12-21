@@ -1,8 +1,7 @@
 package houseInception.connet.service;
 
-import houseInception.connet.domain.Status;
 import houseInception.connet.domain.channel.Channel;
-import houseInception.connet.dto.channel.ChannelAddDto;
+import houseInception.connet.dto.channel.ChannelDto;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.ChannelRepository;
@@ -12,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_GROUP;
-import static houseInception.connet.response.status.BaseErrorCode.ONLY_GROUP_OWNER;
+import static houseInception.connet.response.status.BaseErrorCode.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -25,14 +23,30 @@ public class ChannelService {
     private final GroupRepository groupRepository;
 
     @Transactional
-    public Long addChannel(Long userId, String groupUuid, ChannelAddDto channelAddDto) {
+    public Long addChannel(Long userId, String groupUuid, ChannelDto channelDto) {
         Long groupId = findGroupIdByUuid(groupUuid);
         checkGroupOwner(userId, groupId);
 
-        Channel channel = Channel.create(groupId, channelAddDto.getChannelName());
+        Channel channel = Channel.create(groupId, channelDto.getChannelName());
         channelRepository.save(channel);
 
         return channel.getId();
+    }
+
+    @Transactional
+    public Long updateChannel(Long userId, String groupUuid, Long channelId, ChannelDto channelDto) {
+        Long groupId = findGroupIdByUuid(groupUuid);
+        checkGroupOwner(userId, groupId);
+        Channel channel = findChannel(channelId);
+
+        channel.update(channelDto.getChannelName());
+
+        return channelId;
+    }
+
+    private Channel findChannel(Long channelId){
+        return channelRepository.findById(channelId)
+                .orElseThrow(() -> new ChannelException(NO_SUCH_CHANNEL));
     }
 
     private Long findGroupIdByUuid(String groupUuid){

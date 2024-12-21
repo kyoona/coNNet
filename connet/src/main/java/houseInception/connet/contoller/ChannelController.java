@@ -1,6 +1,6 @@
 package houseInception.connet.contoller;
 
-import houseInception.connet.dto.channel.ChannelAddDto;
+import houseInception.connet.dto.channel.ChannelDto;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.DefaultIdDto;
 import houseInception.connet.service.ChannelService;
@@ -17,9 +17,19 @@ public class ChannelController {
 
     @PostMapping
     public BaseResponse<DefaultIdDto> addChannel(@PathVariable String groupUuid,
-                                                 @RequestBody @Valid ChannelAddDto channelAddDto){
+                                                 @RequestBody @Valid ChannelDto channelDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        Long resultId = channelService.addChannel(userId, groupUuid, channelAddDto);
+        Long resultId = channelService.addChannel(userId, groupUuid, channelDto);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @PatchMapping("/{channelId}")
+    public BaseResponse<DefaultIdDto> updateChannel(@PathVariable String groupUuid,
+                                                 @PathVariable Long channelId,
+                                                 @RequestBody @Valid ChannelDto channelDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = channelService.updateChannel(userId, groupUuid, channelId, channelDto);
 
         return BaseResponse.getSimpleRes(resultId);
     }

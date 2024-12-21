@@ -31,4 +31,8 @@ public class Channel {
 
         return channel;
     }
+
+    public void update(String channelName){
+        this.channelName = channelName;
+    }
 }
