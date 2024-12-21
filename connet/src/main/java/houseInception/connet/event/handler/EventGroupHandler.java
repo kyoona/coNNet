@@ -19,6 +19,7 @@ public class EventGroupHandler {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void acceptGroupInvite(GroupInviteAcceptEvent event){
+        log.info("옹?");
         groupService.addGroupUser(event.getUserId(), event.getGroupUuid());
     }
 }
