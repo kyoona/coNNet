@@ -128,4 +128,15 @@ class GroupServiceTest {
         assertThat(result).hasSize(4);
         assertThat(result.get(0).getUserId()).isEqualTo(user2.getId()); //방장은 맨 첫번째로 조회
     }
+
+    @Test
+    void getGroupUserList_권한x() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, true);
+        em.persist(group);
+
+        //when
+        assertThatThrownBy(() -> groupService.getGroupUserList(user2.getId(), group.getGroupUuid()))
+                .isInstanceOf(GroupException.class);
+    }
 }
