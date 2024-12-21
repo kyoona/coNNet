@@ -89,6 +89,10 @@ public class GroupService {
         GroupUser groupUser = groupRepository.findGroupUser(group.getId(), userId)
                 .orElseThrow(() -> new GroupException(NOT_IN_GROUP));
 
+        if(groupUser.isOwner()){
+            throw new GroupException(OWNER_CAN_NOT_EXIT);
+        }
+
         group.removeUser(groupUser);
 
         return groupUser.getId();

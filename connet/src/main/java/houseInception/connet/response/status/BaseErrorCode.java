@@ -38,6 +38,7 @@ public enum BaseErrorCode implements StatusCode{
     NO_SUCH_GROUP_INVITE(400022, "그룹에 초대되지 않은 사용자입니다.", HttpStatus.BAD_REQUEST),
     PRIVATE_GROUP(400023, "개인 그룹입니다.", HttpStatus.BAD_REQUEST),
     GROUP_USER_LIMIT(400024, "그룹 인원 제한이 초과되었습니다.", HttpStatus.BAD_REQUEST),
+    OWNER_CAN_NOT_EXIT(400025, "방장은 퇴장할 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     INVALID_GOOGLE_TOKEN(40101, "유효하지 않은 Google Access Token입니다.", HttpStatus.UNAUTHORIZED),
     INVALID_REFRESH_TOKEN(40102, "유효하지 않은 Refresh Token입니다.", HttpStatus.UNAUTHORIZED),
