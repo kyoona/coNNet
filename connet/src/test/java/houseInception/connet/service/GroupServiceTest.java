@@ -1,16 +1,17 @@
 package houseInception.connet.service;
 
+import houseInception.connet.domain.Status;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.group.GroupTag;
 import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.dto.group.GroupAddDto;
+import houseInception.connet.dto.group.GroupUserResDto;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,11 +20,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @Transactional
@@ -78,7 +77,7 @@ class GroupServiceTest {
         String groupUuid = groupService.addGroup(user1.getId(), groupAddDto);
 
         //then
-        Group group = groupRepository.findByGroupUuid(groupUuid).orElseThrow();
+        Group group = groupRepository.findByGroupUuidAndStatus(groupUuid, Status.ALIVE).orElseThrow();
         assertThat(group.getGroupName()).isEqualTo(groupName);
 
         List<GroupUser> groupUserList = group.getGroupUserList();
@@ -110,6 +109,105 @@ class GroupServiceTest {
         );
 
         assertThatThrownBy(() -> groupService.addGroup(user1.getId(), groupAddDto))
+                .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void getGroupUserList() {
+        //given
+        Group group = Group.create(user2, "groupName", null, null, 3, true);
+        group.addUser(user1);
+        group.addUser(user3);
+        group.addUser(user4);
+        em.persist(group);
+
+        //when
+        List<GroupUserResDto> result = groupService.getGroupUserList(user1.getId(), group.getGroupUuid());
+
+        //then
+        assertThat(result).hasSize(4);
+        assertThat(result.get(0).getUserId()).isEqualTo(user2.getId()); //방장은 맨 첫번째로 조회
+    }
+
+    @Test
+    void getGroupUserList_권한x() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, true);
+        em.persist(group);
+
+        //when
+        assertThatThrownBy(() -> groupService.getGroupUserList(user2.getId(), group.getGroupUuid()))
+                .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void enterGroup() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, true);
+        em.persist(group);
+
+        //when
+        groupService.enterGroup(user2.getId(), group.getGroupUuid());
+
+        //then
+        assertThat(groupRepository.existUserInGroup(user2.getId(), group.getGroupUuid())).isTrue();
+    }
+
+    @Test
+    void enterGroup_그룹_인원_제한_초과() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 1, true);
+        em.persist(group);
+
+        //when
+        assertThatThrownBy(() -> groupService.enterGroup(user2.getId(), group.getGroupUuid()))
+                .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void enterGroup_private그룹() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, false);
+        em.persist(group);
+
+        //when
+        assertThatThrownBy(() -> groupService.enterGroup(user2.getId(), group.getGroupUuid()))
+                .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void exitGroup() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, false);
+        group.addUser(user2);
+        em.persist(group);
+
+        //when
+        groupService.exitGroup(user2.getId(), group.getGroupUuid());
+
+        //then
+        assertThat(groupRepository.existUserInGroup(user2.getId(), group.getGroupUuid())).isFalse();
+    }
+
+    @Test
+    void exitGroup_방장_퇴장_불가() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, false);
+        em.persist(group);
+
+        //when
+        assertThatThrownBy(() -> groupService.exitGroup(user1.getId(), group.getGroupUuid()))
+                .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void exitGroup_그룹에_속하지_않는_유저() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, false);
+        em.persist(group);
+
+        //when
+        assertThatThrownBy(() -> groupService.exitGroup(user2.getId(), group.getGroupUuid()))
                 .isInstanceOf(GroupException.class);
     }
 }

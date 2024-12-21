@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import static houseInception.connet.domain.Status.ALIVE;
+import static houseInception.connet.domain.Status.DELETED;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,5 +38,9 @@ public class GroupUser extends BaseTime {
         this.user = user;
         this.group = group;
         this.isOwner = isOwner;
+    }
+
+    protected void delete(){
+        this.status = DELETED;
     }
 }

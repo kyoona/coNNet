@@ -36,19 +36,19 @@ public class Group extends BaseTime {
     private String groupProfile;
     private String groupDescription;
     private int userLimit;
-    private boolean is_open;
+    private boolean isOpen;
 
     @Enumerated(EnumType.STRING)
     private Status status = ALIVE;
 
-    public static Group create(User user, String groupName, String groupProfile, String groupDescription, int userLimit, boolean is_open) {
+    public static Group create(User user, String groupName, String groupProfile, String groupDescription, int userLimit, boolean isOpen) {
         Group group = new Group();
         group.groupUuid = UUID.randomUUID().toString();
         group.groupName = groupName;
         group.groupProfile = groupProfile;
         group.groupDescription = groupDescription;
         group.userLimit = userLimit;
-        group.is_open = is_open;
+        group.isOpen = isOpen;
 
         group.addOwner(user);
 
@@ -58,6 +58,17 @@ public class Group extends BaseTime {
     private void addOwner(User user){
         GroupUser groupUser = new GroupUser(user, this, true);
         this.groupUserList.add(groupUser);
+    }
+
+    public void addUser(User user){
+        GroupUser groupUser = new GroupUser(user, this, false);
+        this.groupUserList.add(groupUser);
+    }
+
+    public void removeUser(GroupUser groupUser){
+        if(isGroupUser(groupUser)){
+            groupUser.delete();
+        }
     }
 
     public boolean addTag(List<String> tags){
@@ -79,5 +90,9 @@ public class Group extends BaseTime {
 
     public List<GroupTag> getGroupTagList() {
         return List.copyOf(groupTagList);
+    }
+
+    private boolean isGroupUser(GroupUser groupUser){
+        return groupUser.getGroup().getId().equals(this.id);
     }
 }

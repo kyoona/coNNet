@@ -36,6 +36,9 @@ public enum BaseErrorCode implements StatusCode{
     ALREADY_IN_GROUP(400020, "이미 그룹에 속한 사용자입니다.", HttpStatus.BAD_REQUEST),
     ALREADY_HAS_GROUP_INVITE(400021, "이미 그룹 초대된 사용자입니다.", HttpStatus.BAD_REQUEST),
     NO_SUCH_GROUP_INVITE(400022, "그룹에 초대되지 않은 사용자입니다.", HttpStatus.BAD_REQUEST),
+    PRIVATE_GROUP(400023, "개인 그룹입니다.", HttpStatus.BAD_REQUEST),
+    GROUP_USER_LIMIT(400024, "그룹 인원 제한이 초과되었습니다.", HttpStatus.BAD_REQUEST),
+    OWNER_CAN_NOT_EXIT(400025, "방장은 퇴장할 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     INVALID_GOOGLE_TOKEN(40101, "유효하지 않은 Google Access Token입니다.", HttpStatus.UNAUTHORIZED),
     INVALID_REFRESH_TOKEN(40102, "유효하지 않은 Refresh Token입니다.", HttpStatus.UNAUTHORIZED),
@@ -43,7 +46,7 @@ public enum BaseErrorCode implements StatusCode{
     //5XX 서버 에러
     INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR.name(), HttpStatus.INTERNAL_SERVER_ERROR),
     CANT_NOT_PARSE_SOCKET_MESSAGE(50001, HttpStatus.INTERNAL_SERVER_ERROR.name(), HttpStatus.INTERNAL_SERVER_ERROR),
-    CAN_NOT_UPLOAD_FILE_TO_S3(50002, HttpStatus.INTERNAL_SERVER_ERROR.name(), HttpStatus.INTERNAL_SERVER_ERROR);
+    CAN_NOT_UPLOAD_FILE_TO_S3(50002, "파일 업로드가 불가능합니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private int code; //서버 내부 오류 코드
     private String message; //서버 내부 오류 메세지
