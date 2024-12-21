@@ -4,6 +4,7 @@ import houseInception.connet.domain.User;
 import houseInception.connet.domain.channel.Channel;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.dto.channel.ChannelDto;
+import houseInception.connet.dto.channel.TapDto;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupRepository;
@@ -140,5 +141,20 @@ class ChannelServiceTest {
         //when
         assertThatThrownBy(() -> channelService.deleteChannel(user1.getId(), group.getGroupUuid(), channel.getId()))
                 .isInstanceOf(ChannelException.class);
+    }
+
+    @Test
+    void addTap() {
+        //given
+        Channel channel = Channel.create(group.getId(), "channel");
+        em.persist(channel);
+
+        //when
+        TapDto tapDto = new TapDto("tap");
+        Long resultId = channelService.addTap(groupOwner.getId(), group.getGroupUuid(), channel.getId(), tapDto);
+
+        //then
+        assertThat(channel.getTapList()).hasSize(1);
+        assertThat(channel.getTapList().get(0).getTapName()).isEqualTo(tapDto.getTapName());
     }
 }
