@@ -84,7 +84,7 @@ public class GroupService {
 
     private void checkGroupLimit(Group group) {
         Long count = groupRepository.countOfGroupUsers(group.getId());
-        if (count != null && count > group.getUserLimit()) {
+        if (count != null && count >= group.getUserLimit()) {
             throw new GroupException(GROUP_USER_LIMIT);
         }
     }

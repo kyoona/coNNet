@@ -166,4 +166,5 @@ class GroupInviteServiceTest {
                 .extracting((res) -> res.getInviter().getUserId())
                 .contains(groupOwner.getId(), user1.getId());
     }
+
 }
