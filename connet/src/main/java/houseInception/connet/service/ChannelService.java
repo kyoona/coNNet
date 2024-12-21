@@ -4,6 +4,7 @@ import houseInception.connet.domain.Status;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.channel.Channel;
 import houseInception.connet.dto.channel.ChannelAddDto;
+import houseInception.connet.exception.ChannelException;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupRepository;
@@ -12,6 +13,9 @@ import houseInception.connet.service.util.DomainValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_GROUP;
+import static houseInception.connet.response.status.BaseErrorCode.ONLY_GROUP_OWNER;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -24,8 +28,8 @@ public class ChannelService {
 
     @Transactional
     public Long addChannel(Long userId, String groupUuid, ChannelAddDto channelAddDto) {
-        User user = validator.findUser(userId);
         Long groupId = findGroupIdByUuid(groupUuid);
+        checkGroupOwner(userId, groupId);
 
         Channel channel = Channel.create(groupId, channelAddDto.getChannelName());
         channelRepository.save(channel);
@@ -36,9 +40,15 @@ public class ChannelService {
     private Long findGroupIdByUuid(String groupUuid){
         Long groupId = groupRepository.findIdByGroupUuidAndStatus(groupUuid, Status.ALIVE);
         if(groupId == null){
-            throw new GroupException(BaseErrorCode.NO_SUCH_GROUP);
+            throw new GroupException(NO_SUCH_GROUP);
         }
 
         return groupId;
+    }
+
+    private void checkGroupOwner(Long userId, Long groupId){
+        if(!groupRepository.existGroupOwner(userId, groupId)){
+            throw new ChannelException(ONLY_GROUP_OWNER);
+        }
     }
 }

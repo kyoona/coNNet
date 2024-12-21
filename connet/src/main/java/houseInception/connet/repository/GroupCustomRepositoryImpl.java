@@ -51,6 +51,20 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
     }
 
     @Override
+    public boolean existGroupOwner(Long userId, Long groupId) {
+        Long count = query
+                .select(groupUser.count())
+                .from(groupUser)
+                .where(group.id.eq(groupId),
+                        groupUser.user.id.eq(userId),
+                        groupUser.isOwner.isTrue(),
+                        groupUser.status.eq(Status.ALIVE))
+                .fetchOne();
+
+        return count != null && count > 0;
+    }
+
+    @Override
     public Long countOfGroupUsers(Long groupId) {
         return query
                 .select(groupUser.count())
