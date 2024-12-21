@@ -4,6 +4,7 @@ import houseInception.connet.domain.GroupInvite;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.dto.group_invite.GroupInviteDto;
+import houseInception.connet.dto.group_invite.GroupInviteResDto;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.exception.GroupInviteException;
 import houseInception.connet.repository.GroupInviteRepository;
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -136,5 +139,31 @@ class GroupInviteServiceTest {
         //when
         assertThatThrownBy(() -> groupInviteService.acceptInvite(user2.getId(), group.getGroupUuid()))
                 .isInstanceOf(GroupInviteException.class);
+    }
+
+    @Test
+    void getGroupInviteList() {
+        //given
+        Group group1 = Group.create(groupOwner, "group1", null, null, 3, false);
+        Group group2 = Group.create(user1, "group2", null, null, 3, false);
+        em.persist(group1);
+        em.persist(group2);
+
+        GroupInvite groupInvite1 = GroupInvite.create(group1.getGroupUuid(), groupOwner, user2);
+        GroupInvite groupInvite2 = GroupInvite.create(group2.getGroupUuid(), user1, user2);
+        em.persist(groupInvite1);
+        em.persist(groupInvite2);
+
+        //when
+        List<GroupInviteResDto> result = groupInviteService.getGroupInviteList(user2.getId());
+
+        //then
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(GroupInviteResDto::getGroupName)
+                .contains(group1.getGroupName(), group2.getGroupName());
+        assertThat(result)
+                .extracting((res) -> res.getInviter().getUserId())
+                .contains(groupOwner.getId(), user1.getId());
     }
 }
