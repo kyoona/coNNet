@@ -43,7 +43,7 @@ public class GroupController {
         return BaseResponse.getSimpleRes(resultUuid);
     }
 
-    @PostMapping("/{groupUuid}/exit")
+    @DeleteMapping("/{groupUuid}/exit")
     public BaseResponse<DefaultIdDto> exitGroup(@PathVariable String groupUuid){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = groupService.exitGroup(userId, groupUuid);
