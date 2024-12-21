@@ -84,4 +84,34 @@ class ChannelServiceTest {
         assertThatThrownBy(() -> channelService.addChannel(user1.getId(), group.getGroupUuid(), channelDto))
                 .isInstanceOf(ChannelException.class);
     }
+
+    @Test
+    void updateChannel() {
+        //given
+        Channel channel = Channel.create(group.getId(), "channel");
+        em.persist(channel);
+
+        //when
+        ChannelDto channelDto = new ChannelDto("new channel");
+        Long resultId = channelService.updateChannel(groupOwner.getId(), group.getGroupUuid(), channel.getId(), channelDto);
+
+        //then
+        Channel testChannel = channelRepository.findById(resultId).orElseThrow();
+        assertThat(testChannel.getChannelName()).isEqualTo(channelDto.getChannelName());
+    }
+
+    @Test
+    void updateChannel_그룹멤버o_방장x() {
+        //given
+        group.addUser(user1);
+        em.flush();
+
+        Channel channel = Channel.create(group.getId(), "channel");
+        em.persist(channel);
+
+        //when
+        ChannelDto channelDto = new ChannelDto("new channel");
+        assertThatThrownBy(() -> channelService.updateChannel(user1.getId(), group.getGroupUuid(), channel.getId(), channelDto))
+                .isInstanceOf(ChannelException.class);
+    }
 }
