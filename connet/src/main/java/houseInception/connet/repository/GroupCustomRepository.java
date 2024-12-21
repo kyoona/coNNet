@@ -1,6 +1,5 @@
 package houseInception.connet.repository;
 
-
 import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.dto.group.GroupUserResDto;
 
@@ -13,6 +12,7 @@ public interface GroupCustomRepository {
     boolean existUserInGroup(Long userId, String groupUuid);
     boolean existGroupOwner(Long userId, Long groupId);
     Long countOfGroupUsers(Long groupId);
+    Optional<Long> findGroupIdByGroupUuid(String groupUuid);
 
     List<GroupUserResDto> getGroupUserList(String groupUuid);
 }

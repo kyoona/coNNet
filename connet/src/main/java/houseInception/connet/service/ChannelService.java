@@ -1,14 +1,12 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.Status;
-import houseInception.connet.domain.User;
 import houseInception.connet.domain.channel.Channel;
 import houseInception.connet.dto.channel.ChannelAddDto;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupRepository;
-import houseInception.connet.response.status.BaseErrorCode;
 import houseInception.connet.service.util.DomainValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,12 +36,8 @@ public class ChannelService {
     }
 
     private Long findGroupIdByUuid(String groupUuid){
-        Long groupId = groupRepository.findIdByGroupUuidAndStatus(groupUuid, Status.ALIVE);
-        if(groupId == null){
-            throw new GroupException(NO_SUCH_GROUP);
-        }
-
-        return groupId;
+        return groupRepository.findGroupIdByGroupUuid(groupUuid)
+                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
     }
 
     private void checkGroupOwner(Long userId, Long groupId){

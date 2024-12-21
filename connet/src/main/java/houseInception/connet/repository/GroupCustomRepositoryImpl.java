@@ -2,11 +2,8 @@ package houseInception.connet.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import houseInception.connet.domain.QUser;
 import houseInception.connet.domain.Status;
 import houseInception.connet.domain.group.GroupUser;
-import houseInception.connet.domain.group.QGroup;
-import houseInception.connet.domain.group.QGroupUser;
 import houseInception.connet.dto.group.GroupUserResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -55,7 +52,7 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
         Long count = query
                 .select(groupUser.count())
                 .from(groupUser)
-                .where(group.id.eq(groupId),
+                .where(groupUser.group.id.eq(groupId),
                         groupUser.user.id.eq(userId),
                         groupUser.isOwner.isTrue(),
                         groupUser.status.eq(Status.ALIVE))
@@ -72,6 +69,18 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .where(groupUser.group.id.eq(groupId),
                         groupUser.status.eq(Status.ALIVE))
                 .fetchOne();
+    }
+
+    @Override
+    public Optional<Long> findGroupIdByGroupUuid(String groupUuid) {
+        Long id = query
+                .select(group.id)
+                .from(group)
+                .where(group.groupUuid.eq(groupUuid),
+                        group.status.eq(Status.ALIVE))
+                .fetchOne();
+
+        return Optional.ofNullable(id);
     }
 
     @Override
