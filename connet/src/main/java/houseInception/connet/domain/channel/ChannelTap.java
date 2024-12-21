@@ -26,4 +26,8 @@ public class ChannelTap extends BaseTime {
         this.channel = channel;
         this.tapName = tapName;
     }
+
+    protected void update(String tapName){
+        this.tapName = tapName;
+    }
 }

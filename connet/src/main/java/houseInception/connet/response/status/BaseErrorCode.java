@@ -41,6 +41,7 @@ public enum BaseErrorCode implements StatusCode{
     OWNER_CAN_NOT_EXIT(400025, "방장은 퇴장할 수 없습니다.", HttpStatus.BAD_REQUEST),
     ONLY_GROUP_OWNER(400026, "그룹 수정 권한이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     NO_SUCH_CHANNEL(400027, "채널이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
+    NO_SUCH_TAP(400028, "탭이 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
 
     INVALID_GOOGLE_TOKEN(40101, "유효하지 않은 Google Access Token입니다.", HttpStatus.UNAUTHORIZED),
     INVALID_REFRESH_TOKEN(40102, "유효하지 않은 Refresh Token입니다.", HttpStatus.UNAUTHORIZED),

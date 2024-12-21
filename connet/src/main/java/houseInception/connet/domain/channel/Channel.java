@@ -42,4 +42,14 @@ public class Channel {
 
         return tap;
     }
+
+    public void updateTap(ChannelTap tap, String tapName){
+        if (isChannelTap(tap)){
+            tap.update(tapName);
+        }
+    }
+
+    private boolean isChannelTap(ChannelTap tap){
+        return tap.getChannel().getId().equals(this.id);
+    }
 }

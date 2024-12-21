@@ -48,9 +48,19 @@ public class ChannelController {
     @PostMapping("/{channelId}/taps")
     public BaseResponse<DefaultIdDto> addTap(@PathVariable String groupUuid,
                                              @PathVariable Long channelId,
-                                             @RequestBody TapDto tapDto){
+                                             @RequestBody @Valid TapDto tapDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = channelService.addTap(userId, groupUuid, channelId, tapDto);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @PostMapping("/taps/{tapId}")
+    public BaseResponse<DefaultIdDto> updateTap(@PathVariable String groupUuid,
+                                                @PathVariable Long tapId,
+                                                @RequestBody @Valid TapDto tapDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = channelService.updateTap(userId, groupUuid, tapId, tapDto);
 
         return BaseResponse.getSimpleRes(resultId);
     }

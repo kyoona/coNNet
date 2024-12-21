@@ -68,9 +68,25 @@ public class ChannelService {
         return tap.getId();
     }
 
+    @Transactional
+    public Long updateTap(Long userId, String groupUuid, Long tapId, TapDto tapDto) {
+        checkGroupOwner(userId, groupUuid);
+        ChannelTap tap = findTapWithChannel(tapId);
+        Channel channel = tap.getChannel();
+
+        channel.updateTap(tap, tapDto.getTapName());
+
+        return tapId;
+    }
+
     private Channel findChannel(Long channelId){
         return channelRepository.findById(channelId)
                 .orElseThrow(() -> new ChannelException(NO_SUCH_CHANNEL));
+    }
+
+    private ChannelTap findTapWithChannel(Long tapId){
+        return channelRepository.findChannelTapWithChannel(tapId)
+                .orElseThrow(() -> new ChannelException(NO_SUCH_TAP));
     }
 
     private Long findGroupIdByUuid(String groupUuid){

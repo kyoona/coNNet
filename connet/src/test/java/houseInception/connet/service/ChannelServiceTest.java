@@ -2,6 +2,7 @@ package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.channel.Channel;
+import houseInception.connet.domain.channel.ChannelTap;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.dto.channel.ChannelDto;
 import houseInception.connet.dto.channel.TapDto;
@@ -156,5 +157,21 @@ class ChannelServiceTest {
         //then
         assertThat(channel.getTapList()).hasSize(1);
         assertThat(channel.getTapList().get(0).getTapName()).isEqualTo(tapDto.getTapName());
+    }
+
+    @Test
+    void updateTap() {
+        //given
+        Channel channel = Channel.create(group.getId(), "channel");
+        ChannelTap tap = channel.addTap("tap");
+        em.persist(channel);
+
+        //when
+        TapDto tapDto = new TapDto("newTap");
+        Long resultId = channelService.updateTap(groupOwner.getId(), group.getGroupUuid(), tap.getId(), tapDto);
+
+        //then
+        assertThat(tap.getTapName()).isEqualTo(tapDto.getTapName());
+
     }
 }
