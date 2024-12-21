@@ -4,6 +4,7 @@ import houseInception.connet.domain.User;
 import houseInception.connet.domain.channel.Channel;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.dto.channel.ChannelAddDto;
+import houseInception.connet.exception.ChannelException;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
 @SpringBootTest
@@ -70,5 +72,17 @@ class ChannelServiceTest {
         Channel channel = channelRepository.findById(resultId).orElseThrow();
         assertThat(channel.getGroupId()).isEqualTo(group.getId());
         assertThat(channel.getChannelName()).isEqualTo(channelAddDto.getChannelName());
+    }
+
+    @Test
+    void addChannel_그룹멤버o_방장x() {
+        //given
+        group.addUser(user1);
+        em.flush();
+
+        //when
+        ChannelAddDto channelAddDto = new ChannelAddDto("channel");
+        assertThatThrownBy(() -> channelService.addChannel(user1.getId(), group.getGroupUuid(), channelAddDto))
+                .isInstanceOf(ChannelException.class);
     }
 }
