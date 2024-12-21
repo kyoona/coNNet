@@ -52,4 +52,8 @@ public class Channel {
     private boolean isChannelTap(ChannelTap tap){
         return tap.getChannel().getId().equals(this.id);
     }
+
+    public List<ChannelTap> getTapList() {
+        return List.copyOf(tapList);
+    }
 }
