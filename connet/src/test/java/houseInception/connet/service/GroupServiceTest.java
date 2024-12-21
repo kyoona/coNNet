@@ -174,4 +174,40 @@ class GroupServiceTest {
         assertThatThrownBy(() -> groupService.enterGroup(user2.getId(), group.getGroupUuid()))
                 .isInstanceOf(GroupException.class);
     }
+
+    @Test
+    void exitGroup() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, false);
+        group.addUser(user2);
+        em.persist(group);
+
+        //when
+        groupService.exitGroup(user2.getId(), group.getGroupUuid());
+
+        //then
+        assertThat(groupRepository.existUserInGroup(user2.getId(), group.getGroupUuid())).isFalse();
+    }
+
+    @Test
+    void exitGroup_방장_퇴장_불가() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, false);
+        em.persist(group);
+
+        //when
+        assertThatThrownBy(() -> groupService.exitGroup(user1.getId(), group.getGroupUuid()))
+                .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void exitGroup_그룹에_속하지_않는_유저() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, false);
+        em.persist(group);
+
+        //when
+        assertThatThrownBy(() -> groupService.exitGroup(user2.getId(), group.getGroupUuid()))
+                .isInstanceOf(GroupException.class);
+    }
 }
