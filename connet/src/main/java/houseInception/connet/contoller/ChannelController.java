@@ -26,8 +26,8 @@ public class ChannelController {
 
     @PatchMapping("/{channelId}")
     public BaseResponse<DefaultIdDto> updateChannel(@PathVariable String groupUuid,
-                                                 @PathVariable Long channelId,
-                                                 @RequestBody @Valid ChannelDto channelDto){
+                                                    @PathVariable Long channelId,
+                                                    @RequestBody @Valid ChannelDto channelDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = channelService.updateChannel(userId, groupUuid, channelId, channelDto);
 
