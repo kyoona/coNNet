@@ -6,6 +6,7 @@ import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.group.GroupTag;
 import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.dto.group.GroupAddDto;
+import houseInception.connet.dto.group.GroupUserResDto;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
@@ -109,5 +110,22 @@ class GroupServiceTest {
 
         assertThatThrownBy(() -> groupService.addGroup(user1.getId(), groupAddDto))
                 .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void getGroupUserList() {
+        //given
+        Group group = Group.create(user2, "groupName", null, null, 3, true);
+        group.addUser(user1);
+        group.addUser(user3);
+        group.addUser(user4);
+        em.persist(group);
+
+        //when
+        List<GroupUserResDto> result = groupService.getGroupUserList(user1.getId(), group.getGroupUuid());
+
+        //then
+        assertThat(result).hasSize(4);
+        assertThat(result.get(0).getUserId()).isEqualTo(user2.getId()); //방장은 맨 첫번째로 조회
     }
 }
