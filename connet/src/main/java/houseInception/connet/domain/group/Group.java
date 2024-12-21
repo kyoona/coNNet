@@ -36,19 +36,19 @@ public class Group extends BaseTime {
     private String groupProfile;
     private String groupDescription;
     private int userLimit;
-    private boolean is_open;
+    private boolean isOpen;
 
     @Enumerated(EnumType.STRING)
     private Status status = ALIVE;
 
-    public static Group create(User user, String groupName, String groupProfile, String groupDescription, int userLimit, boolean is_open) {
+    public static Group create(User user, String groupName, String groupProfile, String groupDescription, int userLimit, boolean isOpen) {
         Group group = new Group();
         group.groupUuid = UUID.randomUUID().toString();
         group.groupName = groupName;
         group.groupProfile = groupProfile;
         group.groupDescription = groupDescription;
         group.userLimit = userLimit;
-        group.is_open = is_open;
+        group.isOpen = isOpen;
 
         group.addOwner(user);
 

@@ -37,6 +37,16 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
     }
 
     @Override
+    public Long countOfGroupUsers(Long groupId) {
+        return query
+                .select(groupUser.count())
+                .from(groupUser)
+                .where(groupUser.group.id.eq(groupId),
+                        groupUser.status.eq(Status.ALIVE))
+                .fetchOne();
+    }
+
+    @Override
     public List<GroupUserResDto> getGroupUserList(String groupUuid) {
         return query
                 .select(Projections.constructor(

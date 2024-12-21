@@ -69,6 +69,28 @@ public class GroupService {
     }
 
     @Transactional
+    public String enterGroup(Long userId, String groupUuid) {
+        Group group = groupRepository.findByGroupUuidAndStatusWithLock(groupUuid, Status.ALIVE)
+                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
+        checkOpenGroup(group);
+        checkGroupLimit(group);
+
+        User user = validator.findUser(userId);
+        checkUserInGroup(userId, groupUuid, false);
+
+        group.addUser(user);
+
+        return groupUuid;
+    }
+
+    private void checkGroupLimit(Group group) {
+        Long count = groupRepository.countOfGroupUsers(group.getId());
+        if (count != null && count > group.getUserLimit()) {
+            throw new GroupException(GROUP_USER_LIMIT);
+        }
+    }
+
+    @Transactional
     public void addGroupUser(Long userId, String groupUuid) {
         User user = validator.findUser(userId);
         Group group = findGroup(groupUuid);
@@ -77,16 +99,26 @@ public class GroupService {
     }
 
     public List<GroupUserResDto> getGroupUserList(Long userId, String groupUuid) {
-        checkUserInGroup(userId, groupUuid);
+        checkUserInGroup(userId, groupUuid, true);
 
         List<GroupUserResDto> result = groupRepository.getGroupUserList(groupUuid);
 
         return result;
     }
 
-    private void checkUserInGroup(Long userId, String groupUuid){
-        if (!groupRepository.existUserInGroup(userId, groupUuid)) {
-            throw new GroupException(NOT_IN_GROUP);
+    private void checkOpenGroup(Group group){
+        if(!group.isOpen()){
+            throw new GroupException(PRIVATE_GROUP);
+        }
+    }
+
+    private void checkUserInGroup(Long userId, String groupUuid, boolean isInGroup){
+        if (groupRepository.existUserInGroup(userId, groupUuid) != isInGroup) {
+            if (isInGroup) {
+                throw new GroupException(NOT_IN_GROUP);
+            } else {
+                throw new GroupException(ALREADY_IN_GROUP);
+            }
         }
     }
 
