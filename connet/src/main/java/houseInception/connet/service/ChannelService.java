@@ -1,12 +1,15 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.channel.Channel;
+import houseInception.connet.domain.channel.ChannelTap;
 import houseInception.connet.dto.channel.ChannelDto;
+import houseInception.connet.dto.channel.TapDto;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.service.util.DomainValidatorUtil;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,7 @@ public class ChannelService {
     private final DomainValidatorUtil validator;
     private final ChannelRepository channelRepository;
     private final GroupRepository groupRepository;
+    private final EntityManager em;
 
     @Transactional
     public Long addChannel(Long userId, String groupUuid, ChannelDto channelDto) {
@@ -53,6 +57,18 @@ public class ChannelService {
         channelRepository.delete(channel);
 
         return channelId;
+    }
+
+    @Transactional
+    public Long addTap(Long userId, String groupUuid, Long channelId, TapDto tapDto) {
+        Long groupId = findGroupIdByUuid(groupUuid);
+        checkGroupOwner(userId, groupId);
+        Channel channel = findChannel(channelId);
+
+        ChannelTap tap = channel.addTap(tapDto.getTapName());
+        em.flush();
+
+        return tap.getId();
     }
 
     private Channel findChannel(Long channelId){

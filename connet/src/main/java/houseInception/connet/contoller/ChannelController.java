@@ -1,6 +1,7 @@
 package houseInception.connet.contoller;
 
 import houseInception.connet.dto.channel.ChannelDto;
+import houseInception.connet.dto.channel.TapDto;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.DefaultIdDto;
 import houseInception.connet.service.ChannelService;
@@ -39,6 +40,17 @@ public class ChannelController {
                                                     @PathVariable Long channelId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = channelService.deleteChannel(userId, groupUuid, channelId);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
+
+    @PostMapping("/{channelId}/taps")
+    public BaseResponse<DefaultIdDto> addTap(@PathVariable String groupUuid,
+                                             @PathVariable Long channelId,
+                                             @RequestBody TapDto tapDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = channelService.addTap(userId, groupUuid, channelId, tapDto);
 
         return BaseResponse.getSimpleRes(resultId);
     }

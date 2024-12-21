@@ -35,4 +35,11 @@ public class Channel {
     public void update(String channelName){
         this.channelName = channelName;
     }
+
+    public ChannelTap addTap(String tapName) {
+        ChannelTap tap = new ChannelTap(this, tapName);
+        this.tapList.add(tap);
+
+        return tap;
+    }
 }
