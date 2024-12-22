@@ -64,4 +64,13 @@ public class ChannelController {
 
         return BaseResponse.getSimpleRes(resultId);
     }
+
+    @DeleteMapping("/taps/{tapId}")
+    public BaseResponse<DefaultIdDto> deleteTap(@PathVariable String groupUuid,
+                                                @PathVariable Long tapId){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = channelService.deleteTap(userId, groupUuid, tapId);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
 }

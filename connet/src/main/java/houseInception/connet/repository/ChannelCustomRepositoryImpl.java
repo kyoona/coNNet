@@ -19,6 +19,14 @@ public class ChannelCustomRepositoryImpl implements ChannelCustomRepository{
     private final JPAQueryFactory query;
 
     @Override
+    public Long deleteTapById(Long tapId) {
+        return query
+                .delete(channelTap)
+                .where(channelTap.id.eq(tapId))
+                .execute();
+    }
+
+    @Override
     public Optional<ChannelTap> findChannelTapWithChannel(Long tapId) {
         ChannelTap tap = query
                 .selectFrom(channelTap)

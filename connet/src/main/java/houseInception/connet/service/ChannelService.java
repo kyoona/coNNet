@@ -79,6 +79,18 @@ public class ChannelService {
         return tapId;
     }
 
+    @Transactional
+    public Long deleteTap(Long userId, String groupUuid, Long tapId) {
+        checkGroupOwner(userId, groupUuid);
+
+        Long deleteCount = channelRepository.deleteTapById(tapId);
+        if(deleteCount == 0){
+            throw new ChannelException(NO_SUCH_TAP);
+        }
+
+        return tapId;
+    }
+
     private Channel findChannel(Long channelId){
         return channelRepository.findById(channelId)
                 .orElseThrow(() -> new ChannelException(NO_SUCH_CHANNEL));
