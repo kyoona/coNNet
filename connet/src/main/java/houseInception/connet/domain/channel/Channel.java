@@ -1,5 +1,6 @@
 package houseInception.connet.domain.channel;
 
+import houseInception.connet.domain.BaseTime;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Entity
-public class Channel {
+public class Channel extends BaseTime {
 
     @Column(name = "channelId")
     @Id

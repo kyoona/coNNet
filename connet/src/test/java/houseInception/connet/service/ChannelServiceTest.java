@@ -5,7 +5,9 @@ import houseInception.connet.domain.channel.Channel;
 import houseInception.connet.domain.channel.ChannelTap;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.dto.channel.ChannelDto;
+import houseInception.connet.dto.channel.ChannelResDto;
 import houseInception.connet.dto.channel.TapDto;
+import houseInception.connet.dto.channel.TapResDto;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupRepository;
@@ -17,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -198,5 +202,32 @@ class ChannelServiceTest {
         //when
         assertThatThrownBy(() -> channelService.deleteTap(user1.getId(), group.getGroupUuid(), tap.getId()))
                 .isInstanceOf(ChannelException.class);
+    }
+
+    @Test
+    void getChannelTapList() {
+        //given
+        Channel channel1 = Channel.create(group.getId(), "channel1");
+        ChannelTap tap1 = channel1.addTap("tap1");
+        ChannelTap tap2 = channel1.addTap("tap2");
+        em.persist(channel1);
+
+        Channel channel2 = Channel.create(group.getId(), "channel2");
+        em.persist(channel2);
+
+        //when
+        List<ChannelResDto> result = channelService.getChannelTapList(groupOwner.getId(), group.getGroupUuid());
+
+        //then
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(ChannelResDto::getChannelId)
+                .containsExactly(channel1.getId(), channel2.getId());
+
+        assertThat(result.get(0).getTaps())
+                .extracting(TapResDto::getTapId)
+                .containsExactly(tap1.getId(), tap2.getId());
+
+        assertThat(result.get(1).getTaps()).hasSize(0);
     }
 }

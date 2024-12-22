@@ -1,6 +1,7 @@
 package houseInception.connet.contoller;
 
 import houseInception.connet.dto.channel.ChannelDto;
+import houseInception.connet.dto.channel.ChannelResDto;
 import houseInception.connet.dto.channel.TapDto;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.DefaultIdDto;
@@ -8,6 +9,8 @@ import houseInception.connet.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/groups/{groupUuid}/channels")
 @RequiredArgsConstructor
@@ -72,5 +75,13 @@ public class ChannelController {
         Long resultId = channelService.deleteTap(userId, groupUuid, tapId);
 
         return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @GetMapping("/taps")
+    public BaseResponse<List<ChannelResDto>> getChannelTapList(@PathVariable String groupUuid){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        List<ChannelResDto> result = channelService.getChannelTapList(userId, groupUuid);
+
+        return new BaseResponse<>(result);
     }
 }

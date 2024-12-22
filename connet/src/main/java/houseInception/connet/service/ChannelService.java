@@ -3,16 +3,22 @@ package houseInception.connet.service;
 import houseInception.connet.domain.channel.Channel;
 import houseInception.connet.domain.channel.ChannelTap;
 import houseInception.connet.dto.channel.ChannelDto;
+import houseInception.connet.dto.channel.ChannelResDto;
 import houseInception.connet.dto.channel.TapDto;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupRepository;
+import houseInception.connet.repository.dto.ChannelTapDto;
 import houseInception.connet.service.util.DomainValidatorUtil;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static houseInception.connet.response.status.BaseErrorCode.*;
 
@@ -91,6 +97,18 @@ public class ChannelService {
         return tapId;
     }
 
+    public List<ChannelResDto> getChannelTapList(Long userId, String groupUuid) {
+        checkUserInGroup(userId, groupUuid);
+
+        List<ChannelTapDto> channelTapList = channelRepository.getChannelTapListOfGroup(groupUuid);
+        Map<Long, List<ChannelTapDto>> groupedTap = channelTapList.stream()
+                .collect(Collectors.groupingBy(ChannelTapDto::getChannelId));
+
+        return groupedTap.values().stream()
+                .map(ChannelResDto::new)
+                .toList();
+    }
+
     private Channel findChannel(Long channelId){
         return channelRepository.findById(channelId)
                 .orElseThrow(() -> new ChannelException(NO_SUCH_CHANNEL));
@@ -115,6 +133,12 @@ public class ChannelService {
     private void checkGroupOwner(Long userId, String groupUuid){
         if(!groupRepository.existGroupOwner(userId, groupUuid)){
             throw new ChannelException(ONLY_GROUP_OWNER);
+        }
+    }
+
+    private void checkUserInGroup(Long userId, String groupUuid){
+        if (!groupRepository.existUserInGroup(userId, groupUuid)) {
+            throw new GroupException(NOT_IN_GROUP);
         }
     }
 }
