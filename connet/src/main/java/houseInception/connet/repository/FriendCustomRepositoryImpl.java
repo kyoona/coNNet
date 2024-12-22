@@ -5,7 +5,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DefaultUserResDto;
-import houseInception.connet.dto.FriendFilterDto;
+import houseInception.connet.dto.friend.FriendFilterDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

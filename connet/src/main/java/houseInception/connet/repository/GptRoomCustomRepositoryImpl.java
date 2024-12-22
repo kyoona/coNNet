@@ -4,8 +4,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.Status;
 import houseInception.connet.domain.gptRoom.*;
-import houseInception.connet.dto.GptRoomChatResDto;
-import houseInception.connet.dto.GptRoomListResDto;
+import houseInception.connet.dto.GptRoom.GptRoomChatResDto;
+import houseInception.connet.dto.GptRoom.GptRoomListResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -58,7 +58,7 @@ public class GptRoomCustomRepositoryImpl implements GptRoomCustomRepository {
                         gptRoomUser.status.eq(ALIVE),
                         gptRoom.status.eq(ALIVE))
                 .orderBy(gptRoom.createdAt.desc())
-                .offset((page - 1) * 5)
+                .offset((page - 1) * 30)
                 .limit(6)
                 .fetch();
     }

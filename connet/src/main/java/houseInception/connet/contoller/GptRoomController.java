@@ -1,8 +1,9 @@
 package houseInception.connet.contoller;
 
 import houseInception.connet.dto.*;
+import houseInception.connet.dto.GptRoom.*;
 import houseInception.connet.response.BaseResponse;
-import houseInception.connet.response.BaseResultDto;
+import houseInception.connet.response.DefaultIdDto;
 import houseInception.connet.service.GptRoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class GptRoomController {
     }
 
     @DeleteMapping("/{gptRoomUuid}")
-    public BaseResponse<BaseResultDto> deleteGptRoom(@PathVariable String gptRoomUuid){
+    public BaseResponse<DefaultIdDto> deleteGptRoom(@PathVariable String gptRoomUuid){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = gptRoomService.deleteGptRoom(userId, gptRoomUuid);
 

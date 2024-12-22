@@ -7,16 +7,21 @@ import houseInception.connet.domain.User;
 import houseInception.connet.domain.privateRoom.PrivateChat;
 import houseInception.connet.domain.privateRoom.PrivateRoom;
 import houseInception.connet.domain.privateRoom.PrivateRoomUser;
-import houseInception.connet.dto.EmojiDto;
+import houseInception.connet.dto.chatEmoji.EmojiDto;
+import houseInception.connet.dto.chatEmoji.ChatEmojiUserResDto;
 import houseInception.connet.exception.ChatEmojiException;
 import houseInception.connet.repository.ChatEmojiRepository;
 import houseInception.connet.repository.PrivateRoomRepository;
+import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -32,6 +37,8 @@ class ChatEmojiServiceTest {
     @Autowired
     PrivateRoomRepository privateRoomRepository;
     @Autowired
+    UserRepository userRepository;
+    @Autowired
     EntityManager em;
 
     User user1;
@@ -46,6 +53,11 @@ class ChatEmojiServiceTest {
         em.persist(user1);
         em.persist(user2);
         em.persist(user3);
+    }
+
+    @AfterEach
+    void afterEach(){
+        userRepository.deleteAll();
     }
 
     @Test
@@ -85,7 +97,8 @@ class ChatEmojiServiceTest {
 
         //when
         EmojiDto emojiDto = new EmojiDto(EmojiType.HEART);
-        assertThatThrownBy(() -> chatEmojiService.addEmojiToPrivateChat(user1.getId(), privateChat.getId(), emojiDto)).isInstanceOf(ChatEmojiException.class);
+        assertThatThrownBy(() -> chatEmojiService.addEmojiToPrivateChat(user1.getId(), privateChat.getId(), emojiDto))
+                .isInstanceOf(ChatEmojiException.class);
     }
 
     @Test
@@ -100,7 +113,8 @@ class ChatEmojiServiceTest {
 
         //when
         EmojiDto emojiDto = new EmojiDto(EmojiType.HEART);
-        assertThatThrownBy(() -> chatEmojiService.addEmojiToPrivateChat(user3.getId(), privateChat.getId(), emojiDto)).isInstanceOf(ChatEmojiException.class);
+        assertThatThrownBy(() -> chatEmojiService.addEmojiToPrivateChat(user3.getId(), privateChat.getId(), emojiDto))
+                .isInstanceOf(ChatEmojiException.class);
     }
 
     @Test
@@ -139,5 +153,29 @@ class ChatEmojiServiceTest {
         //when
         assertThatThrownBy(() -> chatEmojiService.removeEmojiToPrivateChat(user2.getId(), privateChat.getId(), new EmojiDto(EmojiType.HEART)))
                 .isInstanceOf(ChatEmojiException.class);
+    }
+
+    @Test
+    void getEmojiInfoInPrivateRoom() {
+        //given
+        PrivateRoom privateRoom = PrivateRoom.create(user1, user2);
+        em.persist(privateRoom);
+
+        PrivateRoomUser privateRoomUser1 = privateRoomRepository.findPrivateRoomUser(privateRoom.getId(), user1.getId()).orElseThrow();
+        PrivateChat privateChat = privateRoom.addUserToUserChat("mess", null, privateRoomUser1);
+        em.flush();
+
+        ChatEmoji chatEmoji1 = ChatEmoji.createPrivateChatEmoji(user1, privateChat.getId(), EmojiType.HEART);
+        ChatEmoji chatEmoji2 = ChatEmoji.createPrivateChatEmoji(user2, privateChat.getId(), EmojiType.HEART);
+        em.persist(chatEmoji1);
+        em.persist(chatEmoji2);
+
+        //when
+        List<ChatEmojiUserResDto> result = chatEmojiService.getEmojiInfoInPrivateRoom(user1.getId(), privateChat.getId(), EmojiType.HEART);
+
+        //then
+        assertThat(result)
+                .extracting(ChatEmojiUserResDto::getUserName)
+                .contains(user1.getUserName(), user2.getUserName());
     }
 }

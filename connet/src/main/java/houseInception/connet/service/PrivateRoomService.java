@@ -6,13 +6,12 @@ import houseInception.connet.domain.privateRoom.PrivateChat;
 import houseInception.connet.domain.privateRoom.PrivateRoom;
 import houseInception.connet.domain.privateRoom.PrivateRoomUser;
 import houseInception.connet.dto.*;
+import houseInception.connet.dto.privateRoom.*;
 import houseInception.connet.exception.PrivateRoomException;
-import houseInception.connet.exception.UserException;
 import houseInception.connet.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.PrivateRoomRepository;
-import houseInception.connet.repository.UserBlockRepository;
-import houseInception.connet.repository.UserRepository;
+import houseInception.connet.service.util.DomainValidatorUtil;
 import houseInception.connet.socketManager.SocketServiceProvider;
 import houseInception.connet.socketManager.dto.PrivateChatSocketDto;
 import jakarta.persistence.EntityManager;
@@ -30,6 +29,8 @@ import java.util.*;
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.Status.DELETED;
 import static houseInception.connet.response.status.BaseErrorCode.*;
+import static houseInception.connet.service.util.FileUtil.getUniqueFileName;
+import static houseInception.connet.service.util.FileUtil.isInValidFile;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -41,20 +42,19 @@ public class PrivateRoomService {
     private final SocketServiceProvider socketServiceProvider;
     private final S3ServiceProvider s3ServiceProvider;
     private final PrivateRoomRepository privateRoomRepository;
-    private final UserBlockRepository userBlockRepository;
-    private final UserRepository userRepository;
     private final EntityManager em;
+    private final DomainValidatorUtil validator;
 
     @Value("${aws.s3.imageUrlPrefix}")
     private String s3UrlPrefix;
 
     @Transactional
     public PrivateChatAddResDto addPrivateChat(Long userId, Long targetId, PrivateChatAddDto chatAddDto) {
-        User targetUser = findUser(targetId);
-        User user = findUser(userId);
+        User targetUser = validator.findUser(targetId);
+        User user = validator.findUser(userId);
 
         checkValidContent(chatAddDto.getMessage(), chatAddDto.getImage());
-        checkHasUserBlock(userId, targetId);
+        validator.checkNotUserBlock(userId, targetId);
 
         Optional<PrivateRoom> nullablePrivateRoom = privateRoomRepository.findPrivateRoomByUsers(userId, targetId);
         PrivateRoom privateRoom = getOrCreatePrivateRoom(nullablePrivateRoom, user, targetUser);
@@ -90,7 +90,7 @@ public class PrivateRoomService {
     }
 
     private String uploadImages(MultipartFile image){
-        if (image == null) {
+        if (isInValidFile(image)) {
             return null;
         }
 
@@ -100,16 +100,6 @@ public class PrivateRoomService {
         return s3UrlPrefix + newFileName;
     }
 
-    private String getUniqueFileName(String originalFileName){
-        int extensionIndex = originalFileName.lastIndexOf(".");
-        if(extensionIndex == -1){
-            throw new PrivateRoomException(NO_VALID_FILE_NAME);
-        }
-
-        String extension = originalFileName.substring(extensionIndex);
-
-        return UUID.randomUUID() + extension;
-    }
 
     private void checkValidContent(String message, MultipartFile images) {
         boolean hasMessage = StringUtils.hasText(message);
@@ -122,10 +112,10 @@ public class PrivateRoomService {
 
     @Transactional
     public GptPrivateChatAddResDto addGptChat(Long userId, Long targetId, String message) {
-        User targetUser = findUser(targetId);
-        User user = findUser(userId);
+        User targetUser = validator.findUser(targetId);
+        User user = validator.findUser(userId);
 
-        checkHasUserBlock(userId, targetId);
+        validator.checkNotUserBlock(userId, targetId);
 
         Optional<PrivateRoom> nullablePrivateRoom = privateRoomRepository.findPrivateRoomByUsers(userId, targetId);
         PrivateRoom privateRoom = getOrCreatePrivateRoom(nullablePrivateRoom, user, targetUser);
@@ -194,17 +184,6 @@ public class PrivateRoomService {
         List<PrivateChatResDto> privateChatList = privateRoomRepository.getPrivateChatList(userId, privateRoom.get().getId(), page);
 
         return new DataListResDto<>(page, privateChatList);
-    }
-
-    private void checkHasUserBlock(Long userId, Long targetId) {
-        if(userBlockRepository.existsByUserIdAndTargetId(userId, targetId)){
-            throw new PrivateRoomException(BLOCK_USER);
-        }
-    }
-
-    private User findUser(Long userId){
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(NO_SUCH_USER));
     }
 
     private PrivateRoom findPrivateRoom(String privateRoomUuid){

@@ -1,8 +1,9 @@
 package houseInception.connet.contoller;
 
 import houseInception.connet.dto.*;
+import houseInception.connet.dto.friend.FriendFilterDto;
 import houseInception.connet.response.BaseResponse;
-import houseInception.connet.response.BaseResultDto;
+import houseInception.connet.response.DefaultIdDto;
 import houseInception.connet.service.FriendService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class FriendController {
     private final FriendService friendService;
 
     @PostMapping("/{targetId}/request")
-    public BaseResponse<BaseResultDto> requestFriend(@PathVariable Long targetId){
+    public BaseResponse<DefaultIdDto> requestFriend(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.requestFriendById(userId, targetId);
 
@@ -24,7 +25,7 @@ public class FriendController {
     }
 
     @PostMapping("/request")
-    public BaseResponse<BaseResultDto> requestFriend(@RequestBody @Valid EmailDto emailDto){
+    public BaseResponse<DefaultIdDto> requestFriend(@RequestBody @Valid EmailDto emailDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.requestFriendByEmail(userId, emailDto.getEmail());
 
@@ -40,7 +41,7 @@ public class FriendController {
     }
 
     @DeleteMapping("/{targetId}/request")
-    public BaseResponse<BaseResultDto> cancelFriendRequest(@PathVariable Long targetId){
+    public BaseResponse<DefaultIdDto> cancelFriendRequest(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.cancelFriendRequest(userId, targetId);
 
@@ -48,7 +49,7 @@ public class FriendController {
     }
 
     @PostMapping("/{targetId}/accept")
-    public BaseResponse<BaseResultDto> acceptFriendRequest(@PathVariable Long targetId){
+    public BaseResponse<DefaultIdDto> acceptFriendRequest(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.acceptFriendRequest(userId, targetId);
 
@@ -56,7 +57,7 @@ public class FriendController {
     }
 
     @PostMapping("/{targetId}/deny")
-    public BaseResponse<BaseResultDto> denyFriendRequest(@PathVariable Long targetId){
+    public BaseResponse<DefaultIdDto> denyFriendRequest(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.denyFriendRequest(userId, targetId);
 
@@ -64,7 +65,7 @@ public class FriendController {
     }
 
     @DeleteMapping("/{targetId}")
-    public BaseResponse<BaseResultDto> deleteFriend(@PathVariable Long targetId){
+    public BaseResponse<DefaultIdDto> deleteFriend(@PathVariable Long targetId){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = friendService.deleteFriend(userId, targetId);
 

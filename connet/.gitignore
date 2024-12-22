@@ -39,3 +39,5 @@ out/
 # 로그 파일 및 디렉토리 무시
 logs/
 *.log
+
+/src/test/resources/

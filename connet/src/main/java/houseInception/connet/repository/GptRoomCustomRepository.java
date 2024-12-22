@@ -2,8 +2,8 @@ package houseInception.connet.repository;
 
 import houseInception.connet.domain.Status;
 import houseInception.connet.domain.gptRoom.GptRoomChat;
-import houseInception.connet.dto.GptRoomChatResDto;
-import houseInception.connet.dto.GptRoomListResDto;
+import houseInception.connet.dto.GptRoom.GptRoomChatResDto;
+import houseInception.connet.dto.GptRoom.GptRoomListResDto;
 
 import java.util.List;
 

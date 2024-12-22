@@ -1,17 +1,11 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
-import houseInception.connet.domain.UserBlock;
-import houseInception.connet.dto.UserResDto;
-import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.UserRepository;
+import houseInception.connet.service.util.DomainValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static houseInception.connet.domain.Status.ALIVE;
-import static houseInception.connet.domain.Status.DELETED;
-import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_USER;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -19,48 +13,17 @@ import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_USER;
 public class UserService {
 
     private final UserRepository userRepository;
-
-    public UserResDto getUserInfo(Long userId, String email) {
-        if (email == null) {
-            return new UserResDto(findUser(userId));
-        }else {
-            return userRepository.findUserByEmailWithFriendRelation(userId, email);
-        }
-    }
+    private final DomainValidatorUtil validator;
 
     @Transactional
     public void setUserActive(Long userId){
-        User user = findUser(userId);
+        User user = validator.findUser(userId);
         user.setActive();
     }
 
     @Transactional
     public void setUserInActive(Long userId){
-        User user = findUser(userId);
+        User user = validator.findUser(userId);
         user.setInActive();
-    }
-
-    private User findUserByEmail(String email){
-        User user = userRepository.findByEmailAndStatus(email, ALIVE).orElse(null);
-        if (user == null) {
-            throw new UserException(NO_SUCH_USER);
-        }
-
-        return user;
-    }
-
-    private User findUser(Long userId){
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null || user.getStatus() == DELETED) {
-            throw new UserException(NO_SUCH_USER);
-        }
-
-        return user;
-    }
-
-    private void checkUser(Long userId){
-        if(!userRepository.existsByIdAndStatus(userId, ALIVE)){
-            throw new UserException(NO_SUCH_USER);
-        }
     }
 }
