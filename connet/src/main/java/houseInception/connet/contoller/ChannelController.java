@@ -55,7 +55,7 @@ public class ChannelController {
         return BaseResponse.getSimpleRes(resultId);
     }
 
-    @PostMapping("/taps/{tapId}")
+    @PatchMapping("/taps/{tapId}")
     public BaseResponse<DefaultIdDto> updateTap(@PathVariable String groupUuid,
                                                 @PathVariable Long tapId,
                                                 @RequestBody @Valid TapDto tapDto){
