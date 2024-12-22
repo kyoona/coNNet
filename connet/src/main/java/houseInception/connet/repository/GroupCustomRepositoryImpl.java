@@ -2,11 +2,8 @@ package houseInception.connet.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import houseInception.connet.domain.QUser;
 import houseInception.connet.domain.Status;
 import houseInception.connet.domain.group.GroupUser;
-import houseInception.connet.domain.group.QGroup;
-import houseInception.connet.domain.group.QGroupUser;
 import houseInception.connet.dto.group.GroupUserResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -51,6 +48,35 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
     }
 
     @Override
+    public boolean existGroupOwner(Long userId, Long groupId) {
+        Long count = query
+                .select(groupUser.count())
+                .from(groupUser)
+                .where(groupUser.group.id.eq(groupId),
+                        groupUser.user.id.eq(userId),
+                        groupUser.isOwner.isTrue(),
+                        groupUser.status.eq(Status.ALIVE))
+                .fetchOne();
+
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean existGroupOwner(Long userId, String groupUuid) {
+        Long count = query
+                .select(groupUser.count())
+                .from(groupUser)
+                .innerJoin(groupUser.group, group)
+                .where(group.groupUuid.eq(groupUuid),
+                        groupUser.user.id.eq(userId),
+                        groupUser.isOwner.isTrue(),
+                        groupUser.status.eq(Status.ALIVE))
+                .fetchOne();
+
+        return count != null && count > 0;
+    }
+
+    @Override
     public Long countOfGroupUsers(Long groupId) {
         return query
                 .select(groupUser.count())
@@ -58,6 +84,18 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .where(groupUser.group.id.eq(groupId),
                         groupUser.status.eq(Status.ALIVE))
                 .fetchOne();
+    }
+
+    @Override
+    public Optional<Long> findGroupIdByGroupUuid(String groupUuid) {
+        Long id = query
+                .select(group.id)
+                .from(group)
+                .where(group.groupUuid.eq(groupUuid),
+                        group.status.eq(Status.ALIVE))
+                .fetchOne();
+
+        return Optional.ofNullable(id);
     }
 
     @Override
