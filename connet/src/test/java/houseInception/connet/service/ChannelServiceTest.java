@@ -172,6 +172,31 @@ class ChannelServiceTest {
 
         //then
         assertThat(tap.getTapName()).isEqualTo(tapDto.getTapName());
+    }
 
+    @Test
+    void deleteTap() {
+        //given
+        Channel channel = Channel.create(group.getId(), "channel");
+        ChannelTap tap = channel.addTap("tap");
+        em.persist(channel);
+
+        //when
+        Long resultId = channelService.deleteTap(groupOwner.getId(), group.getGroupUuid(), tap.getId());
+
+        //then
+        assertThat(channelRepository.findChannelTap(resultId)).isEmpty();
+    }
+
+    @Test
+    void deleteTap_권한x() {
+        //given
+        Channel channel = Channel.create(group.getId(), "channel");
+        ChannelTap tap = channel.addTap("tap");
+        em.persist(channel);
+
+        //when
+        assertThatThrownBy(() -> channelService.deleteTap(user1.getId(), group.getGroupUuid(), tap.getId()))
+                .isInstanceOf(ChannelException.class);
     }
 }

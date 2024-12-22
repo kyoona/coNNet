@@ -9,4 +9,5 @@ public interface ChannelCustomRepository {
     Long deleteTapById(Long tapId);
 
     Optional<ChannelTap> findChannelTapWithChannel(Long tapId);
+    Optional<ChannelTap> findChannelTap(Long tapId);
 }

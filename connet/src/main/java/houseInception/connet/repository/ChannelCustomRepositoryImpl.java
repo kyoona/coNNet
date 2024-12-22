@@ -36,4 +36,14 @@ public class ChannelCustomRepositoryImpl implements ChannelCustomRepository{
 
         return Optional.ofNullable(tap);
     }
+
+    @Override
+    public Optional<ChannelTap> findChannelTap(Long tapId) {
+        ChannelTap tap = query
+                .selectFrom(channelTap)
+                .where(channelTap.id.eq(tapId))
+                .fetchOne();
+
+        return Optional.ofNullable(tap);
+    }
 }
