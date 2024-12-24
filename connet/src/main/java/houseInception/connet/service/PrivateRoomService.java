@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static houseInception.connet.domain.ChatterRole.GPT;
+import static houseInception.connet.domain.ChatterRole.USER;
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.Status.DELETED;
 import static houseInception.connet.response.status.BaseErrorCode.*;
@@ -65,7 +67,7 @@ public class PrivateRoomService {
         checkRoomUserDeletedAndSetAlive(privateRoomReceiver, privateRoom, privateChat.getCreatedAt());
         checkRoomUserDeletedAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());
 
-        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), privateChat.getId(), chatAddDto.getMessage(), imgUrl, ChatterRole.USER, user, privateChat.getCreatedAt());
+        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), privateChat, USER, user);
 
         return new PrivateChatAddResDto(privateRoom.getPrivateRoomUuid(), privateChat.getId());
     }
@@ -117,7 +119,7 @@ public class PrivateRoomService {
 
         PrivateRoomUser privateRoomReceiver = privateRoomRepository.findPrivateRoomUser(privateRoom.getId(), targetId)
                 .orElseThrow(() -> new PrivateRoomException(INTERNAL_SERVER_ERROR, "개인 채팅방에 상대 유저가 존재하지 않습니다."));
-        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), privateChat.getId(), message, null, ChatterRole.USER, user, privateChat.getCreatedAt());
+        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), privateChat, USER, user);
 
         checkRoomUserDeletedAndSetAlive(privateRoomReceiver, privateRoom, privateChat.getCreatedAt());
         checkRoomUserDeletedAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());
@@ -126,7 +128,7 @@ public class PrivateRoomService {
         PrivateChat gptPrivateChat = privateRoom.addGptToUserChat(gptResponse);
         em.flush();
 
-        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), gptPrivateChat.getId(), gptResponse, null, ChatterRole.GPT, user, gptPrivateChat.getCreatedAt());
+        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), gptPrivateChat, GPT, null);
 
         return new GptPrivateChatAddResDto(privateRoom.getPrivateRoomUuid(), privateChat.getId(), privateChat.getCreatedAt(), gptPrivateChat.getId(), gptPrivateChat.getCreatedAt(), gptResponse);
     }
@@ -144,9 +146,9 @@ public class PrivateRoomService {
         return privateRoom;
     }
 
-    private void sendMessageThrowSocket(Long targetId, String roomUuid, Long chatId, String message, String image, ChatterRole chatterRole, User sender, LocalDateTime createdAt){
+    private void sendMessageThrowSocket(Long targetId, String roomUuid, PrivateChat chat, ChatterRole chatterRole, User sender) {
         PrivateChatSocketDto chatSocketDto =
-                new PrivateChatSocketDto(roomUuid, chatId, message, image, chatterRole, sender, createdAt);
+                new PrivateChatSocketDto(roomUuid, chat, chatterRole, sender);
         socketServiceProvider.sendMessage(targetId, chatSocketDto);
     }
 

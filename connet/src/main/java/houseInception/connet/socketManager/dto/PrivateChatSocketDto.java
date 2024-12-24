@@ -2,6 +2,7 @@ package houseInception.connet.socketManager.dto;
 
 import houseInception.connet.domain.ChatterRole;
 import houseInception.connet.domain.User;
+import houseInception.connet.domain.privateRoom.PrivateChat;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -20,13 +21,17 @@ public class PrivateChatSocketDto {
     private ChatterResDto writer;
     private LocalDateTime createAt;
 
-    public PrivateChatSocketDto(String chatRoomUuid, Long chatId, String message, String image, ChatterRole writerRole, User user, LocalDateTime createAt) {
+    public PrivateChatSocketDto(String chatRoomUuid, PrivateChat chat, ChatterRole writerRole, User user) {
         this.chatRoomUuid = chatRoomUuid;
-        this.chatId = chatId;
-        this.message = message;
-        this.image = image;
+        this.chatId = chat.getId();
+        this.message = chat.getMessage();
+        this.image = chat.getImage();
         this.writerRole = writerRole;
-        this.writer = new ChatterResDto(user.getId(), user.getUserName(), user.getUserProfile());
-        this.createAt = createAt;
+
+        if (user != null) {
+            this.writer = new ChatterResDto(user.getId(), user.getUserName(), user.getUserProfile());
+        }
+
+        this.createAt = chat.getCreatedAt();
     }
 }
