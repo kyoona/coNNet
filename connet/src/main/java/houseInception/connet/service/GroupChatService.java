@@ -11,9 +11,6 @@ import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupChatRepository;
 import houseInception.connet.repository.GroupRepository;
-import houseInception.connet.response.status.BaseErrorCode;
-import houseInception.connet.service.util.DomainValidatorUtil;
-import houseInception.connet.service.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +29,6 @@ public class GroupChatService {
     private final GroupChatRepository groupChatRepository;
     private final ChannelRepository channelRepository;
     private final GroupRepository groupRepository;
-    private final DomainValidatorUtil validator;
     private final S3ServiceProvider s3ServiceProvider;
 
     @Transactional
@@ -58,15 +54,15 @@ public class GroupChatService {
         return s3ServiceProvider.uploadImage(newFileName, image);
     }
 
+    private GroupUser findGroupUser(Long userId, String groupUuid){
+        return groupRepository.findGroupUser(groupUuid, userId)
+                .orElseThrow(() -> new GroupException(NOT_IN_GROUP));
+    }
+
     private void checkValidContent(MultipartFile image, String message) {
         if((image == null || image.isEmpty()) && !StringUtils.hasText(message)){
             throw new GroupChatException(NO_CONTENT_IN_CHAT);
         }
-    }
-
-    private GroupUser findGroupUser(Long userId, String groupUuid){
-        return groupRepository.findGroupUser(groupUuid, userId)
-                .orElseThrow(() -> new GroupException(NOT_IN_GROUP));
     }
 
     private void checkExistTap(Long tapId){

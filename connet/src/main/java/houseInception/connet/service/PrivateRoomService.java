@@ -11,13 +11,12 @@ import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.PrivateRoomRepository;
-import houseInception.connet.service.util.DomainValidatorUtil;
+import houseInception.connet.service.util.CommonDomainService;
 import houseInception.connet.socketManager.SocketServiceProvider;
 import houseInception.connet.socketManager.dto.PrivateChatSocketDto;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -38,20 +37,20 @@ import static houseInception.connet.service.util.FileUtil.isInValidFile;
 @Service
 public class PrivateRoomService {
 
+    private final PrivateRoomRepository privateRoomRepository;
+    private final EntityManager em;
+    private final CommonDomainService domainService;
     private final GptApiProvider gptApiProvider;
     private final SocketServiceProvider socketServiceProvider;
     private final S3ServiceProvider s3ServiceProvider;
-    private final PrivateRoomRepository privateRoomRepository;
-    private final EntityManager em;
-    private final DomainValidatorUtil validator;
 
     @Transactional
     public PrivateChatAddResDto addPrivateChat(Long userId, Long targetId, PrivateChatAddDto chatAddDto) {
-        User targetUser = validator.findUser(targetId);
-        User user = validator.findUser(userId);
+        User targetUser = domainService.findUser(targetId);
+        User user = domainService.findUser(userId);
 
         checkValidContent(chatAddDto.getMessage(), chatAddDto.getImage());
-        validator.checkNotUserBlock(userId, targetId);
+        domainService.checkNotUserBlock(userId, targetId);
 
         Optional<PrivateRoom> nullablePrivateRoom = privateRoomRepository.findPrivateRoomByUsers(userId, targetId);
         PrivateRoom privateRoom = getOrCreatePrivateRoom(nullablePrivateRoom, user, targetUser);
@@ -107,10 +106,10 @@ public class PrivateRoomService {
 
     @Transactional
     public GptPrivateChatAddResDto addGptChat(Long userId, Long targetId, String message) {
-        User targetUser = validator.findUser(targetId);
-        User user = validator.findUser(userId);
+        User targetUser = domainService.findUser(targetId);
+        User user = domainService.findUser(userId);
 
-        validator.checkNotUserBlock(userId, targetId);
+        domainService.checkNotUserBlock(userId, targetId);
 
         Optional<PrivateRoom> nullablePrivateRoom = privateRoomRepository.findPrivateRoomByUsers(userId, targetId);
         PrivateRoom privateRoom = getOrCreatePrivateRoom(nullablePrivateRoom, user, targetUser);

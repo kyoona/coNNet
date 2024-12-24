@@ -9,7 +9,7 @@ import houseInception.connet.exception.GroupException;
 import houseInception.connet.exception.GroupInviteException;
 import houseInception.connet.repository.GroupInviteRepository;
 import houseInception.connet.repository.GroupRepository;
-import houseInception.connet.service.util.DomainValidatorUtil;
+import houseInception.connet.service.util.CommonDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,15 +23,15 @@ import static houseInception.connet.response.status.BaseErrorCode.*;
 @Service
 public class GroupInviteService {
 
-    private final DomainValidatorUtil validator;
     private final GroupInviteRepository groupInviteRepository;
     private final GroupRepository groupRepository;
+    private final CommonDomainService domainService;
     private final GroupInviteEventPublisher groupInviteEventPublisher;
 
     @Transactional
     public Long inviteGroup(Long userId, String groupUuid, GroupInviteDto inviteDto) {
-        User user = validator.findUser(userId);
-        User targetUser = validator.findUser(inviteDto.getTargetId());
+        User user = domainService.findUser(userId);
+        User targetUser = domainService.findUser(inviteDto.getTargetId());
 
         checkUserInGroup(userId, groupUuid);
         checkUserAlreadyInGroup(targetUser.getId(), groupUuid);

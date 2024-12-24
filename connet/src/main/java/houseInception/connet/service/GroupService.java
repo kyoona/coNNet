@@ -9,9 +9,8 @@ import houseInception.connet.dto.group.GroupUserResDto;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.GroupRepository;
-import houseInception.connet.service.util.DomainValidatorUtil;
+import houseInception.connet.service.util.CommonDomainService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,15 +27,12 @@ import static houseInception.connet.service.util.FileUtil.isInValidFile;
 public class GroupService {
 
     private final GroupRepository groupRepository;
-    private final DomainValidatorUtil validator;
+    private final CommonDomainService domainService;
     private final S3ServiceProvider s3ServiceProvider;
-
-    @Value("${aws.s3.imageUrlPrefix}")
-    private String s3UrlPrefix;
 
     @Transactional
     public String addGroup(Long userId, GroupAddDto groupAddDto) {
-        User user = validator.findUser(userId);
+        User user = domainService.findUser(userId);
 
         String groupProfileUrl = uploadImages(groupAddDto.getGroupProfile());
 
@@ -64,9 +60,7 @@ public class GroupService {
         }
 
         String newFileName = getUniqueFileName(image.getOriginalFilename());
-        s3ServiceProvider.uploadImage(newFileName, image);
-
-        return s3UrlPrefix + newFileName;
+        return s3ServiceProvider.uploadImage(newFileName, image);
     }
 
     @Transactional
@@ -75,7 +69,7 @@ public class GroupService {
         checkOpenGroup(group);
         checkGroupLimit(group);
 
-        User user = validator.findUser(userId);
+        User user = domainService.findUser(userId);
         checkUserInGroup(userId, groupUuid, false);
 
         group.addUser(user);
@@ -100,7 +94,7 @@ public class GroupService {
 
     @Transactional
     public void addGroupUser(Long userId, String groupUuid) {
-        User user = validator.findUser(userId);
+        User user = domainService.findUser(userId);
 
         Group group = findGroupWithLock(groupUuid);
         checkGroupLimit(group);
@@ -116,10 +110,14 @@ public class GroupService {
         return result;
     }
 
-    private void checkOpenGroup(Group group){
-        if(!group.isOpen()){
-            throw new GroupException(PRIVATE_GROUP);
-        }
+    private Group findGroup(String groupUuid){
+        return groupRepository.findByGroupUuidAndStatus(groupUuid, Status.ALIVE)
+                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
+    }
+
+    private Group findGroupWithLock(String groupUuid){
+        return groupRepository.findByGroupUuidAndStatusWithLock(groupUuid, Status.ALIVE)
+                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
     }
 
     private void checkUserInGroup(Long userId, String groupUuid, boolean isInGroup){
@@ -132,20 +130,16 @@ public class GroupService {
         }
     }
 
-    private Group findGroup(String groupUuid){
-        return groupRepository.findByGroupUuidAndStatus(groupUuid, Status.ALIVE)
-                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
-    }
-
-    private Group findGroupWithLock(String groupUuid){
-        return groupRepository.findByGroupUuidAndStatusWithLock(groupUuid, Status.ALIVE)
-                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
-    }
-
     private void checkGroupLimit(Group group) {
         Long count = groupRepository.countOfGroupUsers(group.getId());
         if (count != null && count >= group.getUserLimit()) {
             throw new GroupException(GROUP_USER_LIMIT);
+        }
+    }
+
+    private void checkOpenGroup(Group group){
+        if(!group.isOpen()){
+            throw new GroupException(PRIVATE_GROUP);
         }
     }
 }

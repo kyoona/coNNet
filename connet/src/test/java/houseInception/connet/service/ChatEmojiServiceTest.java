@@ -10,6 +10,7 @@ import houseInception.connet.domain.privateRoom.PrivateRoomUser;
 import houseInception.connet.dto.chatEmoji.EmojiDto;
 import houseInception.connet.dto.chatEmoji.ChatEmojiUserResDto;
 import houseInception.connet.exception.ChatEmojiException;
+import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.repository.ChatEmojiRepository;
 import houseInception.connet.repository.PrivateRoomRepository;
 import houseInception.connet.repository.UserRepository;
@@ -114,7 +115,7 @@ class ChatEmojiServiceTest {
         //when
         EmojiDto emojiDto = new EmojiDto(EmojiType.HEART);
         assertThatThrownBy(() -> chatEmojiService.addEmojiToPrivateChat(user3.getId(), privateChat.getId(), emojiDto))
-                .isInstanceOf(ChatEmojiException.class);
+                .isInstanceOf(PrivateRoomException.class);
     }
 
     @Test

@@ -17,7 +17,7 @@ import static houseInception.connet.response.status.BaseErrorCode.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
-public class DomainValidatorUtil {
+public class CommonDomainService {
 
     private final UserRepository userRepository;
     private final UserBlockRepository userBlockRepository;
@@ -25,6 +25,11 @@ public class DomainValidatorUtil {
 
     public User findUser(Long userId){
         return userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(NO_SUCH_USER));
+    }
+
+    public User findUserByEmail(String email){
+        return userRepository.findByEmailAndStatus(email, ALIVE)
                 .orElseThrow(() -> new UserException(NO_SUCH_USER));
     }
 
@@ -37,12 +42,6 @@ public class DomainValidatorUtil {
     public void checkNotUserBlock(Long userId, Long targetId){
         if (userBlockRepository.existsByUserIdAndTargetId(userId, targetId)){
             throw new UserBlockException(BLOCK_USER);
-        }
-    }
-
-    public void checkExistGroup(String groupUuid){
-        if(!groupRepository.existsByGroupUuidAndStatus(groupUuid, ALIVE)){
-            throw new GroupException(NO_SUCH_GROUP);
         }
     }
 }

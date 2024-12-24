@@ -1,8 +1,7 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
-import houseInception.connet.repository.UserRepository;
-import houseInception.connet.service.util.DomainValidatorUtil;
+import houseInception.connet.service.util.CommonDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,18 +11,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final DomainValidatorUtil validator;
+    private final CommonDomainService domainService;
 
     @Transactional
     public void setUserActive(Long userId){
-        User user = validator.findUser(userId);
+        User user = domainService.findUser(userId);
         user.setActive();
     }
 
     @Transactional
     public void setUserInActive(Long userId){
-        User user = validator.findUser(userId);
+        User user = domainService.findUser(userId);
         user.setInActive();
     }
 }

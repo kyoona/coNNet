@@ -4,12 +4,11 @@ import houseInception.connet.domain.User;
 import houseInception.connet.dto.login.TokenResDto;
 import houseInception.connet.dto.login.SignInDto;
 import houseInception.connet.exception.InValidTokenException;
-import houseInception.connet.exception.UserException;
 import houseInception.connet.externalServiceProvider.google.GoogleOathProvider;
 import houseInception.connet.externalServiceProvider.google.GoogleUserInfo;
 import houseInception.connet.jwt.JwtTokenProvider;
 import houseInception.connet.repository.UserRepository;
-import houseInception.connet.service.util.DomainValidatorUtil;
+import houseInception.connet.service.util.CommonDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class LoginService {
     private final UserRepository userRepository;
     private final GoogleOathProvider googleOathProvider;
     private final JwtTokenProvider tokenProvider;
-    private final DomainValidatorUtil validator;
+    private final CommonDomainService domainService;
 
     @Transactional
     public TokenResDto signIn(SignInDto signInDto) {
@@ -43,7 +42,7 @@ public class LoginService {
             User user = User.create(userInfo.getName(), userInfo.getPicture(), userInfo.getEmail(), refreshToken);
             userRepository.save(user);
         } else {
-            User user = findUser(userInfo.getEmail());
+            User user = domainService.findUserByEmail(userInfo.getEmail());
             user.setRefreshToken(refreshToken);
         }
 
@@ -52,7 +51,7 @@ public class LoginService {
 
     @Transactional
     public TokenResDto refresh(Long userId, String refreshToken) {
-        User user = validator.findUser(userId);
+        User user = domainService.findUser(userId);
         if(!user.equals(refreshToken)){
             throw new InValidTokenException(INVALID_REFRESH_TOKEN);
         }
@@ -74,24 +73,14 @@ public class LoginService {
 
     @Transactional
     public Long signOut(Long userId) {
-        User user = validator.findUser(userId);
+        User user = domainService.findUser(userId);
         user.deleteRefreshToken();
 
         return user.getId();
     }
 
     private boolean isNotServiceUser(String email){
-
         return !userRepository.existsByEmailAndStatus(email, ALIVE);
-    }
-
-    private User findUser(String email){
-        User user = userRepository.findByEmailAndStatus(email, ALIVE).orElse(null);
-        if (user == null) {
-            throw new UserException(NO_SUCH_USER);
-        }
-
-        return user;
     }
 
     private void checkValidToken(String refreshToken) {
