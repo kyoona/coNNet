@@ -61,7 +61,7 @@ public class GroupChatService {
     }
 
     private void checkValidContent(MultipartFile image, String message) {
-        if(!isInValidFile(image) && !StringUtils.hasText(message)){
+        if(isInValidFile(image) && !StringUtils.hasText(message)){
             throw new GroupChatException(NO_CONTENT_IN_CHAT);
         }
     }
