@@ -34,6 +34,19 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
     }
 
     @Override
+    public Optional<GroupUser> findGroupUser(String groupUuid, Long userId) {
+        GroupUser fetchedGroupUser = query
+                .selectFrom(groupUser)
+                .innerJoin(groupUser.group, group)
+                .where(group.groupUuid.eq(groupUuid),
+                        groupUser.user.id.eq(userId),
+                        groupUser.status.eq(Status.ALIVE))
+                .fetchOne();
+
+        return Optional.ofNullable(fetchedGroupUser);
+    }
+
+    @Override
     public boolean existUserInGroup(Long userId, String groupUuid) {
         Long count = query
                 .select(groupUser.count())

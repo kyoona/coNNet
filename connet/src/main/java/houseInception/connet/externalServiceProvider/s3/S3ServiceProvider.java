@@ -26,7 +26,10 @@ public class S3ServiceProvider {
     @Value("${aws.s3.bucketName}")
     private String bucketName;
 
-    public void uploadImage(String objectKey, MultipartFile file){
+    @Value("${aws.s3.imageUrlPrefix}")
+    private String s3UrlPrefix;
+
+    public String uploadImage(String objectKey, MultipartFile file){
         try {
             PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(bucketName)
@@ -34,6 +37,8 @@ public class S3ServiceProvider {
                     .acl(ObjectCannedACL.PUBLIC_READ)
                     .build();
             s3Client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+
+            return s3UrlPrefix + objectKey;
         } catch (S3Exception e) {
             log.error("S3Exception ", e);
             throw new S3UploadException(CAN_NOT_UPLOAD_FILE_TO_S3);

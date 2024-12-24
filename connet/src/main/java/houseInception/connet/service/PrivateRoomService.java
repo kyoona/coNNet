@@ -45,9 +45,6 @@ public class PrivateRoomService {
     private final EntityManager em;
     private final DomainValidatorUtil validator;
 
-    @Value("${aws.s3.imageUrlPrefix}")
-    private String s3UrlPrefix;
-
     @Transactional
     public PrivateChatAddResDto addPrivateChat(Long userId, Long targetId, PrivateChatAddDto chatAddDto) {
         User targetUser = validator.findUser(targetId);
@@ -95,9 +92,7 @@ public class PrivateRoomService {
         }
 
         String newFileName = getUniqueFileName(image.getOriginalFilename());
-        s3ServiceProvider.uploadImage(newFileName, image);
-
-        return s3UrlPrefix + newFileName;
+        return s3ServiceProvider.uploadImage(newFileName, image);
     }
 
 
