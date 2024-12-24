@@ -1,10 +1,8 @@
 package houseInception.connet.service.util;
 
 import houseInception.connet.domain.User;
-import houseInception.connet.exception.GroupException;
 import houseInception.connet.exception.UserBlockException;
 import houseInception.connet.exception.UserException;
-import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,6 @@ public class CommonDomainService {
 
     private final UserRepository userRepository;
     private final UserBlockRepository userBlockRepository;
-    private final GroupRepository groupRepository;
 
     public User findUser(Long userId){
         return userRepository.findById(userId)
