@@ -14,6 +14,7 @@ public interface GroupCustomRepository {
     boolean existGroupOwner(Long userId, String groupUuid);
     Long countOfGroupUsers(Long groupId);
     Optional<Long> findGroupIdByGroupUuid(String groupUuid);
+    List<Long> findUserIdsOfGroupExceptUser(String groupUuid, Long userId);
 
     List<GroupUserResDto> getGroupUserList(String groupUuid);
 }

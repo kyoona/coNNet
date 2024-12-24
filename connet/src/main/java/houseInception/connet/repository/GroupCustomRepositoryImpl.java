@@ -98,6 +98,19 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
     }
 
     @Override
+    public List<Long> findUserIdsOfGroupExceptUser(String groupUuid, Long userId) {
+        return query
+                .select(user.id)
+                .from(groupUser)
+                .innerJoin(groupUser.user, user)
+                .innerJoin(groupUser.group, group)
+                .where(group.groupUuid.eq(groupUuid),
+                        user.id.ne(userId),
+                        groupUser.status.eq(Status.ALIVE))
+                .fetch();
+    }
+
+    @Override
     public List<GroupUserResDto> getGroupUserList(String groupUuid) {
         return query
                 .select(Projections.constructor(
