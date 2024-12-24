@@ -1,6 +1,7 @@
 package houseInception.connet.socketManager.dto;
 
 import houseInception.connet.domain.ChatterRole;
+import houseInception.connet.domain.GroupChat;
 import houseInception.connet.domain.User;
 import lombok.Getter;
 
@@ -21,14 +22,18 @@ public class GroupChatSocketDto {
     private ChatterResDto writer;
     private LocalDateTime createAt;
 
-    public GroupChatSocketDto(String groupUuid, Long tapId, Long chatId, String message, String image, ChatterRole writerRole, User user, LocalDateTime createAt) {
+    public GroupChatSocketDto(String groupUuid, GroupChat chat, ChatterRole writerRole, User user) {
         this.groupUuid = groupUuid;
-        this.tapId = tapId;
-        this.chatId = chatId;
-        this.message = message;
-        this.image = image;
+        this.tapId = chat.getTapId();
+        this.chatId = chat.getId();
+        this.message = chat.getMessage();
+        this.image = chat.getImage();
         this.writerRole = writerRole;
-        this.writer = new ChatterResDto(user.getId(), user.getUserName(), user.getUserProfile());
-        this.createAt = createAt;
+
+        if(user != null){
+            this.writer = new ChatterResDto(user.getId(), user.getUserName(), user.getUserProfile());
+        }
+
+        this.createAt = chat.getCreatedAt();
     }
 }

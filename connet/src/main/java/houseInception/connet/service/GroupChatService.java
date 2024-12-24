@@ -5,16 +5,22 @@ import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.dto.groupChat.GroupChatAddDto;
 import houseInception.connet.dto.groupChat.GroupChatAddResDto;
+import houseInception.connet.dto.groupChat.GroupGptChatAddDto;
+import houseInception.connet.dto.groupChat.GroupGptChatAddResDto;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.exception.GroupChatException;
 import houseInception.connet.exception.GroupException;
+import houseInception.connet.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupChatRepository;
 import houseInception.connet.repository.GroupRepository;
+<<<<<<< Updated upstream
 import houseInception.connet.service.util.CommonDomainService;
 import houseInception.connet.socketManager.SocketServiceProvider;
 import houseInception.connet.socketManager.dto.GroupChatSocketDto;
+=======
+>>>>>>> Stashed changes
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+import static houseInception.connet.domain.ChatterRole.GPT;
 import static houseInception.connet.domain.ChatterRole.USER;
 import static houseInception.connet.response.status.BaseErrorCode.*;
 import static houseInception.connet.service.util.FileUtil.getUniqueFileName;
@@ -39,6 +46,7 @@ public class GroupChatService {
     private final CommonDomainService domainService;
     private final S3ServiceProvider s3ServiceProvider;
     private final SocketServiceProvider socketServiceProvider;
+    private final GptApiProvider gptApiProvider;
 
     @Transactional
     public GroupChatAddResDto addChat(Long userId, String groupUuid, GroupChatAddDto chatAddDto) {
@@ -52,7 +60,7 @@ public class GroupChatService {
         GroupChat chat = GroupChat.createUserToUser(groupUser, chatAddDto.getTapId(), chatAddDto.getMessage(), imageUrl);
         groupChatRepository.save(chat);
 
-        GroupChatSocketDto socketDto = new GroupChatSocketDto(groupUuid, chat.getTapId(), chat.getId(), chat.getMessage(), chat.getImage(), USER, user, chat.getCreatedAt());
+        GroupChatSocketDto socketDto = new GroupChatSocketDto(groupUuid, chat, USER, user);
         sendMessageToGroupUsers(groupUuid, userId, socketDto);
 
         return new GroupChatAddResDto(chat.getId(), chat.getCreatedAt());
@@ -70,6 +78,33 @@ public class GroupChatService {
 
         String newFileName = getUniqueFileName(image.getOriginalFilename());
         return s3ServiceProvider.uploadImage(newFileName, image);
+    }
+
+    @Transactional
+    public GroupGptChatAddResDto addGptChat(Long userId, String groupUuid, GroupGptChatAddDto chatAddDto) {
+        checkExistTap(chatAddDto.getTapId());
+        GroupUser groupUser = findGroupUser(userId, groupUuid);
+        User user = domainService.findUser(userId);
+
+        GroupChat userChat = GroupChat.createUserToGpt(groupUser, chatAddDto.getTapId(), chatAddDto.getMessage());
+        groupChatRepository.save(userChat);
+
+        List<Long> groupUserIds = groupRepository.findUserIdsOfGroupExceptUser(groupUuid, userId);
+        GroupChatSocketDto userSocketDto = new GroupChatSocketDto(groupUuid, userChat, USER, user);
+        sendMessageToGroupUsers(groupUserIds, userSocketDto);
+
+        String gptMessage = gptApiProvider.getChatCompletion(userChat.getMessage());
+        GroupChat gptChat = GroupChat.createGptToUser(chatAddDto.getTapId(), gptMessage);
+        groupChatRepository.save(gptChat);
+
+        GroupChatSocketDto gptSocketDto = new GroupChatSocketDto(groupUuid, gptChat, GPT, null);
+        sendMessageToGroupUsers(groupUserIds, gptSocketDto);
+
+        return new GroupGptChatAddResDto(userChat.getId(), userChat.getCreatedAt(), gptChat.getId(), gptChat.getCreatedAt(), gptMessage);
+    }
+
+    private void sendMessageToGroupUsers(List<Long> groupUserIds, GroupChatSocketDto socketDto){
+        groupUserIds.forEach((targetId) -> socketServiceProvider.sendMessage(targetId, socketDto));
     }
 
     private GroupUser findGroupUser(Long userId, String groupUuid){
