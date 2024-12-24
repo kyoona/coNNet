@@ -11,6 +11,7 @@ import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupChatRepository;
 import houseInception.connet.repository.GroupRepository;
+import houseInception.connet.service.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +61,7 @@ public class GroupChatService {
     }
 
     private void checkValidContent(MultipartFile image, String message) {
-        if((image == null || image.isEmpty()) && !StringUtils.hasText(message)){
+        if(!isInValidFile(image) && !StringUtils.hasText(message)){
             throw new GroupChatException(NO_CONTENT_IN_CHAT);
         }
     }

@@ -95,11 +95,8 @@ public class PrivateRoomService {
     }
 
 
-    private void checkValidContent(String message, MultipartFile images) {
-        boolean hasMessage = StringUtils.hasText(message);
-        boolean hasImages = images != null;
-
-        if (!hasMessage && !hasImages) {
+    private void checkValidContent(String message, MultipartFile image) {
+        if(!isInValidFile(image) && !StringUtils.hasText(message)){
             throw new PrivateRoomException(NO_CONTENT_IN_CHAT);
         }
     }
