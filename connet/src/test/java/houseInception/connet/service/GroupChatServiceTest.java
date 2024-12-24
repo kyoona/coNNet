@@ -7,6 +7,8 @@ import houseInception.connet.domain.channel.ChannelTap;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.dto.groupChat.GroupChatAddDto;
 import houseInception.connet.dto.groupChat.GroupChatAddResDto;
+import houseInception.connet.dto.groupChat.GroupGptChatAddDto;
+import houseInception.connet.dto.groupChat.GroupGptChatAddResDto;
 import houseInception.connet.exception.GroupChatException;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.ChannelRepository;
@@ -14,6 +16,7 @@ import houseInception.connet.repository.GroupChatRepository;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Slf4j
 @Transactional
 @SpringBootTest
 class GroupChatServiceTest {
@@ -102,5 +106,23 @@ class GroupChatServiceTest {
         GroupChatAddDto chatAddDto = new GroupChatAddDto(" ", null, groupChannelTap.getId());
         assertThatThrownBy(() -> groupChatService.addChat(groupUser.getId(), group.getGroupUuid(), chatAddDto))
                 .isInstanceOf(GroupChatException.class);
+    }
+
+    @Test
+    void addGptChat() {
+        //when
+        String message = "아이폰 13미니의 출시일은 언제야?";
+        GroupGptChatAddDto chatAddDto = new GroupGptChatAddDto(message, groupChannelTap.getId());
+        GroupGptChatAddResDto result = groupChatService.addGptChat(groupUser.getId(), group.getGroupUuid(), chatAddDto);
+
+        //then
+        GroupChat groupChat = groupChatRepository.findById(result.getUserChatId()).orElseThrow();
+        assertThat(groupChat.getTapId()).isEqualTo(groupChannelTap.getId());
+        assertThat(groupChat.getMessage()).isEqualTo(chatAddDto.getMessage());
+        assertThat(groupChat.getImage()).isNull();
+
+        GroupChat gptChat = groupChatRepository.findById(result.getGptChatId()).orElseThrow();
+        assertThat(gptChat.getTapId()).isEqualTo(groupChannelTap.getId());
+        log.info("gpt response = {}", result.getMessage());
     }
 }
