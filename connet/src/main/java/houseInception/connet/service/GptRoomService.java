@@ -10,7 +10,7 @@ import houseInception.connet.exception.GptRoomException;
 import houseInception.connet.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.connet.externalServiceProvider.gpt.GptResDto;
 import houseInception.connet.repository.GptRoomRepository;
-import houseInception.connet.service.util.DomainValidatorUtil;
+import houseInception.connet.service.util.CommonDomainService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,13 +28,13 @@ import static houseInception.connet.response.status.BaseErrorCode.NO_SUCH_CHATRO
 public class GptRoomService {
 
     private final GptRoomRepository gptRoomRepository;
-    private final GptApiProvider gptApiProvider;
     private final EntityManager em;
-    private final DomainValidatorUtil validator;
+    private final CommonDomainService domainService;
+    private final GptApiProvider gptApiProvider;
 
     @Transactional
     public GptChatResDto addGptChat(Long userId, GptRoomChatAddDto gptRoomChatAddDto) {
-        User user = validator.findUser(userId);
+        User user = domainService.findUser(userId);
 
         String chatRoomUuid = gptRoomChatAddDto.getChatRoomUuid();
 

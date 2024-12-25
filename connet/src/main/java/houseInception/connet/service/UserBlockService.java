@@ -2,23 +2,18 @@ package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.UserBlock;
-import houseInception.connet.domain.UserBlockType;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.event.publisher.UserBlockEventPublisher;
 import houseInception.connet.exception.UserBlockException;
-import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.UserBlockRepository;
-import houseInception.connet.repository.UserRepository;
-import houseInception.connet.service.util.DomainValidatorUtil;
+import houseInception.connet.service.util.CommonDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static houseInception.connet.domain.Status.ALIVE;
-import static houseInception.connet.domain.Status.DELETED;
 import static houseInception.connet.domain.UserBlockType.ACCEPT;
 import static houseInception.connet.domain.UserBlockType.REQUEST;
 import static houseInception.connet.response.status.BaseErrorCode.*;
@@ -29,13 +24,13 @@ import static houseInception.connet.response.status.BaseErrorCode.*;
 public class UserBlockService {
 
     private final UserBlockRepository userBlockRepository;
+    private final CommonDomainService domainService;
     private final UserBlockEventPublisher userBlockEventPublisher;
-    private final DomainValidatorUtil validator;
 
     @Transactional
     public Long blockUser(Long userId, Long targetId) {
-        User targetUser = validator.findUser(targetId);
-        User user = validator.findUser(userId);
+        User targetUser = domainService.findUser(targetId);
+        User user = domainService.findUser(userId);
 
         UserBlock findUserBlock = userBlockRepository.findByUserIdAndTargetId(userId, targetId).orElse(null);
         checkAlreadyRequestBlock(findUserBlock);
@@ -59,7 +54,7 @@ public class UserBlockService {
 
     @Transactional
     public Long cancelBlock(Long userId, Long targetId) {
-        validator.checkExistUser(targetId);
+        domainService.checkExistUser(targetId);
         UserBlock userBlock = findUserBlock(userId, targetId);
         UserBlock reverseUserBlock = findUserBlock(targetId, userId);
 
@@ -76,7 +71,7 @@ public class UserBlockService {
     public DataListResDto<DefaultUserResDto> getBlockUserList(Long userId) {
         List<DefaultUserResDto> blockUserList = userBlockRepository.getBlockUserList(userId);
 
-        return new DataListResDto<DefaultUserResDto>(0, blockUserList);
+        return new DataListResDto<>(0, blockUserList);
     }
 
     private UserBlock findUserBlock(Long userId, Long targetId){

@@ -8,11 +8,8 @@ import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.friend.FriendFilterDto;
 import houseInception.connet.exception.FriendException;
-import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.FriendRepository;
-import houseInception.connet.repository.UserBlockRepository;
-import houseInception.connet.repository.UserRepository;
-import houseInception.connet.service.util.DomainValidatorUtil;
+import houseInception.connet.service.util.CommonDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +19,6 @@ import java.util.List;
 
 import static houseInception.connet.domain.FriendStatus.ACCEPT;
 import static houseInception.connet.domain.FriendStatus.WAIT;
-import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.response.status.BaseErrorCode.*;
 
 @Slf4j
@@ -32,15 +28,13 @@ import static houseInception.connet.response.status.BaseErrorCode.*;
 public class FriendService {
 
     private final FriendRepository friendRepository;
-    private final UserRepository userRepository;
-    private final UserBlockRepository userBlockRepository;
-    private final DomainValidatorUtil validator;
+    private final CommonDomainService domainService;
 
     @Transactional
     public Long requestFriendById(Long userId, Long targetId) {
-        User targetUser = validator.findUser(targetId);
-        validator.checkNotUserBlock(userId, targetId);
-        User user = validator.findUser(userId);
+        User targetUser = domainService.findUser(targetId);
+        domainService.checkNotUserBlock(userId, targetId);
+        User user = domainService.findUser(userId);
 
         if(userId.equals(targetId)){
             throw new FriendException(CANT_NOT_REQUEST_SELF);
@@ -56,9 +50,9 @@ public class FriendService {
 
     @Transactional
     public Long requestFriendByEmail(Long userId, String email) {
-        User targetUser = findUserByEmail(email);
-        validator.checkNotUserBlock(userId, targetUser.getId());
-        User user = validator.findUser(userId);
+        User targetUser = domainService.findUserByEmail(email);
+        domainService.checkNotUserBlock(userId, targetUser.getId());
+        User user = domainService.findUser(userId);
 
         if(userId.equals(targetUser.getId())){
             throw new FriendException(CANT_NOT_REQUEST_SELF);
@@ -74,7 +68,7 @@ public class FriendService {
 
     @Transactional
     public Long cancelFriendRequest(Long userId, Long targetId){
-        validator.checkExistUser(targetId);
+        domainService.checkExistUser(targetId);
 
         Friend friend = findFriend(userId, targetId, WAIT);
         friendRepository.delete(friend);
@@ -84,9 +78,9 @@ public class FriendService {
 
     @Transactional
     public Long acceptFriendRequest(Long userId, Long targetId) {
-        User targetUser = validator.findUser(targetId);
+        User targetUser = domainService.findUser(targetId);
         checkHasFriendRequestOfOneWay(targetId, userId);
-        User user = validator.findUser(userId);
+        User user = domainService.findUser(userId);
 
         Friend requestFriend = findFriend(targetId, userId, WAIT);
         requestFriend.accept();
@@ -100,7 +94,7 @@ public class FriendService {
 
     @Transactional
     public Long denyFriendRequest(Long userId, Long targetId) {
-        validator.checkExistUser(targetId);
+        domainService.checkExistUser(targetId);
         checkHasFriendRequestOfOneWay(targetId, userId);
 
         Friend friend = findFriend(targetId, userId, WAIT);
@@ -111,7 +105,7 @@ public class FriendService {
 
     @Transactional
     public Long deleteFriend(Long userId, Long targetId) {
-        validator.checkExistUser(targetId);
+        domainService.checkExistUser(targetId);
 
         Friend friend1 = findFriend(userId, targetId, ACCEPT);
         friendRepository.delete(friend1);
@@ -126,19 +120,24 @@ public class FriendService {
     public DataListResDto<DefaultUserResDto> getFriendRequestList(Long userId) {
         List<DefaultUserResDto> requestReceivers = friendRepository.getFriendRequestList(userId);
 
-        return new DataListResDto<DefaultUserResDto>(0, requestReceivers);
+        return new DataListResDto<>(0, requestReceivers);
     }
 
     public DataListResDto<DefaultUserResDto> getFriendWaitList(Long userId) {
         List<DefaultUserResDto> requestSenders = friendRepository.getFriendWaitList(userId);
 
-        return new DataListResDto<DefaultUserResDto>(0, requestSenders);
+        return new DataListResDto<>(0, requestSenders);
     }
 
     public DataListResDto<ActiveUserResDto> getFriendList(Long userId, FriendFilterDto friendFilter) {
         List<ActiveUserResDto> friendList = friendRepository.getFriendList(userId, friendFilter);
 
-        return new DataListResDto<ActiveUserResDto>(0, friendList);
+        return new DataListResDto<>(0, friendList);
+    }
+
+    private Friend findFriend(Long senderId, Long receiverId, FriendStatus acceptStatus){
+        return friendRepository.findBySenderIdAndReceiverIdAndAcceptStatus(senderId, receiverId, acceptStatus)
+                .orElseThrow(() -> new FriendException(NO_SUCH_FRIEND));
     }
 
     private void checkAlreadyFriendRequestOfTwoWay(Long userId, Long targetId){
@@ -151,15 +150,5 @@ public class FriendService {
         if(!friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(senderId, receiverId, WAIT)){
             throw new FriendException(NO_SUCH_FRIEND_REQUEST);
         }
-    }
-
-    private User findUserByEmail(String email){
-        return userRepository.findByEmailAndStatus(email, ALIVE)
-                .orElseThrow(() -> new UserException(NO_SUCH_USER));
-    }
-
-    private Friend findFriend(Long senderId, Long receiverId, FriendStatus acceptStatus){
-        return friendRepository.findBySenderIdAndReceiverIdAndAcceptStatus(senderId, receiverId, acceptStatus)
-                .orElseThrow(() -> new FriendException(NO_SUCH_FRIEND));
     }
 }

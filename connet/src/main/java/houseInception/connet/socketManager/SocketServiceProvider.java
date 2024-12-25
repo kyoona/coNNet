@@ -19,14 +19,14 @@ public class SocketServiceProvider {
     private final SocketManager socketManager;
     private final ObjectMapper objectMapper;
 
-    public boolean sendMessage(Long userId, PrivateChatSocketDto privateChatSocketDto){
+    public boolean sendMessage(Long userId, Object message){
         WebSocketSession socketSession = socketManager.getSocketSession(userId);
         if (socketSession == null) {
             return false;
         }
 
         try {
-            TextMessage textMessage = new TextMessage(objectMapper.writeValueAsString(privateChatSocketDto));
+            TextMessage textMessage = new TextMessage(objectMapper.writeValueAsString(message));
             socketSession.sendMessage(textMessage);
 
             return true;

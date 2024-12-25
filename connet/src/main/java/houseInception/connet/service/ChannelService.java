@@ -10,7 +10,6 @@ import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.dto.ChannelTapDto;
-import houseInception.connet.service.util.DomainValidatorUtil;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,6 @@ import static houseInception.connet.response.status.BaseErrorCode.*;
 @Service
 public class ChannelService {
 
-    private final DomainValidatorUtil validator;
     private final ChannelRepository channelRepository;
     private final GroupRepository groupRepository;
     private final EntityManager em;
@@ -35,7 +33,7 @@ public class ChannelService {
     @Transactional
     public Long addChannel(Long userId, String groupUuid, ChannelDto channelDto) {
         Long groupId = findGroupIdByUuid(groupUuid);
-        checkGroupOwner(userId, groupId);
+        checkGroupOwner(userId, groupUuid);
 
         Channel channel = Channel.create(groupId, channelDto.getChannelName());
         channelRepository.save(channel);
@@ -124,15 +122,9 @@ public class ChannelService {
                 .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
     }
 
-    private void checkGroupOwner(Long userId, Long groupId){
-        if(!groupRepository.existGroupOwner(userId, groupId)){
-            throw new ChannelException(ONLY_GROUP_OWNER);
-        }
-    }
-
     private void checkGroupOwner(Long userId, String groupUuid){
         if(!groupRepository.existGroupOwner(userId, groupUuid)){
-            throw new ChannelException(ONLY_GROUP_OWNER);
+            throw new GroupException(ONLY_GROUP_OWNER);
         }
     }
 

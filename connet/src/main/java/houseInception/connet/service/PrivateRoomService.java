@@ -11,13 +11,12 @@ import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.PrivateRoomRepository;
-import houseInception.connet.service.util.DomainValidatorUtil;
+import houseInception.connet.service.util.CommonDomainService;
 import houseInception.connet.socketManager.SocketServiceProvider;
 import houseInception.connet.socketManager.dto.PrivateChatSocketDto;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -26,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static houseInception.connet.domain.ChatterRole.GPT;
+import static houseInception.connet.domain.ChatterRole.USER;
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.Status.DELETED;
 import static houseInception.connet.response.status.BaseErrorCode.*;
@@ -38,23 +39,20 @@ import static houseInception.connet.service.util.FileUtil.isInValidFile;
 @Service
 public class PrivateRoomService {
 
+    private final PrivateRoomRepository privateRoomRepository;
+    private final EntityManager em;
+    private final CommonDomainService domainService;
     private final GptApiProvider gptApiProvider;
     private final SocketServiceProvider socketServiceProvider;
     private final S3ServiceProvider s3ServiceProvider;
-    private final PrivateRoomRepository privateRoomRepository;
-    private final EntityManager em;
-    private final DomainValidatorUtil validator;
-
-    @Value("${aws.s3.imageUrlPrefix}")
-    private String s3UrlPrefix;
 
     @Transactional
     public PrivateChatAddResDto addPrivateChat(Long userId, Long targetId, PrivateChatAddDto chatAddDto) {
-        User targetUser = validator.findUser(targetId);
-        User user = validator.findUser(userId);
+        User targetUser = domainService.findUser(targetId);
+        User user = domainService.findUser(userId);
 
         checkValidContent(chatAddDto.getMessage(), chatAddDto.getImage());
-        validator.checkNotUserBlock(userId, targetId);
+        domainService.checkNotUserBlock(userId, targetId);
 
         Optional<PrivateRoom> nullablePrivateRoom = privateRoomRepository.findPrivateRoomByUsers(userId, targetId);
         PrivateRoom privateRoom = getOrCreatePrivateRoom(nullablePrivateRoom, user, targetUser);
@@ -69,7 +67,7 @@ public class PrivateRoomService {
         checkRoomUserDeletedAndSetAlive(privateRoomReceiver, privateRoom, privateChat.getCreatedAt());
         checkRoomUserDeletedAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());
 
-        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), privateChat.getId(), chatAddDto.getMessage(), imgUrl, ChatterRole.USER, user, privateChat.getCreatedAt());
+        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), privateChat, USER, user);
 
         return new PrivateChatAddResDto(privateRoom.getPrivateRoomUuid(), privateChat.getId());
     }
@@ -95,27 +93,22 @@ public class PrivateRoomService {
         }
 
         String newFileName = getUniqueFileName(image.getOriginalFilename());
-        s3ServiceProvider.uploadImage(newFileName, image);
-
-        return s3UrlPrefix + newFileName;
+        return s3ServiceProvider.uploadImage(newFileName, image);
     }
 
 
-    private void checkValidContent(String message, MultipartFile images) {
-        boolean hasMessage = StringUtils.hasText(message);
-        boolean hasImages = images != null;
-
-        if (!hasMessage && !hasImages) {
+    private void checkValidContent(String message, MultipartFile image) {
+        if(isInValidFile(image) && !StringUtils.hasText(message)){
             throw new PrivateRoomException(NO_CONTENT_IN_CHAT);
         }
     }
 
     @Transactional
     public GptPrivateChatAddResDto addGptChat(Long userId, Long targetId, String message) {
-        User targetUser = validator.findUser(targetId);
-        User user = validator.findUser(userId);
+        User targetUser = domainService.findUser(targetId);
+        User user = domainService.findUser(userId);
 
-        validator.checkNotUserBlock(userId, targetId);
+        domainService.checkNotUserBlock(userId, targetId);
 
         Optional<PrivateRoom> nullablePrivateRoom = privateRoomRepository.findPrivateRoomByUsers(userId, targetId);
         PrivateRoom privateRoom = getOrCreatePrivateRoom(nullablePrivateRoom, user, targetUser);
@@ -126,7 +119,7 @@ public class PrivateRoomService {
 
         PrivateRoomUser privateRoomReceiver = privateRoomRepository.findPrivateRoomUser(privateRoom.getId(), targetId)
                 .orElseThrow(() -> new PrivateRoomException(INTERNAL_SERVER_ERROR, "개인 채팅방에 상대 유저가 존재하지 않습니다."));
-        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), privateChat.getId(), message, null, ChatterRole.USER, user, privateChat.getCreatedAt());
+        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), privateChat, USER, user);
 
         checkRoomUserDeletedAndSetAlive(privateRoomReceiver, privateRoom, privateChat.getCreatedAt());
         checkRoomUserDeletedAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());
@@ -135,7 +128,7 @@ public class PrivateRoomService {
         PrivateChat gptPrivateChat = privateRoom.addGptToUserChat(gptResponse);
         em.flush();
 
-        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), gptPrivateChat.getId(), gptResponse, null, ChatterRole.GPT, user, gptPrivateChat.getCreatedAt());
+        sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), gptPrivateChat, GPT, null);
 
         return new GptPrivateChatAddResDto(privateRoom.getPrivateRoomUuid(), privateChat.getId(), privateChat.getCreatedAt(), gptPrivateChat.getId(), gptPrivateChat.getCreatedAt(), gptResponse);
     }
@@ -153,9 +146,9 @@ public class PrivateRoomService {
         return privateRoom;
     }
 
-    private void sendMessageThrowSocket(Long targetId, String roomUuid, Long chatId, String message, String image, ChatterRole chatterRole, User sender, LocalDateTime createdAt){
+    private void sendMessageThrowSocket(Long targetId, String roomUuid, PrivateChat chat, ChatterRole chatterRole, User sender) {
         PrivateChatSocketDto chatSocketDto =
-                new PrivateChatSocketDto(roomUuid, chatId, message, image, chatterRole, sender, createdAt);
+                new PrivateChatSocketDto(roomUuid, chat, chatterRole, sender);
         socketServiceProvider.sendMessage(targetId, chatSocketDto);
     }
 
