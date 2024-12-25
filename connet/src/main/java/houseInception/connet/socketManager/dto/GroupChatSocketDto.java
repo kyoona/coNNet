@@ -1,19 +1,20 @@
 package houseInception.connet.socketManager.dto;
 
 import houseInception.connet.domain.ChatterRole;
+import houseInception.connet.domain.GroupChat;
 import houseInception.connet.domain.User;
-import houseInception.connet.domain.privateRoom.PrivateChat;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-import static houseInception.connet.socketManager.dto.ChatMessageType.PRIVATE;
+import static houseInception.connet.socketManager.dto.ChatMessageType.GROUP;
 
 @Getter
-public class PrivateChatSocketDto {
+public class GroupChatSocketDto {
 
-    private ChatMessageType type = PRIVATE;
-    private String chatRoomUuid;
+    private ChatMessageType type = GROUP;
+    private String groupUuid;
+    private Long tapId;
     private Long chatId;
     private String message;
     private String image;
@@ -21,14 +22,15 @@ public class PrivateChatSocketDto {
     private ChatterResDto writer;
     private LocalDateTime createAt;
 
-    public PrivateChatSocketDto(String chatRoomUuid, PrivateChat chat, ChatterRole writerRole, User user) {
-        this.chatRoomUuid = chatRoomUuid;
+    public GroupChatSocketDto(String groupUuid, GroupChat chat, ChatterRole writerRole, User user) {
+        this.groupUuid = groupUuid;
+        this.tapId = chat.getTapId();
         this.chatId = chat.getId();
         this.message = chat.getMessage();
         this.image = chat.getImage();
         this.writerRole = writerRole;
 
-        if (user != null) {
+        if(user != null){
             this.writer = new ChatterResDto(user.getId(), user.getUserName(), user.getUserProfile());
         }
 

@@ -9,6 +9,7 @@ import houseInception.connet.dto.channel.ChannelResDto;
 import houseInception.connet.dto.channel.TapDto;
 import houseInception.connet.dto.channel.TapResDto;
 import houseInception.connet.exception.ChannelException;
+import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
@@ -88,7 +89,7 @@ class ChannelServiceTest {
         //when
         ChannelDto channelDto = new ChannelDto("channel");
         assertThatThrownBy(() -> channelService.addChannel(user1.getId(), group.getGroupUuid(), channelDto))
-                .isInstanceOf(ChannelException.class);
+                .isInstanceOf(GroupException.class);
     }
 
     @Test
@@ -118,7 +119,7 @@ class ChannelServiceTest {
         //when
         ChannelDto channelDto = new ChannelDto("new channel");
         assertThatThrownBy(() -> channelService.updateChannel(user1.getId(), group.getGroupUuid(), channel.getId(), channelDto))
-                .isInstanceOf(ChannelException.class);
+                .isInstanceOf(GroupException.class);
     }
 
     @Test
@@ -145,7 +146,7 @@ class ChannelServiceTest {
 
         //when
         assertThatThrownBy(() -> channelService.deleteChannel(user1.getId(), group.getGroupUuid(), channel.getId()))
-                .isInstanceOf(ChannelException.class);
+                .isInstanceOf(GroupException.class);
     }
 
     @Test
@@ -201,7 +202,7 @@ class ChannelServiceTest {
 
         //when
         assertThatThrownBy(() -> channelService.deleteTap(user1.getId(), group.getGroupUuid(), tap.getId()))
-                .isInstanceOf(ChannelException.class);
+                .isInstanceOf(GroupException.class);
     }
 
     @Test

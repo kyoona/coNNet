@@ -10,8 +10,7 @@ import houseInception.connet.exception.ChatEmojiException;
 import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.repository.ChatEmojiRepository;
 import houseInception.connet.repository.PrivateRoomRepository;
-import houseInception.connet.repository.UserRepository;
-import houseInception.connet.service.util.DomainValidatorUtil;
+import houseInception.connet.service.util.CommonDomainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,14 +26,14 @@ public class ChatEmojiService {
 
     private final ChatEmojiRepository chatEmojiRepository;
     private final PrivateRoomRepository privateRoomRepository;
-    private final DomainValidatorUtil validator;
+    private final CommonDomainService domainService;
 
     @Transactional
     public Long addEmojiToPrivateChat(Long userId, Long chatId, EmojiDto emojiDto){
         Long privateRoomId = checkExistsPrivateChatAndGetChatRoomID(chatId);
         checkUserInPrivateRoom(userId, privateRoomId);
         checkUserAlreadyHasEmoji(userId, chatId, emojiDto.getEmojiType(), ChatRoomType.PRIVATE);
-        User user = validator.findUser(userId);
+        User user = domainService.findUser(userId);
 
         ChatEmoji chatEmoji = ChatEmoji.createPrivateChatEmoji(user, chatId, emojiDto.getEmojiType());
         chatEmojiRepository.save(chatEmoji);
@@ -67,6 +66,15 @@ public class ChatEmojiService {
                 .orElseThrow(() -> new ChatEmojiException(NO_SUCH_EMOJI));
     }
 
+    private Long checkExistsPrivateChatAndGetChatRoomID(Long chatId){
+        Long privateRoomId = privateRoomRepository.getPrivateRoomIdOfChat(chatId);
+        if(privateRoomId == null){
+            throw new PrivateRoomException(NO_SUCH_CHAT);
+        }
+
+        return privateRoomId;
+    }
+
     private void checkUserAlreadyHasEmoji(Long userId, Long chatId, EmojiType emojiType, ChatRoomType chatRoomType) {
         if(chatEmojiRepository.existsEmojiInChat(userId, chatId, emojiType, chatRoomType)){
             throw new ChatEmojiException(ALREADY_HAS_EMOJI);
@@ -75,16 +83,7 @@ public class ChatEmojiService {
 
     private void checkUserInPrivateRoom(Long userId, Long privateRoomId) {
         if (!privateRoomRepository.existsAlivePrivateRoomUser(userId, privateRoomId)){
-            throw new ChatEmojiException(NOT_CHATROOM_USER);
+            throw new PrivateRoomException(NOT_CHATROOM_USER);
         }
-    }
-
-    private Long checkExistsPrivateChatAndGetChatRoomID(Long chatId){
-        Long privateRoomId = privateRoomRepository.getPrivateRoomIdOfChat(chatId);
-        if(privateRoomId == null){
-            throw new PrivateRoomException(NO_SUCH_CHAT);
-        }
-
-        return privateRoomId;
     }
 }

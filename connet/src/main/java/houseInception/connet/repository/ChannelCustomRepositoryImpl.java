@@ -53,6 +53,17 @@ public class ChannelCustomRepositoryImpl implements ChannelCustomRepository{
     }
 
     @Override
+    public boolean existsTap(Long tapId) {
+        Long count = query
+                .select(channelTap.count())
+                .from(channelTap)
+                .where(channelTap.id.eq(tapId))
+                .fetchOne();
+
+        return count != null && count > 0;
+    }
+
+    @Override
     public List<ChannelTapDto> getChannelTapListOfGroup(String groupUuid) {
         return query
                 .select(Projections.constructor(

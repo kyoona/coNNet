@@ -34,6 +34,19 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
     }
 
     @Override
+    public Optional<GroupUser> findGroupUser(String groupUuid, Long userId) {
+        GroupUser fetchedGroupUser = query
+                .selectFrom(groupUser)
+                .innerJoin(groupUser.group, group)
+                .where(group.groupUuid.eq(groupUuid),
+                        groupUser.user.id.eq(userId),
+                        groupUser.status.eq(Status.ALIVE))
+                .fetchOne();
+
+        return Optional.ofNullable(fetchedGroupUser);
+    }
+
+    @Override
     public boolean existUserInGroup(Long userId, String groupUuid) {
         Long count = query
                 .select(groupUser.count())
@@ -41,20 +54,6 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .innerJoin(groupUser.group, group)
                 .where(group.groupUuid.eq(groupUuid),
                         groupUser.user.id.eq(userId),
-                        groupUser.status.eq(Status.ALIVE))
-                .fetchOne();
-
-        return count != null && count > 0;
-    }
-
-    @Override
-    public boolean existGroupOwner(Long userId, Long groupId) {
-        Long count = query
-                .select(groupUser.count())
-                .from(groupUser)
-                .where(groupUser.group.id.eq(groupId),
-                        groupUser.user.id.eq(userId),
-                        groupUser.isOwner.isTrue(),
                         groupUser.status.eq(Status.ALIVE))
                 .fetchOne();
 
@@ -96,6 +95,19 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .fetchOne();
 
         return Optional.ofNullable(id);
+    }
+
+    @Override
+    public List<Long> findUserIdsOfGroupExceptUser(String groupUuid, Long userId) {
+        return query
+                .select(user.id)
+                .from(groupUser)
+                .innerJoin(groupUser.user, user)
+                .innerJoin(groupUser.group, group)
+                .where(group.groupUuid.eq(groupUuid),
+                        user.id.ne(userId),
+                        groupUser.status.eq(Status.ALIVE))
+                .fetch();
     }
 
     @Override
