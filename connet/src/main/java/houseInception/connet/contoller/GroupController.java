@@ -20,7 +20,7 @@ public class GroupController {
     private final GroupService groupService;
 
     @PostMapping
-    public BaseResponse<DefaultUuidDto> addGroup(@RequestBody @Valid GroupAddDto groupAddDto){
+    public BaseResponse<DefaultUuidDto> addGroup(@ModelAttribute @Valid GroupAddDto groupAddDto){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         String resultUuid = groupService.addGroup(userId, groupAddDto);
 
