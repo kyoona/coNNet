@@ -146,7 +146,7 @@ class GroupChatServiceTest {
         assertThat(result).hasSize(3);
         assertThat(result)
                 .extracting(GroupChatResDto::getChatId)
-                .containsExactly(chat3.getId(), chat2.getId(), chat1.getId());
+                .containsExactly(chat1.getId(), chat2.getId(), chat3.getId());
     }
 
     @Test

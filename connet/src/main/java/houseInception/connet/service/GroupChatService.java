@@ -20,8 +20,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.util.comparator.Comparators;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 
 import static houseInception.connet.domain.ChatterRole.GPT;
@@ -107,6 +109,7 @@ public class GroupChatService {
         checkExistTapInGroup(tapId, groupUuid);
 
         List<GroupChatResDto> chatList = groupChatRepository.getChatList(tapId, page);
+        Collections.reverse(chatList);
 
         return new DataListResDto<>(page, chatList);
     }
