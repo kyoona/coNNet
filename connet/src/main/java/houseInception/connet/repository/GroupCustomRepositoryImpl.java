@@ -4,6 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.Status;
 import houseInception.connet.domain.group.GroupUser;
+import houseInception.connet.dto.group.GroupResDto;
 import houseInception.connet.dto.group.GroupUserResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -129,6 +130,26 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .orderBy(
                         groupUser.isOwner.desc(),
                         user.userName.asc())
+                .fetch();
+    }
+
+    @Override
+    public List<GroupResDto> getGroupList(Long userId, int page) {
+        return query
+                .select(Projections.constructor(
+                        GroupResDto.class,
+                        group.groupUuid,
+                        group.groupName,
+                        group.groupProfile
+                ))
+                .from(groupUser)
+                .innerJoin(groupUser.group, group)
+                .where(groupUser.user.id.eq(userId),
+                        groupUser.status.eq(Status.ALIVE),
+                        group.status.eq(Status.ALIVE))
+                .orderBy(group.createdAt.desc())
+                .offset((page - 1) * 30)
+                .limit(31)
                 .fetch();
     }
 }

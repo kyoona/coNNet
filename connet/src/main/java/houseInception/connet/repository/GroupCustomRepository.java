@@ -1,6 +1,7 @@
 package houseInception.connet.repository;
 
 import houseInception.connet.domain.group.GroupUser;
+import houseInception.connet.dto.group.GroupResDto;
 import houseInception.connet.dto.group.GroupUserResDto;
 
 import java.util.List;
@@ -17,4 +18,5 @@ public interface GroupCustomRepository {
     List<Long> findUserIdsOfGroupExceptUser(String groupUuid, Long userId);
 
     List<GroupUserResDto> getGroupUserList(String groupUuid);
+    List<GroupResDto> getGroupList(Long userId, int page);
 }
