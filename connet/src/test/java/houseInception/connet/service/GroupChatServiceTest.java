@@ -1,14 +1,14 @@
 package houseInception.connet.service;
 
+import houseInception.connet.domain.ChatEmoji;
 import houseInception.connet.domain.GroupChat;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.channel.Channel;
 import houseInception.connet.domain.channel.ChannelTap;
 import houseInception.connet.domain.group.Group;
-import houseInception.connet.dto.groupChat.GroupChatAddDto;
-import houseInception.connet.dto.groupChat.GroupChatAddResDto;
-import houseInception.connet.dto.groupChat.GroupGptChatAddDto;
-import houseInception.connet.dto.groupChat.GroupGptChatAddResDto;
+import houseInception.connet.domain.group.GroupUser;
+import houseInception.connet.dto.groupChat.*;
+import houseInception.connet.exception.ChannelException;
 import houseInception.connet.exception.GroupChatException;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.ChannelRepository;
@@ -24,6 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -124,5 +126,52 @@ class GroupChatServiceTest {
         GroupChat gptChat = groupChatRepository.findById(result.getGptChatId()).orElseThrow();
         assertThat(gptChat.getTapId()).isEqualTo(groupChannelTap.getId());
         log.info("gpt response = {}", result.getMessage());
+    }
+
+    @Test
+    void getChatList() {
+        //given
+        GroupUser groupUser1 = groupRepository.findGroupUser(group.getId(), groupUser.getId()).orElseThrow();
+        GroupChat chat1 = GroupChat.createUserToUser(groupUser1, groupChannelTap.getId(), "message", null);
+        GroupChat chat2 = GroupChat.createUserToUser(groupUser1, groupChannelTap.getId(), "message", null);
+        GroupChat chat3 = GroupChat.createGptToUser(groupChannelTap.getId(), "message");
+        em.persist(chat1);
+        em.persist(chat2);
+        em.persist(chat3);
+
+        //when
+        List<GroupChatResDto> result = groupChatService.getChatList(groupUser.getId(), group.getGroupUuid(), groupChannelTap.getId(), 1).getData();
+
+        //then
+        assertThat(result).hasSize(3);
+        assertThat(result)
+                .extracting(GroupChatResDto::getChatId)
+                .containsExactly(chat1.getId(), chat2.getId(), chat3.getId());
+    }
+
+    @Test
+    void getChatList_권한X() {
+        //given
+        User user = User.create("user", null, null, null);
+        em.persist(user);
+
+        //when
+        assertThatThrownBy(() -> groupChatService.getChatList(user.getId(), group.getGroupUuid(), groupChannelTap.getId(), 1))
+                .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void getChatList_그룹멤버이지만_다른그룹_탭조회() {
+        //given
+        Group group2 = Group.create(groupOwner, "group2", null, null, 10, true);
+        em.persist(group2);
+
+        Channel channel2 = Channel.create(group2.getId(), "channel2");
+        ChannelTap tap2 = channel2.addTap("tap2");
+        em.persist(channel2);
+
+        //when
+        assertThatThrownBy(() -> groupChatService.getChatList(groupUser.getId(), group.getGroupUuid(), tap2.getId(), 1))
+                .isInstanceOf(ChannelException.class);
     }
 }

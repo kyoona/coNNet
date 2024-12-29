@@ -3,10 +3,8 @@ package houseInception.connet.service;
 import houseInception.connet.domain.GroupChat;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.GroupUser;
-import houseInception.connet.dto.groupChat.GroupChatAddDto;
-import houseInception.connet.dto.groupChat.GroupChatAddResDto;
-import houseInception.connet.dto.groupChat.GroupGptChatAddDto;
-import houseInception.connet.dto.groupChat.GroupGptChatAddResDto;
+import houseInception.connet.dto.DataListResDto;
+import houseInception.connet.dto.groupChat.*;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.exception.GroupChatException;
 import houseInception.connet.exception.GroupException;
@@ -22,8 +20,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.util.comparator.Comparators;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 
 import static houseInception.connet.domain.ChatterRole.GPT;
@@ -47,7 +47,7 @@ public class GroupChatService {
 
     @Transactional
     public GroupChatAddResDto addChat(Long userId, String groupUuid, GroupChatAddDto chatAddDto) {
-        checkExistTap(chatAddDto.getTapId());
+        checkExistTapInGroup(chatAddDto.getTapId(), groupUuid);
         checkValidContent(chatAddDto.getImage(), chatAddDto.getMessage());
         GroupUser groupUser = findGroupUser(userId, groupUuid);
         User user = domainService.findUser(userId);
@@ -79,7 +79,7 @@ public class GroupChatService {
 
     @Transactional
     public GroupGptChatAddResDto addGptChat(Long userId, String groupUuid, GroupGptChatAddDto chatAddDto) {
-        checkExistTap(chatAddDto.getTapId());
+        checkExistTapInGroup(chatAddDto.getTapId(), groupUuid);
         GroupUser groupUser = findGroupUser(userId, groupUuid);
         User user = domainService.findUser(userId);
 
@@ -104,6 +104,16 @@ public class GroupChatService {
         groupUserIds.forEach((targetId) -> socketServiceProvider.sendMessage(targetId, socketDto));
     }
 
+    public DataListResDto<GroupChatResDto> getChatList(Long userId, String groupUuid, Long tapId, int page) {
+        checkExistGroupUser(userId, groupUuid);
+        checkExistTapInGroup(tapId, groupUuid);
+
+        List<GroupChatResDto> chatList = groupChatRepository.getChatList(tapId, page);
+        Collections.reverse(chatList);
+
+        return new DataListResDto<>(page, chatList);
+    }
+
     private GroupUser findGroupUser(Long userId, String groupUuid){
         return groupRepository.findGroupUser(groupUuid, userId)
                 .orElseThrow(() -> new GroupException(NOT_IN_GROUP));
@@ -115,9 +125,15 @@ public class GroupChatService {
         }
     }
 
-    private void checkExistTap(Long tapId){
-        if (!channelRepository.existsTap(tapId)){
+    private void checkExistTapInGroup(Long tapId, String groupUuid){
+        if (!channelRepository.existsTapInGroup(tapId, groupUuid)){
             throw new ChannelException(NO_SUCH_TAP);
+        }
+    }
+
+    private void checkExistGroupUser(Long userId, String groupUuid){
+        if(!groupRepository.existUserInGroup(userId, groupUuid)){
+            throw new GroupException(NOT_IN_GROUP);
         }
     }
 }
