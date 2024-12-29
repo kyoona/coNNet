@@ -1,6 +1,8 @@
 package houseInception.connet.contoller;
 
+import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.group.GroupAddDto;
+import houseInception.connet.dto.group.GroupResDto;
 import houseInception.connet.dto.group.GroupUserResDto;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.DefaultIdDto;
@@ -25,6 +27,14 @@ public class GroupController {
         String resultUuid = groupService.addGroup(userId, groupAddDto);
 
         return BaseResponse.getSimpleRes(resultUuid);
+    }
+
+    @GetMapping
+    public DataListResDto<GroupResDto> getGroupList(@RequestParam(defaultValue = "1") int page){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        DataListResDto<GroupResDto> result = groupService.getGroupList(userId, page);
+
+        return result;
     }
 
     @GetMapping("/{groupUuid}/groupUsers")

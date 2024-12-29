@@ -5,7 +5,9 @@ import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.group.GroupTag;
 import houseInception.connet.domain.group.GroupUser;
+import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.group.GroupAddDto;
+import houseInception.connet.dto.group.GroupResDto;
 import houseInception.connet.dto.group.GroupUserResDto;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.GroupRepository;
@@ -209,5 +211,46 @@ class GroupServiceTest {
         //when
         assertThatThrownBy(() -> groupService.exitGroup(user2.getId(), group.getGroupUuid()))
                 .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void getGroupList() {
+        //given
+        Group group1 = Group.create(user1, "groupName", null, null, 3, false);
+        Group group2 = Group.create(user1, "groupName", null, null, 3, false);
+        em.persist(group1);
+        em.persist(group2);
+
+        //when
+        List<GroupResDto> result = groupService.getGroupList(user1.getId(), 1).getData();
+
+        //then
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(GroupResDto::getGroupUuid)
+                .containsExactly(group2.getGroupUuid(), group1.getGroupUuid());
+    }
+
+    @Test
+    void getGroupList_그룹퇴장시_조회x() {
+        //given
+        Group group1 = Group.create(user1, "groupName", null, null, 3, false);
+        Group group2 = Group.create(user1, "groupName", null, null, 3, false);
+        Group group3 = Group.create(user2, "groupName", null, null, 3, false);
+        group3.addUser(user1);
+        em.persist(group1);
+        em.persist(group2);
+        em.persist(group3);
+
+        groupService.exitGroup(user1.getId(), group3.getGroupUuid());
+
+        //when
+        List<GroupResDto> result = groupService.getGroupList(user1.getId(), 1).getData();
+
+        //then
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(GroupResDto::getGroupUuid)
+                .containsExactly(group2.getGroupUuid(), group1.getGroupUuid());
     }
 }
