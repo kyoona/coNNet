@@ -53,11 +53,14 @@ public class ChannelCustomRepositoryImpl implements ChannelCustomRepository{
     }
 
     @Override
-    public boolean existsTap(Long tapId) {
+    public boolean existsTapInGroup(Long tapId, String groupUuid) {
         Long count = query
                 .select(channelTap.count())
                 .from(channelTap)
-                .where(channelTap.id.eq(tapId))
+                .innerJoin(channelTap.channel, channel)
+                .innerJoin(group).on(group.id.eq(channel.groupId))
+                .where(channelTap.id.eq(tapId),
+                        group.groupUuid.eq(groupUuid))
                 .fetchOne();
 
         return count != null && count > 0;
