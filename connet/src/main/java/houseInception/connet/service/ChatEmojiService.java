@@ -36,7 +36,7 @@ public class ChatEmojiService {
 
     @Transactional
     public Long addEmojiToPrivateChat(Long userId, Long chatId, EmojiDto emojiDto){
-        Long privateRoomId = checkExistsPrivateChatAndGetChatRoomID(chatId);
+        Long privateRoomId = findPrivateRoomIdOfChat(chatId);
         checkUserInPrivateRoom(userId, privateRoomId);
         checkUserAlreadyHasEmoji(userId, chatId, emojiDto.getEmojiType(), ChatRoomType.PRIVATE);
         User user = domainService.findUser(userId);
@@ -49,7 +49,7 @@ public class ChatEmojiService {
 
     @Transactional
     public Long removeEmojiToPrivateChat(Long userId, Long chatId, EmojiDto emojiDto) {
-        Long privateRoomId = checkExistsPrivateChatAndGetChatRoomID(chatId);
+        Long privateRoomId = findPrivateRoomIdOfChat(chatId);
         checkUserInPrivateRoom(userId, privateRoomId);
 
         ChatEmoji chatEmoji = findChatEmoji(userId, chatId, emojiDto.getEmojiType(), ChatRoomType.PRIVATE);
@@ -59,7 +59,7 @@ public class ChatEmojiService {
     }
 
     public List<ChatEmojiUserResDto> getEmojiInfoInPrivateRoom(Long userId, Long chatId, EmojiType emojiType) {
-        Long privateRoomId = checkExistsPrivateChatAndGetChatRoomID(chatId);
+        Long privateRoomId = findPrivateRoomIdOfChat(chatId);
         checkUserInPrivateRoom(userId, privateRoomId);
 
         List<ChatEmojiUserResDto> emojiUsers = chatEmojiRepository.getEmojiUsers(chatId, emojiType, ChatRoomType.PRIVATE);
@@ -104,7 +104,7 @@ public class ChatEmojiService {
                 .orElseThrow(() -> new ChatEmojiException(NO_SUCH_EMOJI));
     }
 
-    private Long checkExistsPrivateChatAndGetChatRoomID(Long chatId){
+    private Long findPrivateRoomIdOfChat(Long chatId){
         Long privateRoomId = privateRoomRepository.getPrivateRoomIdOfChat(chatId);
         if(privateRoomId == null){
             throw new PrivateRoomException(NO_SUCH_CHAT);
