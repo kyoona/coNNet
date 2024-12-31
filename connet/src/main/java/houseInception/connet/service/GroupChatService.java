@@ -47,6 +47,7 @@ public class GroupChatService {
 
     @Transactional
     public GroupChatAddResDto addChat(Long userId, String groupUuid, GroupChatAddDto chatAddDto) {
+        Long groupId = findGroupIdByUuid(groupUuid);
         checkExistTapInGroup(chatAddDto.getTapId(), groupUuid);
         checkValidContent(chatAddDto.getImage(), chatAddDto.getMessage());
         GroupUser groupUser = findGroupUser(userId, groupUuid);
@@ -54,7 +55,7 @@ public class GroupChatService {
 
         String imageUrl = uploadImages(chatAddDto.getImage());
 
-        GroupChat chat = GroupChat.createUserToUser(groupUser, chatAddDto.getTapId(), chatAddDto.getMessage(), imageUrl);
+        GroupChat chat = GroupChat.createUserToUser(groupId, groupUser, chatAddDto.getTapId(), chatAddDto.getMessage(), imageUrl);
         groupChatRepository.save(chat);
 
         GroupChatSocketDto socketDto = new GroupChatSocketDto(groupUuid, chat, USER, user);
@@ -79,11 +80,12 @@ public class GroupChatService {
 
     @Transactional
     public GroupGptChatAddResDto addGptChat(Long userId, String groupUuid, GroupGptChatAddDto chatAddDto) {
+        Long groupId = findGroupIdByUuid(groupUuid);
         checkExistTapInGroup(chatAddDto.getTapId(), groupUuid);
         GroupUser groupUser = findGroupUser(userId, groupUuid);
         User user = domainService.findUser(userId);
 
-        GroupChat userChat = GroupChat.createUserToGpt(groupUser, chatAddDto.getTapId(), chatAddDto.getMessage());
+        GroupChat userChat = GroupChat.createUserToGpt(groupId, groupUser, chatAddDto.getTapId(), chatAddDto.getMessage());
         groupChatRepository.save(userChat);
 
         List<Long> groupUserIds = groupRepository.findUserIdsOfGroupExceptUser(groupUuid, userId);
@@ -91,7 +93,7 @@ public class GroupChatService {
         sendMessageToGroupUsers(groupUserIds, userSocketDto);
 
         String gptMessage = gptApiProvider.getChatCompletion(userChat.getMessage());
-        GroupChat gptChat = GroupChat.createGptToUser(chatAddDto.getTapId(), gptMessage);
+        GroupChat gptChat = GroupChat.createGptToUser(groupId, chatAddDto.getTapId(), gptMessage);
         groupChatRepository.save(gptChat);
 
         GroupChatSocketDto gptSocketDto = new GroupChatSocketDto(groupUuid, gptChat, GPT, null);
@@ -112,6 +114,11 @@ public class GroupChatService {
         Collections.reverse(chatList);
 
         return new DataListResDto<>(page, chatList);
+    }
+
+    private Long findGroupIdByUuid(String groupUuid){
+        return groupRepository.findGroupIdByGroupUuid(groupUuid)
+                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
     }
 
     private GroupUser findGroupUser(Long userId, String groupUuid){

@@ -5,9 +5,7 @@ import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.dto.DataListResDto;
-import houseInception.connet.dto.group.GroupAddDto;
-import houseInception.connet.dto.group.GroupResDto;
-import houseInception.connet.dto.group.GroupUserResDto;
+import houseInception.connet.dto.group.*;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.GroupRepository;
@@ -18,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 import static houseInception.connet.response.status.BaseErrorCode.*;
 import static houseInception.connet.service.util.FileUtil.getUniqueFileName;
@@ -104,6 +103,14 @@ public class GroupService {
         group.addUser(user);
     }
 
+    public GroupDetailResDto getGroupDetail(Long userId, String groupUuid) {
+        checkUserInGroup(userId, groupUuid, true);
+
+        GroupDetailResDto groupDetail = groupRepository.getGroupDetail(groupUuid);
+
+        return groupDetail;
+    }
+
     public List<GroupUserResDto> getGroupUserList(Long userId, String groupUuid) {
         checkUserInGroup(userId, groupUuid, true);
 
@@ -116,6 +123,17 @@ public class GroupService {
         List<GroupResDto> groupList = groupRepository.getGroupList(userId, page);
 
         return new DataListResDto<>(page, groupList);
+    }
+
+    public DataListResDto<PublicGroupResDto> getPublicGroupList(Long userId, GroupFilter filter) {
+        List<PublicGroupResDto> publicGroupList = groupRepository.getPublicGroupList(userId, filter);
+
+        List<Long> groupIdList = publicGroupList.stream().map(PublicGroupResDto::getGroupId).toList();
+        Map<Long, Long> groupUserCountMap = groupRepository.countOfGroupUsers(groupIdList);
+
+        publicGroupList.forEach((res) -> res.setUserCount(groupUserCountMap.get(res.getGroupId())));
+
+        return new DataListResDto<>(filter.getPage(), publicGroupList);
     }
 
     private Group findGroup(String groupUuid){

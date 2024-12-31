@@ -132,9 +132,9 @@ class GroupChatServiceTest {
     void getChatList() {
         //given
         GroupUser groupUser1 = groupRepository.findGroupUser(group.getId(), groupUser.getId()).orElseThrow();
-        GroupChat chat1 = GroupChat.createUserToUser(groupUser1, groupChannelTap.getId(), "message", null);
-        GroupChat chat2 = GroupChat.createUserToUser(groupUser1, groupChannelTap.getId(), "message", null);
-        GroupChat chat3 = GroupChat.createGptToUser(groupChannelTap.getId(), "message");
+        GroupChat chat1 = GroupChat.createUserToUser(group.getId(), groupUser1, groupChannelTap.getId(), "message", null);
+        GroupChat chat2 = GroupChat.createUserToUser(group.getId(), groupUser1, groupChannelTap.getId(), "message", null);
+        GroupChat chat3 = GroupChat.createGptToUser(group.getId(), groupChannelTap.getId(), "message");
         em.persist(chat1);
         em.persist(chat2);
         em.persist(chat3);
