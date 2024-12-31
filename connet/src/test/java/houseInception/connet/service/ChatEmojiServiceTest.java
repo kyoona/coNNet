@@ -249,4 +249,49 @@ class ChatEmojiServiceTest {
         assertThatThrownBy(() -> chatEmojiService.removeEmojiToGroupChat(user2.getId(), chat.getId(), new EmojiDto(EmojiType.HEART)))
                 .isInstanceOf(ChatEmojiException.class);
     }
+
+    @Test
+    void getEmojiInfoInGroup() {
+        //given
+        Group group = Group.create(user1, "group", null, null, 10, false);
+        group.addUser(user2);
+        group.addUser(user3);
+        em.persist(group);
+
+        GroupChat chat = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(0), null, "mess", null);
+        em.persist(chat);
+
+        ChatEmoji emoji1 = ChatEmoji.createGroupChatEmoji(user1, chat.getId(), EmojiType.HEART);
+        ChatEmoji emoji2 = ChatEmoji.createGroupChatEmoji(user2, chat.getId(), EmojiType.HEART);
+        ChatEmoji emoji3 = ChatEmoji.createGroupChatEmoji(user3, chat.getId(), EmojiType.GREAT);
+        em.persist(emoji1);
+        em.persist(emoji2);
+        em.persist(emoji3);
+
+        //when
+        List<ChatEmojiUserResDto> result = chatEmojiService.getEmojiInfoInGroup(user3.getId(), chat.getId(), EmojiType.HEART);
+
+        //then
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(ChatEmojiUserResDto::getUserName)
+                .contains(user1.getUserName(), user2.getUserName());
+    }
+
+    @Test
+    void getEmojiInfoInGroup_그룹멤버x() {
+        //given
+        Group group = Group.create(user1, "group", null, null, 10, false);
+        em.persist(group);
+
+        GroupChat chat = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(0), null, "mess", null);
+        em.persist(chat);
+
+        ChatEmoji emoji = ChatEmoji.createGroupChatEmoji(user1, chat.getId(), EmojiType.HEART);
+        em.persist(emoji);
+
+        //when
+        assertThatThrownBy(() -> chatEmojiService.getEmojiInfoInGroup(user2.getId(), chat.getId(), EmojiType.HEART))
+                .isInstanceOf(GroupException.class);
+    }
 }
