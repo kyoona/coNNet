@@ -43,4 +43,13 @@ public class ChatEmojiController {
 
         return new BaseResponse<>(result);
     }
+
+    @PostMapping("/groupChats/{chatId}/emojis")
+    public BaseResponse<DefaultIdDto> addEmojiOfGroup(@PathVariable Long chatId,
+                                                      @RequestBody EmojiDto emojiDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = chatEmojiService.addEmojiToGroupChat(userId, chatId, emojiDto);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
 }
