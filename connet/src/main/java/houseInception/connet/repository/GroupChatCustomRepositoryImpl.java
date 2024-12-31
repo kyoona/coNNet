@@ -56,7 +56,7 @@ public class GroupChatCustomRepositoryImpl implements GroupChatCustomRepository{
                                 JPAExpressions.select(Expressions.stringTemplate("GROUP_CONCAT({0})", chatEmoji.emojiType))
                                         .from(chatEmoji)
                                         .where(chatEmoji.chatId.eq(groupChat.id),
-                                                chatEmoji.chatRoomType.eq(ChatRoomType.MULTI)),
+                                                chatEmoji.chatRoomType.eq(ChatRoomType.GROUP)),
                                 "emojiAggStr")
                 ))
                 .from(groupChat)
