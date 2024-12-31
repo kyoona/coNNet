@@ -1,9 +1,7 @@
 package houseInception.connet.contoller;
 
 import houseInception.connet.dto.DataListResDto;
-import houseInception.connet.dto.group.GroupAddDto;
-import houseInception.connet.dto.group.GroupResDto;
-import houseInception.connet.dto.group.GroupUserResDto;
+import houseInception.connet.dto.group.*;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.DefaultIdDto;
 import houseInception.connet.response.DefaultUuidDto;
@@ -60,4 +58,13 @@ public class GroupController {
 
         return BaseResponse.getSimpleRes(resultId);
     }
+
+    @GetMapping("/public")
+    public BaseResponse<DataListResDto<PublicGroupResDto>> getPublicGroupList(@ModelAttribute GroupFilter filter){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        DataListResDto<PublicGroupResDto> result = groupService.getPublicGroupList(userId, filter);
+
+        return new BaseResponse<>(result);
+    }
+
 }

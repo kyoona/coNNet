@@ -1,19 +1,30 @@
 package houseInception.connet.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import houseInception.connet.domain.Status;
+import houseInception.connet.domain.QGroupChat;
 import houseInception.connet.domain.group.GroupUser;
+import houseInception.connet.dto.group.GroupFilter;
 import houseInception.connet.dto.group.GroupResDto;
 import houseInception.connet.dto.group.GroupUserResDto;
+import houseInception.connet.dto.group.PublicGroupResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static houseInception.connet.domain.QGroupChat.groupChat;
 import static houseInception.connet.domain.QUser.user;
+import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.group.QGroup.group;
+import static houseInception.connet.domain.group.QGroupTag.groupTag;
 import static houseInception.connet.domain.group.QGroupUser.groupUser;
 
 @RequiredArgsConstructor
@@ -28,7 +39,7 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .selectFrom(groupUser)
                 .where(groupUser.group.id.eq(groupId),
                         groupUser.user.id.eq(userId),
-                        groupUser.status.eq(Status.ALIVE))
+                        groupUser.status.eq(ALIVE))
                 .fetchOne();
 
         return Optional.ofNullable(fetchedGroupUser);
@@ -41,7 +52,7 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .innerJoin(groupUser.group, group)
                 .where(group.groupUuid.eq(groupUuid),
                         groupUser.user.id.eq(userId),
-                        groupUser.status.eq(Status.ALIVE))
+                        groupUser.status.eq(ALIVE))
                 .fetchOne();
 
         return Optional.ofNullable(fetchedGroupUser);
@@ -55,7 +66,7 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .innerJoin(groupUser.group, group)
                 .where(group.groupUuid.eq(groupUuid),
                         groupUser.user.id.eq(userId),
-                        groupUser.status.eq(Status.ALIVE))
+                        groupUser.status.eq(ALIVE))
                 .fetchOne();
 
         return count != null && count > 0;
@@ -70,7 +81,7 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .where(group.groupUuid.eq(groupUuid),
                         groupUser.user.id.eq(userId),
                         groupUser.isOwner.isTrue(),
-                        groupUser.status.eq(Status.ALIVE))
+                        groupUser.status.eq(ALIVE))
                 .fetchOne();
 
         return count != null && count > 0;
@@ -82,8 +93,27 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .select(groupUser.count())
                 .from(groupUser)
                 .where(groupUser.group.id.eq(groupId),
-                        groupUser.status.eq(Status.ALIVE))
+                        groupUser.status.eq(ALIVE))
                 .fetchOne();
+    }
+
+    @Override
+    public Map<Long, Long> countOfGroupUsers(List<Long> groupId) {
+        List<Tuple> groupUserCountList = query
+                .select(groupUser.group.id, groupUser.id.count())
+                .from(groupUser)
+                .where(
+                        groupUser.status.eq(ALIVE),
+                        groupUser.group.id.in(groupId)
+                )
+                .groupBy(groupUser.group.id)
+                .fetch();
+
+        return groupUserCountList.stream()
+                .collect(Collectors.toMap(
+                        (tuple) -> tuple.get(group.id),
+                        (tuple) -> tuple.get(groupUser.id.count())
+                ));
     }
 
     @Override
@@ -92,7 +122,7 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .select(group.id)
                 .from(group)
                 .where(group.groupUuid.eq(groupUuid),
-                        group.status.eq(Status.ALIVE))
+                        group.status.eq(ALIVE))
                 .fetchOne();
 
         return Optional.ofNullable(id);
@@ -107,7 +137,7 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .innerJoin(groupUser.group, group)
                 .where(group.groupUuid.eq(groupUuid),
                         user.id.ne(userId),
-                        groupUser.status.eq(Status.ALIVE))
+                        groupUser.status.eq(ALIVE))
                 .fetch();
     }
 
@@ -125,7 +155,7 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .from(groupUser)
                 .innerJoin(groupUser.group, group)
                 .innerJoin(groupUser.user, user)
-                .where(groupUser.status.eq(Status.ALIVE),
+                .where(groupUser.status.eq(ALIVE),
                         group.groupUuid.eq(groupUuid))
                 .orderBy(
                         groupUser.isOwner.desc(),
@@ -145,11 +175,74 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .from(groupUser)
                 .innerJoin(groupUser.group, group)
                 .where(groupUser.user.id.eq(userId),
-                        groupUser.status.eq(Status.ALIVE),
-                        group.status.eq(Status.ALIVE))
+                        groupUser.status.eq(ALIVE),
+                        group.status.eq(ALIVE))
                 .orderBy(group.createdAt.desc())
                 .offset((page - 1) * 30)
                 .limit(31)
                 .fetch();
+    }
+
+    @Override
+    public List<PublicGroupResDto> getPublicGroupList(Long userId, GroupFilter filter) {
+        List<Long> groupIdList = query
+                .select(group.id)
+                .from(group)
+                .leftJoin(group.groupTagList, groupTag)
+                .where(
+                        group.isOpen.isTrue(),
+                        group.status.eq(ALIVE),
+                        (
+                                groupNameContains(filter.getFilter())
+                                .or(tagNameContains(filter.getFilter()))
+                        )
+                )
+                .distinct()
+                .orderBy(group.createdAt.desc())
+                .offset((filter.getPage() - 1) * 30)
+                .limit(31)
+                .fetch();
+
+        return query
+                .select(Projections.constructor(
+                        PublicGroupResDto.class,
+                        group.id,
+                        group.groupUuid,
+                        group.groupName,
+                        group.groupProfile,
+                        group.groupDescription,
+                        Expressions.stringTemplate("GROUP_CONCAT({0})", groupTag.tagName),
+                        group.userLimit,
+                        JPAExpressions
+                                .select(groupUser.id)
+                                .from(groupUser)
+                                .where(
+                                        groupUser.group.id.eq(group.id),
+                                        groupUser.user.id.eq(userId),
+                                        groupUser.status.eq(ALIVE)
+                                ),
+                        JPAExpressions
+                                .select(groupChat.createdAt.max())
+                                .from(groupChat)
+                                .where(groupChat.groupId.eq(group.id))
+                ))
+                .from(group)
+                .leftJoin(group.groupTagList, groupTag)
+                .where(
+                        group.id.in(groupIdList),
+                        group.isOpen.isTrue(),
+                        group.status.eq(ALIVE)
+                )
+                .groupBy(group.id)
+                .orderBy(group.createdAt.desc())
+                .fetch();
+    }
+
+    private BooleanExpression groupNameContains(String str){
+        return str == null ? null : group.groupName.contains(str);
+    }
+
+    private BooleanExpression tagNameContains(String str){
+        return str == null ? null : groupTag.tagName.contains(str);
     }
 }
