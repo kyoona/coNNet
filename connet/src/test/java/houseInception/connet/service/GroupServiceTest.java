@@ -314,4 +314,30 @@ class GroupServiceTest {
                 .extracting(PublicGroupResDto::getGroupId)
                 .contains(group1.getId(), group3.getId());
     }
+
+    @Test
+    void getGroupDetail() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 10, true);
+        List<String> group1Tags = List.of("filter", "tag2", "tag3");
+        group.addTag(group1Tags);
+        em.persist(group);
+
+        //when
+        GroupDetailResDto result = groupService.getGroupDetail(user1.getId(), group.getGroupUuid());
+
+        //then
+        assertThat(result.getTags()).hasSize(3);
+    }
+
+    @Test
+    void getGroupDetail_그룹_멤버x() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 10, true);
+        em.persist(group);
+
+        //when
+        assertThatThrownBy(() -> groupService.getGroupDetail(user2.getId(), group.getGroupUuid()))
+                .isInstanceOf(GroupException.class);
+    }
 }

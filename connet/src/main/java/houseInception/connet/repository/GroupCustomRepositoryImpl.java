@@ -244,7 +244,8 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                         group.groupProfile,
                         group.groupDescription,
                         Expressions.stringTemplate("GROUP_CONCAT({0})", groupTag.tagName),
-                        group.userLimit
+                        group.userLimit,
+                        group.isOpen
                 ))
                 .from(group)
                 .leftJoin(group.groupTagList, groupTag)
