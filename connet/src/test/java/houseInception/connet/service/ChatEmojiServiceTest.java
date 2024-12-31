@@ -214,6 +214,23 @@ class ChatEmojiServiceTest {
     }
 
     @Test
+    void addEmojiToGroupChat_이미_동일_이모지o() {
+        //given
+        Group group = Group.create(user1, "group", null, null, 10, false);
+        em.persist(group);
+
+        GroupChat chat = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(0), null, "mess", null);
+        em.persist(chat);
+
+        ChatEmoji emoji = ChatEmoji.createGroupChatEmoji(user1, chat.getId(), EmojiType.HEART);
+        em.persist(emoji);
+
+        //when
+        assertThatThrownBy(() -> chatEmojiService.addEmojiToGroupChat(user1.getId(), chat.getId(), new EmojiDto(EmojiType.HEART)))
+                .isInstanceOf(ChatEmojiException.class);
+    }
+
+    @Test
     void removeEmojiToGroupChat() {
         //given
         Group group = Group.create(user1, "group", null, null, 10, false);
