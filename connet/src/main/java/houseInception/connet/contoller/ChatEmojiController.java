@@ -52,4 +52,13 @@ public class ChatEmojiController {
 
         return BaseResponse.getSimpleRes(resultId);
     }
+
+    @DeleteMapping("/groupChats/{chatId}/emojis")
+    public BaseResponse<DefaultIdDto> removeEmojiOfGroup(@PathVariable Long chatId,
+                                                         @RequestBody EmojiDto emojiDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = chatEmojiService.removeEmojiToGroupChat(userId, chatId, emojiDto);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
 }

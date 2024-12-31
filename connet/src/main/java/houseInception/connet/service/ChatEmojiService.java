@@ -79,6 +79,17 @@ public class ChatEmojiService {
         return chatEmoji.getId();
     }
 
+    @Transactional
+    public Long removeEmojiToGroupChat(Long userId, Long chatId, EmojiDto emojiDto) {
+        Long groupIdOfChat = findGroupIdOfChat(chatId);
+        checkUserInGroup(userId, groupIdOfChat);
+
+        ChatEmoji chatEmoji = findChatEmoji(userId, chatId, emojiDto.getEmojiType(), ChatRoomType.GROUP);
+        chatEmojiRepository.delete(chatEmoji);
+
+        return chatEmoji.getId();
+    }
+
     private ChatEmoji findChatEmoji(Long userId, Long chatId, EmojiType emojiType, ChatRoomType chatRoomType) {
         return chatEmojiRepository.findChatEmoji(userId, chatId, emojiType, chatRoomType)
                 .orElseThrow(() -> new ChatEmojiException(NO_SUCH_EMOJI));
