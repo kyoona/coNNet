@@ -109,10 +109,12 @@ public class ChannelService {
     }
 
     @Transactional
-    public void addDefaultChannelTap(Long groupId) {
+    public Long addDefaultChannelTap(Long groupId) {
         Channel channel = Channel.create(groupId, "채널1");
         channel.addTap("채팅 탭");
         channelRepository.save(channel);
+
+        return channel.getId();
     }
 
     private Channel findChannel(Long channelId){

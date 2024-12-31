@@ -231,4 +231,15 @@ class ChannelServiceTest {
 
         assertThat(result.get(1).getTaps()).hasSize(0);
     }
+
+    @Test
+    void addDefaultChannelTap() {
+        //when
+        Long channelId = channelService.addDefaultChannelTap(group.getId());
+
+        //then
+        Channel channel = channelRepository.findById(channelId).get();
+        assertThat(channel.getChannelName()).isEqualTo("채널1");
+        assertThat(channel.getTapList()).hasSize(1);
+    }
 }
