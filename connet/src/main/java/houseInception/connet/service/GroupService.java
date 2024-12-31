@@ -6,6 +6,7 @@ import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.group.*;
+import houseInception.connet.event.publisher.GroupEventPublisher;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.GroupRepository;
@@ -30,6 +31,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final CommonDomainService domainService;
     private final S3ServiceProvider s3ServiceProvider;
+    private final GroupEventPublisher groupEventPublisher;
 
     @Transactional
     public String addGroup(Long userId, GroupAddDto groupAddDto) {
@@ -51,6 +53,8 @@ public class GroupService {
         }
 
         groupRepository.save(group);
+
+        groupEventPublisher.publishGroupAddEvent(group.getId());
 
         return group.getGroupUuid();
     }

@@ -2,6 +2,7 @@ package houseInception.connet.service;
 
 import houseInception.connet.domain.channel.Channel;
 import houseInception.connet.domain.channel.ChannelTap;
+import houseInception.connet.domain.group.Group;
 import houseInception.connet.dto.channel.ChannelDto;
 import houseInception.connet.dto.channel.ChannelResDto;
 import houseInception.connet.dto.channel.TapDto;
@@ -105,6 +106,15 @@ public class ChannelService {
         return groupedTap.values().stream()
                 .map(ChannelResDto::new)
                 .toList();
+    }
+
+    @Transactional
+    public Long addDefaultChannelTap(Long groupId) {
+        Channel channel = Channel.create(groupId, "채널1");
+        channel.addTap("채팅 탭");
+        channelRepository.save(channel);
+
+        return channel.getId();
     }
 
     private Channel findChannel(Long channelId){
