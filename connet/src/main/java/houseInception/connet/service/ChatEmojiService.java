@@ -71,6 +71,7 @@ public class ChatEmojiService {
     public Long addEmojiToGroupChat(Long userId, Long chatId, EmojiDto emojiDto) {
         Long groupIdOfChat = findGroupIdOfChat(chatId);
         checkUserInGroup(userId, groupIdOfChat);
+        checkUserAlreadyHasEmoji(userId, chatId, emojiDto.getEmojiType(), ChatRoomType.GROUP);
         User user = domainService.findUser(userId);
 
         ChatEmoji chatEmoji = ChatEmoji.createGroupChatEmoji(user, chatId, emojiDto.getEmojiType());
