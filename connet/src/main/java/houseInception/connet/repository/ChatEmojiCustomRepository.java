@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface ChatEmojiCustomRepository {
 
     Optional<ChatEmoji> findChatEmoji(Long userId, Long chatId, EmojiType emojiType, ChatRoomType chatRoomType);
+
     boolean existsEmojiInChat(Long userId, Long chatId, EmojiType emojiType, ChatRoomType chatRoomType);
 
     List<ChatEmojiUserResDto> getEmojiUsers(Long chatId, EmojiType emojiType, ChatRoomType chatRoomType);
