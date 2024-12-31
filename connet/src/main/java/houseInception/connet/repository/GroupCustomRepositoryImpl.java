@@ -33,9 +33,11 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
     public Optional<GroupUser> findGroupUser(Long groupId, Long userId) {
         GroupUser fetchedGroupUser = query
                 .selectFrom(groupUser)
-                .where(groupUser.group.id.eq(groupId),
+                .where(
+                        groupUser.group.id.eq(groupId),
                         groupUser.user.id.eq(userId),
-                        groupUser.status.eq(ALIVE))
+                        groupUser.status.eq(ALIVE)
+                )
                 .fetchOne();
 
         return Optional.ofNullable(fetchedGroupUser);
@@ -46,9 +48,11 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
         GroupUser fetchedGroupUser = query
                 .selectFrom(groupUser)
                 .innerJoin(groupUser.group, group)
-                .where(group.groupUuid.eq(groupUuid),
+                .where(
+                        group.groupUuid.eq(groupUuid),
                         groupUser.user.id.eq(userId),
-                        groupUser.status.eq(ALIVE))
+                        groupUser.status.eq(ALIVE)
+                )
                 .fetchOne();
 
         return Optional.ofNullable(fetchedGroupUser);
@@ -60,9 +64,11 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .select(groupUser.count())
                 .from(groupUser)
                 .innerJoin(groupUser.group, group)
-                .where(group.groupUuid.eq(groupUuid),
+                .where(
+                        group.groupUuid.eq(groupUuid),
                         groupUser.user.id.eq(userId),
-                        groupUser.status.eq(ALIVE))
+                        groupUser.status.eq(ALIVE)
+                )
                 .fetchOne();
 
         return count != null && count > 0;
@@ -89,10 +95,12 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .select(groupUser.count())
                 .from(groupUser)
                 .innerJoin(groupUser.group, group)
-                .where(group.groupUuid.eq(groupUuid),
+                .where(
+                        group.groupUuid.eq(groupUuid),
                         groupUser.user.id.eq(userId),
                         groupUser.isOwner.isTrue(),
-                        groupUser.status.eq(ALIVE))
+                        groupUser.status.eq(ALIVE)
+                )
                 .fetchOne();
 
         return count != null && count > 0;
@@ -103,8 +111,10 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
         return query
                 .select(groupUser.count())
                 .from(groupUser)
-                .where(groupUser.group.id.eq(groupId),
-                        groupUser.status.eq(ALIVE))
+                .where(
+                        groupUser.group.id.eq(groupId),
+                        groupUser.status.eq(ALIVE)
+                )
                 .fetchOne();
     }
 
@@ -133,8 +143,10 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
         Long id = query
                 .select(group.id)
                 .from(group)
-                .where(group.groupUuid.eq(groupUuid),
-                        group.status.eq(ALIVE))
+                .where(
+                        group.groupUuid.eq(groupUuid),
+                        group.status.eq(ALIVE)
+                )
                 .fetchOne();
 
         return Optional.ofNullable(id);
@@ -147,9 +159,11 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .from(groupUser)
                 .innerJoin(groupUser.user, user)
                 .innerJoin(groupUser.group, group)
-                .where(group.groupUuid.eq(groupUuid),
+                .where(
+                        group.groupUuid.eq(groupUuid),
                         user.id.ne(userId),
-                        groupUser.status.eq(ALIVE))
+                        groupUser.status.eq(ALIVE)
+                )
                 .fetch();
     }
 
@@ -167,11 +181,14 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .from(groupUser)
                 .innerJoin(groupUser.group, group)
                 .innerJoin(groupUser.user, user)
-                .where(groupUser.status.eq(ALIVE),
-                        group.groupUuid.eq(groupUuid))
+                .where(
+                        groupUser.status.eq(ALIVE),
+                        group.groupUuid.eq(groupUuid)
+                )
                 .orderBy(
                         groupUser.isOwner.desc(),
-                        user.userName.asc())
+                        user.userName.asc()
+                )
                 .fetch();
     }
 
@@ -186,9 +203,11 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 ))
                 .from(groupUser)
                 .innerJoin(groupUser.group, group)
-                .where(groupUser.user.id.eq(userId),
+                .where(
+                        groupUser.user.id.eq(userId),
                         groupUser.status.eq(ALIVE),
-                        group.status.eq(ALIVE))
+                        group.status.eq(ALIVE)
+                )
                 .orderBy(group.createdAt.desc())
                 .offset((page - 1) * 30)
                 .limit(31)
