@@ -17,14 +17,16 @@ public class GroupDetailResDto {
     private String groupDescription;
     private List<String> tags;
     private int userLimit;
+    private boolean isOpen;
 
     @QueryProjection
-    public GroupDetailResDto(String groupUuid, String groupName, String groupProfile, String groupDescription, String tagsStr, int userLimit) {
+    public GroupDetailResDto(String groupUuid, String groupName, String groupProfile, String groupDescription, String tagsStr, int userLimit, boolean isOpen) {
         this.groupUuid = groupUuid;
         this.groupName = groupName;
         this.groupProfile = groupProfile;
         this.groupDescription = groupDescription;
         this.tags = Arrays.stream(tagsStr.split(",")).toList();
         this.userLimit = userLimit;
+        this.isOpen = isOpen;
     }
 }
