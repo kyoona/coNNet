@@ -6,7 +6,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import houseInception.connet.domain.QGroupChat;
 import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.dto.group.GroupFilter;
 import houseInception.connet.dto.group.GroupResDto;
@@ -101,7 +100,8 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
     public Map<Long, Long> countOfGroupUsers(List<Long> groupId) {
         List<Tuple> groupUserCountList = query
                 .select(groupUser.group.id, groupUser.id.count())
-                .from(groupUser)
+                .from(group)
+                .leftJoin(group.groupUserList, groupUser)
                 .where(
                         groupUser.status.eq(ALIVE),
                         groupUser.group.id.in(groupId)
@@ -111,7 +111,7 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
 
         return groupUserCountList.stream()
                 .collect(Collectors.toMap(
-                        (tuple) -> tuple.get(group.id),
+                        (tuple) -> tuple.get(groupUser.group.id),
                         (tuple) -> tuple.get(groupUser.id.count())
                 ));
     }
@@ -186,22 +186,22 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
     @Override
     public List<PublicGroupResDto> getPublicGroupList(Long userId, GroupFilter filter) {
         List<Long> groupIdList = query
-                .select(group.id)
+                .select(group.id, group.createdAt)
                 .from(group)
                 .leftJoin(group.groupTagList, groupTag)
                 .where(
                         group.isOpen.isTrue(),
                         group.status.eq(ALIVE),
-                        (
-                                groupNameContains(filter.getFilter())
-                                .or(tagNameContains(filter.getFilter()))
-                        )
+                        groupNameOrTagContains(filter.getFilter())
                 )
                 .distinct()
                 .orderBy(group.createdAt.desc())
                 .offset((filter.getPage() - 1) * 30)
                 .limit(31)
-                .fetch();
+                .fetch()
+                .stream()
+                .map((tuple) -> tuple.get(group.id))
+                .toList();
 
         return query
                 .select(Projections.constructor(
@@ -214,17 +214,16 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                         Expressions.stringTemplate("GROUP_CONCAT({0})", groupTag.tagName),
                         group.userLimit,
                         JPAExpressions
+                                .select(groupChat.createdAt.max())
+                                .from(groupChat)
+                                .where(groupChat.groupId.eq(group.id)),
+                        JPAExpressions
                                 .select(groupUser.id)
                                 .from(groupUser)
                                 .where(
                                         groupUser.group.id.eq(group.id),
                                         groupUser.user.id.eq(userId),
-                                        groupUser.status.eq(ALIVE)
-                                ),
-                        JPAExpressions
-                                .select(groupChat.createdAt.max())
-                                .from(groupChat)
-                                .where(groupChat.groupId.eq(group.id))
+                                        groupUser.status.eq(ALIVE))
                 ))
                 .from(group)
                 .leftJoin(group.groupTagList, groupTag)
@@ -238,11 +237,9 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .fetch();
     }
 
-    private BooleanExpression groupNameContains(String str){
-        return str == null ? null : group.groupName.contains(str);
-    }
-
-    private BooleanExpression tagNameContains(String str){
-        return str == null ? null : groupTag.tagName.contains(str);
+    private BooleanExpression groupNameOrTagContains(String str){
+        return str == null
+                ? null
+                : group.groupName.contains(str).or(groupTag.tagName.contains(str));
     }
 }

@@ -1,14 +1,12 @@
 package houseInception.connet.service;
 
+import houseInception.connet.domain.GroupChat;
 import houseInception.connet.domain.Status;
 import houseInception.connet.domain.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.group.GroupTag;
 import houseInception.connet.domain.group.GroupUser;
-import houseInception.connet.dto.DataListResDto;
-import houseInception.connet.dto.group.GroupAddDto;
-import houseInception.connet.dto.group.GroupResDto;
-import houseInception.connet.dto.group.GroupUserResDto;
+import houseInception.connet.dto.group.*;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
@@ -252,5 +250,68 @@ class GroupServiceTest {
         assertThat(result)
                 .extracting(GroupResDto::getGroupUuid)
                 .containsExactly(group2.getGroupUuid(), group1.getGroupUuid());
+    }
+
+    @Test
+    void getPublicGroupList() {
+        //given
+        Group group1 = Group.create(user1, "groupName", null, null, 10, true);
+        List<String> group1Tags = List.of("tag1", "tag2", "tag3");
+        group1.addTag(group1Tags);
+
+        Group group2 = Group.create(user2, "groupName", null, null, 9, false);
+
+        Group group3 = Group.create(user3, "groupName", null, null, 8, true);
+        group3.addUser(user2);
+
+        em.persist(group1);
+        em.persist(group2);
+        em.persist(group3);
+
+        GroupChat group2Chat1 = GroupChat.createUserToUser(group2.getId(), group2.getGroupUserList().get(0), null, "message", null);
+        em.persist(group2Chat1);
+
+        //when
+        List<PublicGroupResDto> result = groupService.getPublicGroupList(user1.getId(), new GroupFilter(1, null)).getData();
+
+        //then
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(PublicGroupResDto::getGroupId)
+                .contains(group1.getId(), group3.getId());
+        assertThat(result)
+                .extracting(PublicGroupResDto::isParticipate)
+                .contains(true, false);
+        assertThat(result)
+                .extracting(PublicGroupResDto::getUserCount)
+                .contains(1, 2);
+    }
+
+    @Test
+    void getPublicGroupList_필터링() {
+        //given
+        Group group1 = Group.create(user1, "groupName", null, null, 10, true);
+        List<String> group1Tags = List.of("filter", "tag2", "tag3");
+        group1.addTag(group1Tags);
+
+        Group group2 = Group.create(user2, "groupName", null, null, 9, true);
+        List<String> group2Tags = List.of("tag1", "tag2", "tag3");
+        group2.addTag(group2Tags);
+
+        Group group3 = Group.create(user3, "filterGroup", null, null, 8, true);
+
+        em.persist(group1);
+        em.persist(group2);
+        em.persist(group3);
+
+        //when
+        GroupFilter filter = new GroupFilter(1, "filter");
+        List<PublicGroupResDto> result = groupService.getPublicGroupList(user1.getId(), filter).getData();
+
+        //then
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(PublicGroupResDto::getGroupId)
+                .contains(group1.getId(), group3.getId());
     }
 }
