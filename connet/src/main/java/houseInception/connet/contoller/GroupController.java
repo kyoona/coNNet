@@ -67,4 +67,11 @@ public class GroupController {
         return new BaseResponse<>(result);
     }
 
+    @GetMapping("/{groupUuid}")
+    public BaseResponse<GroupDetailResDto> getGroupDetail(@RequestParam String groupUuid){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        GroupDetailResDto result = groupService.getGroupDetail(userId, groupUuid);
+
+        return new BaseResponse<>(result);
+    }
 }

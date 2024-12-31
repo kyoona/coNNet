@@ -103,6 +103,14 @@ public class GroupService {
         group.addUser(user);
     }
 
+    public GroupDetailResDto getGroupDetail(Long userId, String groupUuid) {
+        checkUserInGroup(userId, groupUuid, true);
+
+        GroupDetailResDto groupDetail = groupRepository.getGroupDetail(groupUuid);
+
+        return groupDetail;
+    }
+
     public List<GroupUserResDto> getGroupUserList(Long userId, String groupUuid) {
         checkUserInGroup(userId, groupUuid, true);
 

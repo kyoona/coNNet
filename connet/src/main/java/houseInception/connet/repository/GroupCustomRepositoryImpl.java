@@ -7,10 +7,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.group.GroupUser;
-import houseInception.connet.dto.group.GroupFilter;
-import houseInception.connet.dto.group.GroupResDto;
-import houseInception.connet.dto.group.GroupUserResDto;
-import houseInception.connet.dto.group.PublicGroupResDto;
+import houseInception.connet.dto.group.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -235,6 +232,25 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .groupBy(group.id)
                 .orderBy(group.createdAt.desc())
                 .fetch();
+    }
+
+    @Override
+    public GroupDetailResDto getGroupDetail(String groupUuid) {
+        return query
+                .select(Projections.constructor(
+                        GroupDetailResDto.class,
+                        group.groupUuid,
+                        group.groupName,
+                        group.groupProfile,
+                        group.groupDescription,
+                        Expressions.stringTemplate("GROUP_CONCAT({0})", groupTag.tagName),
+                        group.userLimit
+                ))
+                .from(group)
+                .leftJoin(group.groupTagList, groupTag)
+                .groupBy(group.id)
+                .where(group.groupUuid.eq(groupUuid))
+                .fetchOne();
     }
 
     private BooleanExpression groupNameOrTagContains(String str){
