@@ -90,6 +90,15 @@ public class ChatEmojiService {
         return chatEmoji.getId();
     }
 
+    public List<ChatEmojiUserResDto> getEmojiInfoInGroup(Long userId, Long chatId, EmojiType emojiType) {
+        Long groupIdOfChat = findGroupIdOfChat(chatId);
+        checkUserInGroup(userId, groupIdOfChat);
+
+        List<ChatEmojiUserResDto> emojiUsers = chatEmojiRepository.getEmojiUsers(chatId, emojiType, ChatRoomType.GROUP);
+
+        return emojiUsers;
+    }
+
     private ChatEmoji findChatEmoji(Long userId, Long chatId, EmojiType emojiType, ChatRoomType chatRoomType) {
         return chatEmojiRepository.findChatEmoji(userId, chatId, emojiType, chatRoomType)
                 .orElseThrow(() -> new ChatEmojiException(NO_SUCH_EMOJI));
