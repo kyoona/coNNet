@@ -23,10 +23,12 @@ public class ChatEmojiCustomRepositoryImpl implements ChatEmojiCustomRepository{
     public Optional<ChatEmoji> findChatEmoji(Long userId, Long chatId, EmojiType emojiType, ChatRoomType chatRoomType) {
         ChatEmoji findChatEmoji = query
                 .selectFrom(chatEmoji)
-                .where(chatEmoji.user.id.eq(userId),
+                .where(
+                        chatEmoji.user.id.eq(userId),
                         chatEmoji.emojiType.eq(emojiType),
                         chatEmoji.chatId.eq(chatId),
-                        chatEmoji.chatRoomType.eq(chatRoomType))
+                        chatEmoji.chatRoomType.eq(chatRoomType)
+                )
                 .fetchOne();
 
         return Optional.ofNullable(findChatEmoji);
@@ -36,10 +38,12 @@ public class ChatEmojiCustomRepositoryImpl implements ChatEmojiCustomRepository{
     public boolean existsEmojiInChat(Long userId, Long chatId, EmojiType emojiType, ChatRoomType chatRoomType) {
         Long count = query.select(chatEmoji.count())
                 .from(chatEmoji)
-                .where(chatEmoji.user.id.eq(userId),
+                .where(
+                        chatEmoji.user.id.eq(userId),
                         chatEmoji.chatId.eq(chatId),
                         chatEmoji.emojiType.eq(emojiType),
-                        chatEmoji.chatRoomType.eq(chatRoomType))
+                        chatEmoji.chatRoomType.eq(chatRoomType)
+                )
                 .fetchOne();
 
         return count != null && count > 0;
@@ -54,9 +58,11 @@ public class ChatEmojiCustomRepositoryImpl implements ChatEmojiCustomRepository{
                 ))
                 .from(chatEmoji)
                 .innerJoin(chatEmoji.user, user)
-                .where(chatEmoji.chatId.eq(chatId),
+                .where(
+                        chatEmoji.chatId.eq(chatId),
                         chatEmoji.emojiType.eq(emojiType),
-                        chatEmoji.chatRoomType.eq(chatRoomType))
+                        chatEmoji.chatRoomType.eq(chatRoomType)
+                )
                 .orderBy(user.userName.asc())
                 .fetch();
     }
