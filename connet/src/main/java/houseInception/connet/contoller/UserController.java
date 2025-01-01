@@ -1,6 +1,7 @@
 package houseInception.connet.contoller;
 
 import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.user.SettingUpdateDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.DefaultIdDto;
@@ -44,6 +45,14 @@ public class UserController {
     public BaseResponse<DefaultIdDto> deleteUser(){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Long resultId = userService.deleteUser(userId);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @PostMapping("/setting")
+    public BaseResponse<DefaultIdDto> updateSetting(@RequestBody SettingUpdateDto settingDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = userService.updateSetting(userId, settingDto);
 
         return BaseResponse.getSimpleRes(resultId);
     }

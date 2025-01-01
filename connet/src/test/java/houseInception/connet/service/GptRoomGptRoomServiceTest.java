@@ -1,6 +1,6 @@
 package houseInception.connet.service;
 
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.gptRoom.GptRoom;
 import houseInception.connet.domain.gptRoom.GptRoomChat;
 import houseInception.connet.domain.gptRoom.GptRoomUser;

@@ -1,7 +1,7 @@
 package houseInception.connet.event.handler;
 
 import houseInception.connet.domain.GroupInvite;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.repository.GroupInviteRepository;
 import houseInception.connet.repository.GroupRepository;

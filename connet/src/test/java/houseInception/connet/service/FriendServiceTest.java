@@ -1,7 +1,7 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.Friend;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.UserBlock;
 import houseInception.connet.domain.UserBlockType;
 import houseInception.connet.dto.ActiveUserResDto;

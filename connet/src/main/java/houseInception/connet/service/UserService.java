@@ -1,7 +1,9 @@
 package houseInception.connet.service;
 
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.Setting;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.user.SettingUpdateDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
 import houseInception.connet.event.publisher.UserEventPublisher;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
@@ -64,6 +66,14 @@ public class UserService {
         user.delete();
 
         userEventPublisher.publishUserDeleteEvent(userId);
+
+        return userId;
+    }
+
+    @Transactional
+    public Long updateSetting(Long userId, SettingUpdateDto settingDto) {
+        User user = domainService.findUser(userId);
+        user.setSetting(new Setting(settingDto.isAlarm()));
 
         return userId;
     }

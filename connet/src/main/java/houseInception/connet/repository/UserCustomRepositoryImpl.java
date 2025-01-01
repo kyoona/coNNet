@@ -2,14 +2,12 @@ package houseInception.connet.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import houseInception.connet.domain.QUser;
-import houseInception.connet.domain.Status;
 import houseInception.connet.dto.DefaultUserResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import static houseInception.connet.domain.QUser.user;
 import static houseInception.connet.domain.Status.ALIVE;
+import static houseInception.connet.domain.user.QUser.user;
 
 @RequiredArgsConstructor
 @Repository

@@ -1,13 +1,13 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.Status;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.user.SettingUpdateDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
 import houseInception.connet.repository.FriendRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
@@ -90,5 +89,15 @@ class UserServiceTest {
         //then
         User testUser = userRepository.findById(userId).get();
         assertThat(testUser.getStatus()).isEqualTo(Status.DELETED);
+    }
+
+    @Test
+    void updateSetting() {
+        //when
+        Long userId = userService.updateSetting(user1.getId(), new SettingUpdateDto(true));
+
+        //then
+        User testUser = userRepository.findById(userId).get();
+        assertThat(testUser.getSetting().isAlarm()).isTrue();
     }
 }

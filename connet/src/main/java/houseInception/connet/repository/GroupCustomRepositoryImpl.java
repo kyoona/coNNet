@@ -17,11 +17,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static houseInception.connet.domain.QGroupChat.groupChat;
-import static houseInception.connet.domain.QUser.user;
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.group.QGroup.group;
 import static houseInception.connet.domain.group.QGroupTag.groupTag;
 import static houseInception.connet.domain.group.QGroupUser.groupUser;
+import static houseInception.connet.domain.user.QUser.user;
 
 @RequiredArgsConstructor
 @Repository

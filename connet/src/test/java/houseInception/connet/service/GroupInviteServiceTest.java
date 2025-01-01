@@ -1,18 +1,16 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.GroupInvite;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.dto.group_invite.GroupInviteDto;
 import houseInception.connet.dto.group_invite.GroupInviteResDto;
-import houseInception.connet.exception.GroupException;
 import houseInception.connet.exception.GroupInviteException;
 import houseInception.connet.repository.GroupInviteRepository;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +22,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @Slf4j

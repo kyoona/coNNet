@@ -1,6 +1,6 @@
 package houseInception.connet.event.publisher;
 
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.event.domain.UserBlockEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
