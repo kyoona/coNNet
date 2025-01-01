@@ -7,13 +7,13 @@ import lombok.Getter;
 @Getter
 public class GroupInviteResDto {
 
+    private String groupUuid;
     private String groupName;
     private String groupProfile;
     private DefaultUserResDto inviter;
 
     @QueryProjection
-
-    public GroupInviteResDto(String groupName, String groupProfile, DefaultUserResDto inviter) {
+    public GroupInviteResDto(String groupUuid, String groupName, String groupProfile, DefaultUserResDto inviter) {
         this.groupName = groupName;
         this.groupProfile = groupProfile;
         this.inviter = inviter;
