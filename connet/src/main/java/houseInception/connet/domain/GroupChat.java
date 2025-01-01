@@ -27,7 +27,7 @@ public class GroupChat extends BaseTime{
 
     private Long groupId;
     private Long tapId;
-    
+
     @Lob
     @Column(columnDefinition = "MEDIUMTEXT")
     private String message;
