@@ -40,6 +40,7 @@ public class PrivateChat extends BaseTime {
     private ChatterRole chatTarget;
 
     @Lob
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String message;
     private String image;
 

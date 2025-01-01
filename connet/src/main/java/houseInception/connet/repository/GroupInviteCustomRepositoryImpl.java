@@ -27,6 +27,7 @@ public class GroupInviteCustomRepositoryImpl implements GroupInviteCustomReposit
         return query
                 .select(Projections.constructor(
                         GroupInviteResDto.class,
+                        group.groupUuid,
                         group.groupName,
                         group.groupProfile,
                         Projections.constructor(
