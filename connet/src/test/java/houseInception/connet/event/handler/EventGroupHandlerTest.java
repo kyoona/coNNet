@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -52,13 +53,14 @@ class EventGroupHandlerTest {
     }
 
     @Test
-    void acceptGroupInvite() {
+    void acceptGroupInvite() throws InterruptedException {
         //given
         GroupInvite groupInvite1 = GroupInvite.create(group.getGroupUuid(), groupOwner, user1);
         groupInviteRepository.save(groupInvite1);
 
         //when
         groupInviteService.acceptInvite(user1.getId(), group.getGroupUuid());
+        sleep(1000);
 
         //then
         assertThat(groupRepository.existUserInGroup(user1.getId(), group.getGroupUuid())).isTrue();
