@@ -2,6 +2,7 @@ package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
 import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.user.UserProfileUpdateDto;
 import houseInception.connet.repository.FriendRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -66,5 +67,17 @@ class UserServiceTest {
         //then
         assertThat(result.getUserId()).isEqualTo(user2.getId());
         assertThat(result.getUserName()).isEqualTo(user2.getUserName());
+    }
+
+    @Test
+    void updateProfile() {
+        //when
+        UserProfileUpdateDto userProfileUpdateDto = new UserProfileUpdateDto("userName", "userDes", null);
+        Long userId = userService.updateProfile(user1.getId(), userProfileUpdateDto);
+
+        //then
+        User testUser = userRepository.findById(userId).get();
+        assertThat(testUser.getUserName()).isEqualTo(userProfileUpdateDto.getUserName());
+        assertThat(testUser.getUserDescription()).isEqualTo(userProfileUpdateDto.getUserDescription());
     }
 }

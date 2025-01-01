@@ -3,6 +3,7 @@ package houseInception.connet.service;
 import houseInception.connet.domain.User;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
+import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.UserRepository;
 import houseInception.connet.service.util.CommonDomainService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CommonDomainService domainService;
+    private final S3ServiceProvider s3ServiceProvider;
 
     public DefaultUserResDto getSelfProfile(Long userId) {
         return userRepository.getUserProfile(userId);
