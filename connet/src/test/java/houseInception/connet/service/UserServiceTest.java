@@ -1,9 +1,11 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.Status;
+import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.user.Setting;
 import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.user.CommonGroupOfUserResDto;
 import houseInception.connet.dto.user.SettingUpdateDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
 import houseInception.connet.repository.FriendRepository;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -109,5 +112,30 @@ class UserServiceTest {
 
         //then
         assertThat(setting.isAlarm()).isFalse();
+    }
+
+    @Test
+    void getCommonGroupList() {
+        //given
+        Group group1 = Group.create(user1, "group1", null, null, 3, false);
+        group1.addUser(user2);
+
+        Group group2 = Group.create(user1, "group1", null, null, 3, false);
+        group2.addUser(user2);
+
+        Group group3 = Group.create(user1, "group3", null, null, 3, false);
+
+        em.persist(group1);
+        em.persist(group2);
+        em.persist(group3);
+
+        //when
+        List<CommonGroupOfUserResDto> result = userService.getCommonGroupList(user1.getId(), user2.getId());
+
+        //then
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(CommonGroupOfUserResDto::getGroupUuid)
+                .contains(group1.getGroupUuid(), group2.getGroupUuid());
     }
 }

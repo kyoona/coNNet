@@ -2,6 +2,7 @@ package houseInception.connet.repository;
 
 import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.dto.group.*;
+import houseInception.connet.dto.user.CommonGroupOfUserResDto;
 
 import java.util.List;
 import java.util.Map;
@@ -24,4 +25,5 @@ public interface GroupCustomRepository {
     List<GroupResDto> getGroupList(Long userId, int page);
     List<PublicGroupResDto> getPublicGroupList(Long userId, GroupFilter filter);
     GroupDetailResDto getGroupDetail(String groupUuid);
+    List<CommonGroupOfUserResDto> getCommonGroupList(Long userId, Long targetId);
 }

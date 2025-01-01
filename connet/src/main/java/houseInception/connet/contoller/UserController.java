@@ -2,6 +2,7 @@ package houseInception.connet.contoller;
 
 import houseInception.connet.domain.user.Setting;
 import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.user.CommonGroupOfUserResDto;
 import houseInception.connet.dto.user.SettingUpdateDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
 import houseInception.connet.response.BaseResponse;
@@ -10,6 +11,8 @@ import houseInception.connet.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -62,6 +65,14 @@ public class UserController {
     public BaseResponse<Setting> getSetting(){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         Setting result = userService.getSetting(userId);
+
+        return new BaseResponse<>(result);
+    }
+
+    @GetMapping("/{targetId}/groups")
+    public BaseResponse<List<CommonGroupOfUserResDto>> getCommonGroupList(@PathVariable Long targetId){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        List<CommonGroupOfUserResDto> result = userService.getCommonGroupList(userId, targetId);
 
         return new BaseResponse<>(result);
     }
