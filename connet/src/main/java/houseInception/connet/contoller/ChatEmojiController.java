@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 public class ChatEmojiController {
 
-    private ChatEmojiService chatEmojiService;
+    private final ChatEmojiService chatEmojiService;
 
     @PostMapping("/privateChats/{chatId}/emojis")
     public BaseResponse<DefaultIdDto> addEmojiOfPrivate(@PathVariable Long chatId,
