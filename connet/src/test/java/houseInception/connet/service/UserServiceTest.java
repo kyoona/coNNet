@@ -49,12 +49,22 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserProfile() {
+    void getSelfProfile() {
         //when
         DefaultUserResDto result = userService.getSelfProfile(user1.getId());
 
         //then
         assertThat(result.getUserId()).isEqualTo(user1.getId());
         assertThat(result.getUserName()).isEqualTo(user1.getUserName());
+    }
+
+    @Test
+    void getUserProfile() {
+        //when
+        DefaultUserResDto result = userService.getSelfProfile(user2.getId());
+
+        //then
+        assertThat(result.getUserId()).isEqualTo(user2.getId());
+        assertThat(result.getUserName()).isEqualTo(user2.getUserName());
     }
 }

@@ -20,4 +20,12 @@ public class UserController {
 
         return new BaseResponse<>(result);
     }
+
+    @GetMapping("/{userId}")
+    public BaseResponse<DefaultUserResDto> getUserProfile(){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        DefaultUserResDto result = userService.getUserProfile(userId);
+
+        return new BaseResponse<>(result);
+    }
 }

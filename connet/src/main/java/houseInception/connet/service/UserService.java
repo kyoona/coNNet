@@ -20,6 +20,12 @@ public class UserService {
         return userRepository.getUserProfile(userId);
     }
 
+    public DefaultUserResDto getUserProfile(Long userId) {
+        User user = domainService.findUser(userId);
+
+        return new DefaultUserResDto(user);
+    }
+
     @Transactional
     public void setUserActive(Long userId){
         User user = domainService.findUser(userId);
