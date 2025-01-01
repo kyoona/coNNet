@@ -25,6 +25,7 @@ public class GroupChat extends BaseTime{
     @Enumerated(EnumType.STRING)
     private ChatterRole writerRole;
 
+    private Long groupId;
     private Long tapId;
     private String message;
     private String image;
@@ -35,8 +36,9 @@ public class GroupChat extends BaseTime{
     @Enumerated(EnumType.STRING)
     private Status status = ALIVE;
 
-    public static GroupChat createUserToUser(GroupUser writer, Long tapId, String message, String image){
+    public static GroupChat createUserToUser(Long groupId, GroupUser writer, Long tapId, String message, String image){
         GroupChat chat = new GroupChat();
+        chat.groupId = groupId;
         chat.writer = writer;
         chat.writerRole = ChatterRole.USER;
         chat.tapId = tapId;
@@ -47,8 +49,9 @@ public class GroupChat extends BaseTime{
         return chat;
     }
 
-    public static GroupChat createUserToGpt(GroupUser writer, Long tapId, String message){
+    public static GroupChat createUserToGpt(Long groupId, GroupUser writer, Long tapId, String message){
         GroupChat chat = new GroupChat();
+        chat.groupId = groupId;
         chat.writer = writer;
         chat.writerRole = ChatterRole.USER;
         chat.tapId = tapId;
@@ -58,8 +61,9 @@ public class GroupChat extends BaseTime{
         return chat;
     }
 
-    public static GroupChat createGptToUser(Long tapId, String message){
+    public static GroupChat createGptToUser(Long groupId, Long tapId, String message){
         GroupChat chat = new GroupChat();
+        chat.groupId = groupId;
         chat.writerRole = ChatterRole.GPT;
         chat.tapId = tapId;
         chat.message = message;

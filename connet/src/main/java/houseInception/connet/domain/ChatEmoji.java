@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static houseInception.connet.domain.ChatRoomType.GROUP;
 import static houseInception.connet.domain.ChatRoomType.PRIVATE;
 
 @Getter
@@ -35,6 +36,16 @@ public class ChatEmoji extends BaseTime{
         chatEmoji.user = user;
         chatEmoji.chatId = chatId;
         chatEmoji.chatRoomType = PRIVATE;
+        chatEmoji.emojiType = emojiType;
+
+        return chatEmoji;
+    }
+
+    public static ChatEmoji createGroupChatEmoji(User user, Long chatId, EmojiType emojiType){
+        ChatEmoji chatEmoji = new ChatEmoji();
+        chatEmoji.user = user;
+        chatEmoji.chatId = chatId;
+        chatEmoji.chatRoomType = GROUP;
         chatEmoji.emojiType = emojiType;
 
         return chatEmoji;

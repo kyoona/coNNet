@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static houseInception.connet.domain.QChatEmoji.chatEmoji;
 import static houseInception.connet.domain.QGroupChat.groupChat;
@@ -23,6 +24,17 @@ import static houseInception.connet.domain.group.QGroupUser.groupUser;
 public class GroupChatCustomRepositoryImpl implements GroupChatCustomRepository{
 
     private final JPAQueryFactory query;
+
+    @Override
+    public Optional<Long> findGroupIdOfChat(Long chatId) {
+        Long groupId = query
+                .select(groupChat.groupId)
+                .from(groupChat)
+                .where(groupChat.id.eq(chatId))
+                .fetchOne();
+
+        return Optional.ofNullable(groupId);
+    }
 
     @Override
     public List<GroupChatResDto> getChatList(Long tapId, int page) {
@@ -44,7 +56,7 @@ public class GroupChatCustomRepositoryImpl implements GroupChatCustomRepository{
                                 JPAExpressions.select(Expressions.stringTemplate("GROUP_CONCAT({0})", chatEmoji.emojiType))
                                         .from(chatEmoji)
                                         .where(chatEmoji.chatId.eq(groupChat.id),
-                                                chatEmoji.chatRoomType.eq(ChatRoomType.MULTI)),
+                                                chatEmoji.chatRoomType.eq(ChatRoomType.GROUP)),
                                 "emojiAggStr")
                 ))
                 .from(groupChat)

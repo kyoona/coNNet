@@ -36,10 +36,37 @@ public class ChatEmojiController {
     }
 
     @GetMapping("/privateChats/{chatId}/emojis")
-    public BaseResponse<List<ChatEmojiUserResDto>> getEmojiInfo(@PathVariable Long chatId,
+    public BaseResponse<List<ChatEmojiUserResDto>> getEmojiInfoInPrivateRoom(@PathVariable Long chatId,
                                                                 @RequestParam EmojiType emojiType){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         List<ChatEmojiUserResDto> result = chatEmojiService.getEmojiInfoInPrivateRoom(userId, chatId, emojiType);
+
+        return new BaseResponse<>(result);
+    }
+
+    @PostMapping("/groupChats/{chatId}/emojis")
+    public BaseResponse<DefaultIdDto> addEmojiOfGroup(@PathVariable Long chatId,
+                                                      @RequestBody EmojiDto emojiDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = chatEmojiService.addEmojiToGroupChat(userId, chatId, emojiDto);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @DeleteMapping("/groupChats/{chatId}/emojis")
+    public BaseResponse<DefaultIdDto> removeEmojiOfGroup(@PathVariable Long chatId,
+                                                         @RequestBody EmojiDto emojiDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = chatEmojiService.removeEmojiToGroupChat(userId, chatId, emojiDto);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @GetMapping("/groupChats/{chatId}/emojis")
+    public BaseResponse<List<ChatEmojiUserResDto>> getEmojiInfoInGroup(@PathVariable Long chatId,
+                                                                       @RequestParam EmojiType emojiType){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        List<ChatEmojiUserResDto> result = chatEmojiService.getEmojiInfoInGroup(userId, chatId, emojiType);
 
         return new BaseResponse<>(result);
     }
