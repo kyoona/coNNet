@@ -1,17 +1,21 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.User;
+import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.repository.FriendRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
@@ -42,5 +46,15 @@ class UserServiceTest {
     @AfterEach
     void afterEach(){
         userRepository.deleteAll();
+    }
+
+    @Test
+    void getUserProfile() {
+        //when
+        DefaultUserResDto result = userService.getSelfProfile(user1.getId());
+
+        //then
+        assertThat(result.getUserId()).isEqualTo(user1.getId());
+        assertThat(result.getUserName()).isEqualTo(user1.getUserName());
     }
 }
