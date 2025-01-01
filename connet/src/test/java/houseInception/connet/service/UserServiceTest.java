@@ -1,5 +1,6 @@
 package houseInception.connet.service;
 
+import houseInception.connet.domain.Status;
 import houseInception.connet.domain.User;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
@@ -79,5 +80,15 @@ class UserServiceTest {
         User testUser = userRepository.findById(userId).get();
         assertThat(testUser.getUserName()).isEqualTo(userProfileUpdateDto.getUserName());
         assertThat(testUser.getUserDescription()).isEqualTo(userProfileUpdateDto.getUserDescription());
+    }
+
+    @Test
+    void deleteUser() {
+        //when
+        Long userId = userService.deleteUser(user1.getId());
+
+        //then
+        User testUser = userRepository.findById(userId).get();
+        assertThat(testUser.getStatus()).isEqualTo(Status.DELETED);
     }
 }

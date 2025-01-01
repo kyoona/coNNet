@@ -3,6 +3,7 @@ package houseInception.connet.service;
 import houseInception.connet.domain.User;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
+import houseInception.connet.event.publisher.UserEventPublisher;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.UserRepository;
 import houseInception.connet.service.util.CommonDomainService;
@@ -22,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final CommonDomainService domainService;
     private final S3ServiceProvider s3ServiceProvider;
+    private final UserEventPublisher userEventPublisher;
 
     public DefaultUserResDto getSelfProfile(Long userId) {
         return userRepository.getUserProfile(userId);
@@ -54,6 +56,16 @@ public class UserService {
 
         String newFileName = getUniqueFileName(image.getOriginalFilename());
         return s3ServiceProvider.uploadImage(newFileName, image);
+    }
+
+    @Transactional
+    public Long deleteUser(Long userId) {
+        User user = domainService.findUser(userId);
+        user.delete();
+
+        userEventPublisher.publishUserDeleteEvent(userId);
+
+        return userId;
     }
 
     @Transactional

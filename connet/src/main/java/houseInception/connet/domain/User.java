@@ -47,6 +47,10 @@ public class User extends BaseTime{
         this.userDescription = userDescription;
     }
 
+    public void delete(){
+        this.status = Status.DELETED;
+    }
+
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }

@@ -39,4 +39,12 @@ public class UserController {
 
         return BaseResponse.getSimpleRes(resultId);
     }
+
+    @DeleteMapping
+    public BaseResponse<DefaultIdDto> deleteUser(){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = userService.deleteUser(userId);
+
+        return BaseResponse.getSimpleRes(resultId);
+    }
 }
