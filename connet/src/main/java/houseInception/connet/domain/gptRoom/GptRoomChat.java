@@ -33,6 +33,7 @@ public class GptRoomChat extends BaseTime {
     private ChatterRole writerRole;
 
     @Lob
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String content;
 
     @Enumerated(EnumType.STRING)
