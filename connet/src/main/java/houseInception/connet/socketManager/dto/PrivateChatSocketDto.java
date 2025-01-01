@@ -1,7 +1,7 @@
 package houseInception.connet.socketManager.dto;
 
 import houseInception.connet.domain.ChatterRole;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.privateRoom.PrivateChat;
 import lombok.Getter;
 

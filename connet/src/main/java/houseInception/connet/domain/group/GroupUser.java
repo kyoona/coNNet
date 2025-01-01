@@ -2,7 +2,7 @@ package houseInception.connet.domain.group;
 
 import houseInception.connet.domain.BaseTime;
 import houseInception.connet.domain.Status;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

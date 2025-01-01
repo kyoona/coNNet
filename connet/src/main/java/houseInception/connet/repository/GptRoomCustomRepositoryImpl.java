@@ -11,11 +11,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static houseInception.connet.domain.QUser.user;
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.gptRoom.QGptRoom.gptRoom;
 import static houseInception.connet.domain.gptRoom.QGptRoomChat.gptRoomChat;
 import static houseInception.connet.domain.gptRoom.QGptRoomUser.gptRoomUser;
+import static houseInception.connet.domain.user.QUser.user;
 
 @RequiredArgsConstructor
 @Repository

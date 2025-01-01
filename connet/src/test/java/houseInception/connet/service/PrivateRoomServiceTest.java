@@ -4,6 +4,7 @@ import houseInception.connet.domain.*;
 import houseInception.connet.domain.privateRoom.PrivateChat;
 import houseInception.connet.domain.privateRoom.PrivateRoom;
 import houseInception.connet.domain.privateRoom.PrivateRoomUser;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.chatEmoji.ChatEmojiResDto;
 import houseInception.connet.dto.privateRoom.*;
 import houseInception.connet.exception.PrivateRoomException;

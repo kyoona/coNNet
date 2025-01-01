@@ -1,5 +1,8 @@
-package houseInception.connet.domain;
+package houseInception.connet.domain.user;
 
+import houseInception.connet.domain.BaseTime;
+import houseInception.connet.domain.Status;
+import houseInception.connet.domain.UserRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +15,7 @@ import static houseInception.connet.domain.UserRole.USER;
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Entity
-public class User extends BaseTime{
+public class User extends BaseTime {
 
     @Column(name = "userId")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,12 +23,16 @@ public class User extends BaseTime{
 
     private String userName;
     private String userProfile;
+    private String userDescription;
     private String email;
     private String refreshToken;
     private boolean isActive;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    @Embedded
+    private Setting setting;
 
     @Enumerated(EnumType.STRING)
     private Status status = ALIVE;
@@ -37,7 +44,22 @@ public class User extends BaseTime{
         user.email = email;
         user.refreshToken = refreshToken;
         user.role = USER;
+        user.setting = new Setting(false);
         return user;
+    }
+
+    public void update(String userName, String userProfile, String userDescription){
+        this.userName = userName;
+        this.userProfile = userProfile;
+        this.userDescription = userDescription;
+    }
+
+    public void delete(){
+        this.status = Status.DELETED;
+    }
+
+    public void setSetting(Setting setting) {
+        this.setting = setting;
     }
 
     public void setRefreshToken(String refreshToken) {

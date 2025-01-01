@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static houseInception.connet.domain.QChatEmoji.chatEmoji;
-import static houseInception.connet.domain.QUser.user;
+import static houseInception.connet.domain.user.QUser.user;
 
 @RequiredArgsConstructor
 @Repository

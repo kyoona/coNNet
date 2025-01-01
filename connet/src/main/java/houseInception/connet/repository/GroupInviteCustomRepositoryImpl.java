@@ -2,9 +2,6 @@ package houseInception.connet.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import houseInception.connet.domain.QGroupInvite;
-import houseInception.connet.domain.QUser;
-import houseInception.connet.domain.group.QGroup;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.group_invite.GroupInviteResDto;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +10,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static houseInception.connet.domain.QGroupInvite.groupInvite;
-import static houseInception.connet.domain.QUser.user;
 import static houseInception.connet.domain.group.QGroup.group;
+import static houseInception.connet.domain.user.QUser.user;
 
 @RequiredArgsConstructor
 @Repository

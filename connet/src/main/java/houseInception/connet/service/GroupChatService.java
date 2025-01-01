@@ -1,7 +1,7 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.GroupChat;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.groupChat.*;
@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.util.comparator.Comparators;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;

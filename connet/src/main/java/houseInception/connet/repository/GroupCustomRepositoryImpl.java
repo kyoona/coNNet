@@ -7,7 +7,10 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.group.GroupUser;
+import houseInception.connet.domain.group.QGroup;
+import houseInception.connet.domain.group.QGroupUser;
 import houseInception.connet.dto.group.*;
+import houseInception.connet.dto.user.CommonGroupOfUserResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,11 +20,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static houseInception.connet.domain.QGroupChat.groupChat;
-import static houseInception.connet.domain.QUser.user;
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.group.QGroup.group;
 import static houseInception.connet.domain.group.QGroupTag.groupTag;
 import static houseInception.connet.domain.group.QGroupUser.groupUser;
+import static houseInception.connet.domain.user.QUser.user;
 
 @RequiredArgsConstructor
 @Repository
@@ -286,6 +289,35 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .groupBy(group.id)
                 .where(group.groupUuid.eq(groupUuid))
                 .fetchOne();
+    }
+
+    @Override
+    public List<CommonGroupOfUserResDto> getCommonGroupList(Long userId, Long targetId) {
+        QGroupUser subGroupUser = new QGroupUser("subGroupUser");
+
+        return query
+                .select(Projections.constructor(
+                        CommonGroupOfUserResDto.class,
+                        group.groupUuid,
+                        group.groupName,
+                        group.groupProfile
+                ))
+                .from(groupUser)
+                .innerJoin(groupUser.group, group)
+                .where(
+                        groupUser.user.id.eq(targetId),
+                        groupUser.status.eq(ALIVE),
+                        group.id.in(
+                                JPAExpressions.select(subGroupUser.group.id)
+                                        .from(subGroupUser)
+                                        .where(
+                                                subGroupUser.user.id.eq(userId),
+                                                subGroupUser.status.eq(ALIVE)
+                                        )
+                        )
+                )
+                .orderBy(groupUser.createdAt.desc())
+                .fetch();
     }
 
     private BooleanExpression groupNameOrTagContains(String str){

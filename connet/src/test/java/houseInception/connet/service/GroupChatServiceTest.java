@@ -1,8 +1,7 @@
 package houseInception.connet.service;
 
-import houseInception.connet.domain.ChatEmoji;
 import houseInception.connet.domain.GroupChat;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.channel.Channel;
 import houseInception.connet.domain.channel.ChannelTap;
 import houseInception.connet.domain.group.Group;
@@ -17,7 +16,6 @@ import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package houseInception.connet.service.util;
 
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.exception.UserBlockException;
 import houseInception.connet.exception.UserException;
 import houseInception.connet.repository.UserBlockRepository;
