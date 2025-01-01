@@ -1,5 +1,6 @@
 package houseInception.connet.contoller;
 
+import houseInception.connet.domain.user.Setting;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.user.SettingUpdateDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
@@ -55,5 +56,13 @@ public class UserController {
         Long resultId = userService.updateSetting(userId, settingDto);
 
         return BaseResponse.getSimpleRes(resultId);
+    }
+
+    @GetMapping("/setting")
+    public BaseResponse<Setting> getSetting(){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Setting result = userService.getSetting(userId);
+
+        return new BaseResponse<>(result);
     }
 }

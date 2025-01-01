@@ -78,6 +78,12 @@ public class UserService {
         return userId;
     }
 
+    public Setting getSetting(Long userId) {
+        User user = domainService.findUser(userId);
+
+        return user.getSetting();
+    }
+
     @Transactional
     public void setUserActive(Long userId){
         User user = domainService.findUser(userId);

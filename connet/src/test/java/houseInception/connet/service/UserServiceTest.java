@@ -1,6 +1,7 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.Status;
+import houseInception.connet.domain.user.Setting;
 import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.user.SettingUpdateDto;
@@ -99,5 +100,14 @@ class UserServiceTest {
         //then
         User testUser = userRepository.findById(userId).get();
         assertThat(testUser.getSetting().isAlarm()).isTrue();
+    }
+
+    @Test
+    void getSetting() {
+        //when
+        Setting setting = userService.getSetting(user1.getId());
+
+        //then
+        assertThat(setting.isAlarm()).isFalse();
     }
 }
