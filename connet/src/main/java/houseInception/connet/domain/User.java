@@ -20,6 +20,7 @@ public class User extends BaseTime{
 
     private String userName;
     private String userProfile;
+    private String userDescription;
     private String email;
     private String refreshToken;
     private boolean isActive;
@@ -38,6 +39,12 @@ public class User extends BaseTime{
         user.refreshToken = refreshToken;
         user.role = USER;
         return user;
+    }
+
+    public void update(String userName, String userProfile, String userDescription){
+        this.userName = userName;
+        this.userProfile = userProfile;
+        this.userDescription = userDescription;
     }
 
     public void setRefreshToken(String refreshToken) {

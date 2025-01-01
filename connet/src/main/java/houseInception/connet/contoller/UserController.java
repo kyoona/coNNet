@@ -1,8 +1,11 @@
 package houseInception.connet.contoller;
 
 import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.user.UserProfileUpdateDto;
 import houseInception.connet.response.BaseResponse;
+import houseInception.connet.response.DefaultIdDto;
 import houseInception.connet.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,5 +30,13 @@ public class UserController {
         DefaultUserResDto result = userService.getUserProfile(userId);
 
         return new BaseResponse<>(result);
+    }
+
+    @PatchMapping
+    public BaseResponse<DefaultIdDto> updateProfile(@ModelAttribute @Valid UserProfileUpdateDto profileDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        Long resultId = userService.updateProfile(userId, profileDto);
+
+        return BaseResponse.getSimpleRes(resultId);
     }
 }
