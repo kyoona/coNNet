@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
+import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -48,13 +49,14 @@ class EventChannelHandlerTest {
     }
 
     @Test
-    void addDefaultChannelTap() {
+    void addDefaultChannelTap() throws InterruptedException {
         //given
         GroupAddDto groupAddDto = new GroupAddDto("group", null, null, List.of(), 3, false);
         String groupUuid = groupService.addGroup(user1.getId(), groupAddDto);
 
         //when
         List<ChannelTapDto> channelTaps = channelRepository.getChannelTapListOfGroup(groupUuid);
+        sleep(1000);
 
         //then
         assertThat(channelTaps).hasSize(1);
