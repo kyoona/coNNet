@@ -1,5 +1,7 @@
 package houseInception.connet.service;
 
+import houseInception.connet.domain.ChatReadLog;
+import houseInception.connet.domain.GroupChat;
 import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.channel.Channel;
 import houseInception.connet.domain.channel.ChannelTap;
@@ -22,8 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -229,6 +230,41 @@ class ChannelServiceTest {
                 .containsExactly(tap1.getId(), tap2.getId());
 
         assertThat(result.get(1).getTaps()).hasSize(0);
+    }
+
+    @Test
+    void getChannelTapList_채팅_읽은지_유무() {
+        //given
+        group.addUser(user1);
+        group.addUser(user2);
+        group.addUser(user3);
+        em.flush();
+
+        Channel channel1 = Channel.create(group.getId(), "channel1");
+        ChannelTap tap1 = channel1.addTap("tap1");
+        ChannelTap tap2 = channel1.addTap("tap2");
+        ChannelTap tap3 = channel1.addTap("tap3");
+        em.persist(channel1);
+
+        GroupChat chat1 = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(0), tap1.getId(), "mess", null);
+        GroupChat chat2 = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(1), tap1.getId(), "mess", null);
+        GroupChat chat3 = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(1), tap2.getId(), "mess", null);
+        em.persist(chat1);
+        em.persist(chat2);
+        em.persist(chat3);
+
+        ChatReadLog groupChatLog1 = ChatReadLog.createGroupChatLog(user1.getId(), tap1.getId(), chat1.getId());
+        ChatReadLog groupChatLog2 = ChatReadLog.createGroupChatLog(user1.getId(), tap2.getId(), chat3.getId());
+        em.persist(groupChatLog1);
+        em.persist(groupChatLog2);
+
+        //when
+        List<ChannelResDto> result = channelService.getChannelTapList(user1.getId(), group.getGroupUuid());
+
+        //then
+        assertThat(result.get(0).getTaps())
+                .extracting(TapResDto::isUnread)
+                .containsExactlyInAnyOrder(true, false, false);
     }
 
     @Test
