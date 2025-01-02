@@ -133,4 +133,20 @@ class UserBlockServiceTest {
                 .extracting(DefaultUserResDto::getUserId)
                 .contains(user2.getId(), user3.getId());
     }
+
+    @Test
+    void deleteAllUserBlockOfUser() {
+        //given
+        UserBlock userBlock = UserBlock.create(user1, user2, REQUEST);
+        UserBlock reverseUserBlock = UserBlock.create(user2, user1, REQUEST);
+        em.persist(userBlock);
+        em.persist(reverseUserBlock);
+
+        //when
+        userBlockService.deleteAllUserBlockOfUser(user1.getId());
+
+        //then
+        assertThat(userBlockRepository.existsByUserIdAndTargetId(user1.getId(), user2.getId())).isFalse();
+        assertThat(userBlockRepository.existsByUserIdAndTargetId(user2.getId(), user1.getId())).isFalse();
+    }
 }

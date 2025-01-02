@@ -74,6 +74,10 @@ public class UserBlockService {
         return new DataListResDto<>(0, blockUserList);
     }
 
+    public void deleteAllUserBlockOfUser(Long userId) {
+        userBlockRepository.deleteAllUserBlockOfUser(userId);
+    }
+
     private UserBlock findUserBlock(Long userId, Long targetId){
         UserBlock userBlock = userBlockRepository.findByUserIdAndTargetId(userId, targetId).orElse(null);
         if (userBlock == null) {

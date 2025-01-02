@@ -19,6 +19,17 @@ public class UserBlockCustomRepositoryImpl implements UserBlockCustomRepository{
     private final JPAQueryFactory query;
 
     @Override
+    public void deleteAllUserBlockOfUser(Long userId) {
+        query
+                .delete(userBlock)
+                .where(
+                        userBlock.user.id.eq(userId)
+                                .or(userBlock.target.id.eq(userId))
+                )
+                .execute();
+    }
+
+    @Override
     public List<DefaultUserResDto> getBlockUserList(Long userId) {
         return query.select(Projections.constructor(DefaultUserResDto.class,
                         user.id, user.userName, user.userProfile))
