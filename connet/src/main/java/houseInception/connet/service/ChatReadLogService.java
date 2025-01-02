@@ -22,7 +22,7 @@ public class ChatReadLogService {
         ChatReadLog chatReadLog;
         switch (dto.getType()){
             case GROUP -> chatReadLog = ChatReadLog.createGroupChatLog(userId, dto.getTapId(), dto.getChatId());
-            case PRIVATE -> chatReadLog = ChatReadLog.createPrivateChatLog(userId, dto.getChatId());
+            case PRIVATE -> chatReadLog = ChatReadLog.createPrivateChatLog(userId, dto.getPrivateRoomUuid(), dto.getChatId());
             default -> throw new IllegalArgumentException("Unsupported Read Log Type: " + dto.getType());
         }
 

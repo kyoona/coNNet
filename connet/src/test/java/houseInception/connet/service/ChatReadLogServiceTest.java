@@ -32,7 +32,7 @@ class ChatReadLogServiceTest {
         em.persist(user);
 
         //when
-        ChatReadLogDto logDto = new ChatReadLogDto(ChatRoomType.GROUP, 1L, 1L);
+        ChatReadLogDto logDto = new ChatReadLogDto(ChatRoomType.GROUP, 1L, null, 1L);
         Long resultId = chatReadLogService.updateReadLog(user.getId(), ObjectMapperUtil.toJson(logDto));
 
         //then

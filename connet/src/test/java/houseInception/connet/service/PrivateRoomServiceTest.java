@@ -167,6 +167,33 @@ class PrivateRoomServiceTest {
     }
 
     @Test
+    void getPrivateRoomList_채팅읽었는지_유무() {
+        //given
+        PrivateRoom privateRoomA = PrivateRoom.create(user1, user2);
+        PrivateRoom privateRoomB = PrivateRoom.create(user1, user3);
+        em.persist(privateRoomA);
+        em.persist(privateRoomB);
+
+        PrivateChat chatA1 = privateRoomA.addUserToUserChat("message", null, privateRoomA.getPrivateRoomUsers().get(0));
+        PrivateChat chatA2 = privateRoomA.addUserToUserChat("message", null, privateRoomA.getPrivateRoomUsers().get(0));
+        PrivateChat chatB1 = privateRoomB.addUserToUserChat("message", null, privateRoomB.getPrivateRoomUsers().get(0));
+        em.flush();
+
+        ChatReadLog readLog1 = ChatReadLog.createPrivateChatLog(user1.getId(), privateRoomA.getPrivateRoomUuid(), chatA1.getId());
+        ChatReadLog readLog2 = ChatReadLog.createPrivateChatLog(user1.getId(), privateRoomB.getPrivateRoomUuid(), chatB1.getId());
+        em.persist(readLog1);
+        em.persist(readLog2);
+
+        //when
+        List<PrivateRoomResDto> result = privateRoomService.getPrivateRoomList(user1.getId(), 1).getData();
+
+        //then
+        assertThat(result)
+                .extracting(PrivateRoomResDto::isUnread)
+                .containsExactlyInAnyOrder(true, false);
+    }
+
+    @Test
     void getPrivateChatList_이모지o() {
         //given
         PrivateRoom privateRoom1 = PrivateRoom.create(user1, user2);

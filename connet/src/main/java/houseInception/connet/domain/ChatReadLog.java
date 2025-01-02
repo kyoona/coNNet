@@ -19,6 +19,7 @@ public class ChatReadLog extends BaseTime{
     private ChatRoomType type;
     private Long userId;
     private Long tapId;
+    private String privateRoomUuid;
     private Long chatId;
 
     public static ChatReadLog createGroupChatLog(Long userId, Long tapId, Long chatId){
@@ -31,10 +32,11 @@ public class ChatReadLog extends BaseTime{
         return readLog;
     }
 
-    public static ChatReadLog createPrivateChatLog(Long userId, Long chatId){
+    public static ChatReadLog createPrivateChatLog(Long userId, String privateRoomUuid, Long chatId){
         ChatReadLog readLog = new ChatReadLog();
         readLog.userId = userId;
         readLog.type = ChatRoomType.PRIVATE;
+        readLog.privateRoomUuid = privateRoomUuid;
         readLog.chatId = chatId;
 
         return readLog;

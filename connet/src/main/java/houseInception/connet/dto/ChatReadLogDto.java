@@ -12,5 +12,6 @@ public class ChatReadLogDto {
 
     private ChatRoomType type;
     private Long tapId;
+    private String privateRoomUuid;
     private Long chatId;
 }
