@@ -16,7 +16,6 @@ public class UserProfileUpdateDto {
 
     @NotNull
     private String userName;
-    @Pattern(regexp = "\\S*", message = "userDescription must not be blank if provided")
     private String userDescription;
     private MultipartFile userProfile;
 }
