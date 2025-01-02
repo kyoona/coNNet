@@ -117,22 +117,16 @@ public class FriendService {
     }
 
 
-    public DataListResDto<DefaultUserResDto> getFriendRequestList(Long userId) {
-        List<DefaultUserResDto> requestReceivers = friendRepository.getFriendRequestList(userId);
-
-        return new DataListResDto<>(0, requestReceivers);
+    public List<DefaultUserResDto> getFriendRequestList(Long userId) {
+        return friendRepository.getFriendRequestList(userId);
     }
 
-    public DataListResDto<DefaultUserResDto> getFriendWaitList(Long userId) {
-        List<DefaultUserResDto> requestSenders = friendRepository.getFriendWaitList(userId);
-
-        return new DataListResDto<>(0, requestSenders);
+    public List<DefaultUserResDto> getFriendWaitList(Long userId) {
+        return friendRepository.getFriendWaitList(userId);
     }
 
-    public DataListResDto<ActiveUserResDto> getFriendList(Long userId, FriendFilterDto friendFilter) {
-        List<ActiveUserResDto> friendList = friendRepository.getFriendList(userId, friendFilter);
-
-        return new DataListResDto<>(0, friendList);
+    public List<ActiveUserResDto> getFriendList(Long userId, FriendFilterDto friendFilter) {
+        return friendRepository.getFriendList(userId, friendFilter);
     }
 
     @Transactional
