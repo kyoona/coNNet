@@ -91,10 +91,12 @@ public class GroupService {
                 .orElseThrow(() -> new GroupException(NOT_IN_GROUP));
 
         if(groupUser.isOwner()){
-            throw new GroupException(OWNER_CAN_NOT_EXIT);
+            Group groupWithGroupUsers = groupRepository.findGroupWithGroupUsers(group.getId()).get();
+            groupWithGroupUsers.removeAllUser();
+            groupWithGroupUsers.delete();
+        }else {
+            group.removeUser(groupUser);
         }
-
-        group.removeUser(groupUser);
 
         return groupUser.getId();
     }

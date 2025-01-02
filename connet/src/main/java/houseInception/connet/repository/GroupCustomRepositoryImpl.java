@@ -34,6 +34,20 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
     private final JPAQueryFactory query;
 
     @Override
+    public Optional<Group> findGroupWithGroupUsers(Long groupId) {
+        Group fetchedGroup = query
+                .selectFrom(group)
+                .leftJoin(group.groupUserList, groupUser).fetchJoin()
+                .where(
+                        group.id.eq(groupId),
+                        group.status.eq(ALIVE)
+                )
+                .fetchOne();
+
+        return Optional.ofNullable(fetchedGroup);
+    }
+
+    @Override
     public List<Group> findGroupListOfOwnerWithGroupUsers(Long userId) {
         QGroupUser subGroupUser = new QGroupUser("subGroupUser");
         return query
