@@ -75,4 +75,12 @@ public class GptRoom extends BaseTime {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public List<GptRoomUser> getGptRoomUsers() {
+        return List.copyOf(gptRoomUsers);
+    }
+
+    public List<GptRoomChat> getChats() {
+        return List.copyOf(chats);
+    }
 }
