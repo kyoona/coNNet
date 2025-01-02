@@ -36,7 +36,7 @@ public class GroupInviteController {
         return BaseResponse.getSimpleRes(groupUuId);
     }
 
-    @PostMapping("/{groupUuid}/invite/deny")
+    @DeleteMapping("/{groupUuid}/invite/deny")
     public BaseResponse<DefaultUuidDto> denyInvite(@PathVariable String groupUuid){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         String groupUuId = groupInviteService.denyInvite(userId, groupUuid);
