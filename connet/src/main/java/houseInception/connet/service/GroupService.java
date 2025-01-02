@@ -45,7 +45,7 @@ public class GroupService {
                 groupProfileUrl,
                 groupAddDto.getGroupDescription(),
                 groupAddDto.getUserLimit(),
-                groupAddDto.isOpen());
+                groupAddDto.getIsOpen());
 
         List<String> tagList = groupAddDto.getTags();
         if (!tagList.isEmpty() && !group.addTag(tagList)) {
