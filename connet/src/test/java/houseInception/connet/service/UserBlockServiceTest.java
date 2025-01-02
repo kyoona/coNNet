@@ -1,13 +1,11 @@
 package houseInception.connet.service;
 
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.UserBlock;
-import houseInception.connet.domain.UserBlockType;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.repository.UserBlockRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +18,6 @@ import java.util.List;
 import static houseInception.connet.domain.UserBlockType.ACCEPT;
 import static houseInception.connet.domain.UserBlockType.REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest

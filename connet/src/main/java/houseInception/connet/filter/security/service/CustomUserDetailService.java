@@ -1,6 +1,6 @@
 package houseInception.connet.filter.security.service;
 
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.repository.UserRepository;
 import houseInception.connet.filter.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;

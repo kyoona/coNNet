@@ -20,12 +20,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static houseInception.connet.domain.QChatEmoji.chatEmoji;
-import static houseInception.connet.domain.QUser.user;
 import static houseInception.connet.domain.QUserBlock.userBlock;
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.privateRoom.QPrivateChat.privateChat;
 import static houseInception.connet.domain.privateRoom.QPrivateRoom.privateRoom;
 import static houseInception.connet.domain.privateRoom.QPrivateRoomUser.privateRoomUser;
+import static houseInception.connet.domain.user.QUser.user;
 
 @RequiredArgsConstructor
 @Repository

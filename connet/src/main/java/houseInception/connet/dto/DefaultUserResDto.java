@@ -1,7 +1,7 @@
 package houseInception.connet.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

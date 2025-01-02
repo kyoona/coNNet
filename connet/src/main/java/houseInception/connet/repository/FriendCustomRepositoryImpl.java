@@ -14,7 +14,7 @@ import java.util.List;
 import static houseInception.connet.domain.FriendStatus.ACCEPT;
 import static houseInception.connet.domain.FriendStatus.WAIT;
 import static houseInception.connet.domain.QFriend.friend;
-import static houseInception.connet.domain.QUser.user;
+import static houseInception.connet.domain.user.QUser.user;
 
 @RequiredArgsConstructor
 @Repository

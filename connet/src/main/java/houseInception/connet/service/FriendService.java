@@ -2,7 +2,7 @@ package houseInception.connet.service;
 
 import houseInception.connet.domain.Friend;
 import houseInception.connet.domain.FriendStatus;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;

@@ -1,22 +1,19 @@
-package houseInception.connet.dto.group_invite;
+package houseInception.connet.dto.user;
 
 import com.querydsl.core.annotations.QueryProjection;
-import houseInception.connet.dto.DefaultUserResDto;
 import lombok.Getter;
 
 @Getter
-public class GroupInviteResDto {
+public class CommonGroupOfUserResDto {
 
     private String groupUuid;
     private String groupName;
     private String groupProfile;
-    private DefaultUserResDto inviter;
 
     @QueryProjection
-    public GroupInviteResDto(String groupUuid, String groupName, String groupProfile, DefaultUserResDto inviter) {
+    public CommonGroupOfUserResDto(String groupUuid, String groupName, String groupProfile) {
         this.groupUuid = groupUuid;
         this.groupName = groupName;
         this.groupProfile = groupProfile;
-        this.inviter = inviter;
     }
 }

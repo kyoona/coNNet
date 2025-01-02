@@ -1,7 +1,7 @@
 package houseInception.connet.repository;
 
 import houseInception.connet.domain.Status;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

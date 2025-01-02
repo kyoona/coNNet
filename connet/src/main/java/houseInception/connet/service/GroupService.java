@@ -1,7 +1,7 @@
 package houseInception.connet.service;
 
 import houseInception.connet.domain.Status;
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.dto.DataListResDto;

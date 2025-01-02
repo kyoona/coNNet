@@ -1,6 +1,6 @@
 package houseInception.connet.filter.security;
 
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.UserRole;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

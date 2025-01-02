@@ -16,8 +16,8 @@ import java.util.Optional;
 
 import static houseInception.connet.domain.QChatEmoji.chatEmoji;
 import static houseInception.connet.domain.QGroupChat.groupChat;
-import static houseInception.connet.domain.QUser.user;
 import static houseInception.connet.domain.group.QGroupUser.groupUser;
+import static houseInception.connet.domain.user.QUser.user;
 
 @RequiredArgsConstructor
 @Repository

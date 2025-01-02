@@ -1,6 +1,6 @@
 package houseInception.connet.event.handler;
 
-import houseInception.connet.domain.User;
+import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.group.GroupAddDto;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupRepository;
