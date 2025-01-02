@@ -27,5 +27,5 @@ public class GroupAddDto {
 
     @Positive
     private int userLimit;
-    private boolean isOpen;
+    private Boolean isOpen;
 }
