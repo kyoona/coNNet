@@ -190,14 +190,19 @@ class GroupServiceTest {
     }
 
     @Test
-    void exitGroup_방장_퇴장_불가() {
+    void exitGroup_방장() {
         //given
         Group group = Group.create(user1, "groupName", null, null, 3, false);
+        group.addUser(user2);
         em.persist(group);
 
         //when
-        assertThatThrownBy(() -> groupService.exitGroup(user1.getId(), group.getGroupUuid()))
-                .isInstanceOf(GroupException.class);
+        groupService.exitGroup(user1.getId(), group.getGroupUuid());
+
+        //then
+        assertThat(group.getStatus()).isEqualTo(Status.DELETED);
+        assertThat(groupRepository.existUserInGroup(user1.getId(), group.getGroupUuid())).isFalse();
+        assertThat(groupRepository.existUserInGroup(user2.getId(), group.getGroupUuid())).isFalse();
     }
 
     @Test
