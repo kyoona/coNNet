@@ -1,6 +1,7 @@
 package houseInception.connet.dto.group;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -27,5 +28,7 @@ public class GroupAddDto {
 
     @Positive
     private int userLimit;
+
+    @NotNull
     private Boolean isOpen;
 }
