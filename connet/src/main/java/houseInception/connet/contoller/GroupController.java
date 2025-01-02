@@ -27,6 +27,15 @@ public class GroupController {
         return BaseResponse.getSimpleRes(resultUuid);
     }
 
+    @PatchMapping("/{groupUuid}")
+    public BaseResponse<DefaultUuidDto> updateGroup(@PathVariable String groupUuid,
+                                                    @ModelAttribute @Valid GroupUpdateDto updateDto){
+        Long userId = UserAuthorizationUtil.getLoginUserId();
+        String resultUuid = groupService.updateGroup(userId, groupUuid, updateDto);
+
+        return BaseResponse.getSimpleRes(resultUuid);
+    }
+
     @GetMapping
     public DataListResDto<GroupResDto> getGroupList(@RequestParam(defaultValue = "1") int page){
         Long userId = UserAuthorizationUtil.getLoginUserId();

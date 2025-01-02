@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface GroupCustomRepository {
 
     Optional<Group> findGroupWithGroupUsers(Long groupId);
+    Optional<Group> findGroupWithTags(String groupUuid);
     List<Group> findGroupListOfOwnerWithGroupUsers(Long userId);
     List<GroupUser> findGroupUserListOfNotOwnerWithGroup(Long userId);
     Optional<GroupUser> findGroupUser(Long groupId, Long userId);
