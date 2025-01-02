@@ -48,6 +48,20 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
     }
 
     @Override
+    public Optional<Group> findGroupWithTags(String groupUuid) {
+        Group fetchedGroup = query
+                .selectFrom(group)
+                .leftJoin(group.groupTagList, groupTag).fetchJoin()
+                .where(
+                        group.groupUuid.eq(groupUuid),
+                        group.status.eq(ALIVE)
+                )
+                .fetchOne();
+
+        return Optional.ofNullable(fetchedGroup);
+    }
+
+    @Override
     public List<Group> findGroupListOfOwnerWithGroupUsers(Long userId) {
         QGroupUser subGroupUser = new QGroupUser("subGroupUser");
         return query

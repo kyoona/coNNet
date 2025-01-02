@@ -71,6 +71,30 @@ public class GroupService {
     }
 
     @Transactional
+    public String updateGroup(Long userId, String groupUuid, GroupUpdateDto updateDto) {
+        Group group = findGroupWithTags(groupUuid);
+        checkGroupOwner(groupUuid, userId);
+
+        String imageUrl = uploadImages(updateDto.getGroupProfile());
+        imageUrl = (imageUrl == null)
+                ? group.getGroupProfile()
+                : imageUrl;
+
+        group.update(
+                updateDto.getGroupName(),
+                imageUrl,
+                updateDto.getGroupDescription(),
+                updateDto.getAddedTags(),
+                updateDto.getDeletedTags(),
+                updateDto.getIsOpen()
+        );
+
+        checkGroupTagLimit(group);
+
+        return groupUuid;
+    }
+
+    @Transactional
     public String enterGroup(Long userId, String groupUuid) {
         Group group = findGroupWithLock(groupUuid);
         checkOpenGroup(group);
@@ -164,6 +188,11 @@ public class GroupService {
                 .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
     }
 
+    private Group findGroupWithTags(String groupUuid) {
+        return groupRepository.findGroupWithTags(groupUuid)
+                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
+    }
+
     private Group findGroupWithLock(String groupUuid){
         return groupRepository.findByGroupUuidAndStatusWithLock(groupUuid, Status.ALIVE)
                 .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
@@ -189,6 +218,18 @@ public class GroupService {
     private void checkOpenGroup(Group group){
         if(!group.isOpen()){
             throw new GroupException(PRIVATE_GROUP);
+        }
+    }
+
+    private void checkGroupOwner(String groupUuid, Long userId) {
+        if(!groupRepository.existGroupOwner(userId, groupUuid)){
+            throw new GroupException(ONLY_GROUP_OWNER);
+        }
+    }
+
+    private void checkGroupTagLimit(Group group) {
+        if(group.getGroupTagList().size() > 10){
+            throw new GroupException(OVER_TAG_LIMIT);
         }
     }
 }

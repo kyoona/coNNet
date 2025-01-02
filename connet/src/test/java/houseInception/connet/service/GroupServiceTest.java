@@ -113,6 +113,56 @@ class GroupServiceTest {
     }
 
     @Test
+    void updateGroup() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, true);
+        group.addTag(List.of("tag1", "tag2", "deleteTag1", "deleteTag2"));
+        em.persist(group);
+
+        //when
+        List<String> addedTags = List.of("addTag1", "addTag2");
+        List<String> deletedTags = List.of("deleteTag1", "deleteTag2");
+        GroupUpdateDto updateDto = new GroupUpdateDto("update!", null, "des", addedTags, deletedTags, false);
+        groupService.updateGroup(user1.getId(), group.getGroupUuid(), updateDto);
+
+        //then
+        Group testGroup = groupRepository.findGroupWithTags(group.getGroupUuid()).get();
+        assertThat(testGroup.getGroupName()).isEqualTo(updateDto.getGroupName());
+        assertThat(testGroup.getGroupDescription()).isEqualTo(updateDto.getGroupDescription());
+        assertThat(testGroup.getGroupTagList()).hasSize(4);
+        assertThat(testGroup.getGroupTagList())
+                .extracting(GroupTag::getTagName)
+                .containsExactlyInAnyOrder("tag1", "tag2", addedTags.get(0), addedTags.get(1));
+    }
+
+    @Test
+    void updateGroup_방장x() {
+        //given
+        Group group = Group.create(user2, "groupName", null, null, 3, true);
+        em.persist(group);
+
+        //when
+        GroupUpdateDto updateDto = new GroupUpdateDto("update!", null, "des", List.of(), List.of(), false);
+        assertThatThrownBy(() -> groupService.updateGroup(user1.getId(), group.getGroupUuid(), updateDto))
+                .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void updateGroup_태그10개_초과() {
+        //given
+        Group group = Group.create(user2, "groupName", null, null, 3, true);
+        group.addTag(List.of("tag1", "tag2", "deleteTag1", "deleteTag2"));
+        em.persist(group);
+
+        //when
+        List<String> addedTags = List.of("addTag1", "addTag2", "addTag3", "addTag4", "addTag5", "addTag6", "addTag7", "addTag8", "addTag9", "addTag10");
+        List<String> deletedTags = List.of("deleteTag1", "deleteTag2");
+        GroupUpdateDto updateDto = new GroupUpdateDto("update!", null, "des", addedTags, deletedTags, false);
+        assertThatThrownBy(() -> groupService.updateGroup(user1.getId(), group.getGroupUuid(), updateDto))
+                .isInstanceOf(GroupException.class);
+    }
+
+    @Test
     void getGroupUserList() {
         //given
         Group group = Group.create(user2, "groupName", null, null, 3, true);
