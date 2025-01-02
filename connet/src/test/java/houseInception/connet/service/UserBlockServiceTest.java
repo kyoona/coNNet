@@ -125,7 +125,7 @@ class UserBlockServiceTest {
         em.persist(userBlock3);
 
         //when
-        List<DefaultUserResDto> result = userBlockService.getBlockUserList(user1.getId()).getData();
+        List<DefaultUserResDto> result = userBlockService.getBlockUserList(user1.getId());
 
         //then
         assertThat(result).hasSize(2);

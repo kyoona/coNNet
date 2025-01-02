@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequestMapping("/friends")
 @RequiredArgsConstructor
 @RestController
@@ -33,9 +35,9 @@ public class FriendController {
     }
 
     @GetMapping("/request")
-    public BaseResponse<DataListResDto<DefaultUserResDto>> getFriendRequestList(){
+    public BaseResponse<List<DefaultUserResDto>> getFriendRequestList(){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        DataListResDto<DefaultUserResDto> result = friendService.getFriendRequestList(userId);
+        List<DefaultUserResDto> result = friendService.getFriendRequestList(userId);
 
         return new BaseResponse<>(result);
     }
@@ -73,17 +75,17 @@ public class FriendController {
     }
 
     @GetMapping("/wait")
-    public BaseResponse<DataListResDto<DefaultUserResDto>> getFriendWaitList(){
+    public BaseResponse<List<DefaultUserResDto>> getFriendWaitList(){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        DataListResDto<DefaultUserResDto> result = friendService.getFriendWaitList(userId);
+        List<DefaultUserResDto> result = friendService.getFriendWaitList(userId);
 
         return new BaseResponse<>(result);
     }
 
     @GetMapping
-    public BaseResponse<DataListResDto<ActiveUserResDto>> getFriendList(@ModelAttribute FriendFilterDto friendFilter){
+    public BaseResponse<List<ActiveUserResDto>> getFriendList(@ModelAttribute FriendFilterDto friendFilter){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        DataListResDto<ActiveUserResDto> result = friendService.getFriendList(userId, friendFilter);
+        List<ActiveUserResDto> result = friendService.getFriendList(userId, friendFilter);
 
         return new BaseResponse<>(result);
     }

@@ -85,7 +85,7 @@ class FriendServiceTest {
     void requestFriend_ById_차단된_사용자() {
         //given
         UserBlock userBlock = UserBlock.create(user1, user2, UserBlockType.REQUEST);
-        userBlockRepository.save(userBlock);
+        em.persist(userBlock);
 
         //when
         assertThatThrownBy(() -> friendService.requestFriendById(user1.getId(), user2.getId()))
@@ -96,7 +96,7 @@ class FriendServiceTest {
     void requestFriend_ById_이미_요청() {
         //given
         Friend friend = Friend.createFriend(user1, user2);
-        friendRepository.save(friend);
+        em.persist(friend);
 
         //when
         assertThatThrownBy(() -> friendService.requestFriendById(user1.getId(), user2.getId()))
@@ -107,10 +107,11 @@ class FriendServiceTest {
     void requestFriend_ById_상대방이_이미_요청() {
         //given
         Friend friend = Friend.createFriend(user1, user2);
-        friendRepository.save(friend);
+        em.persist(friend);
 
         //when
-        assertThatThrownBy(() -> friendService.requestFriendById(user2.getId(), user1.getId())).isInstanceOf(FriendException.class);
+        assertThatThrownBy(() -> friendService.requestFriendById(user2.getId(), user1.getId()))
+                .isInstanceOf(FriendException.class);
     }
 
     @Test
@@ -133,7 +134,7 @@ class FriendServiceTest {
     void cancelFriendRequest() {
         //given
         Friend friend = Friend.createFriend(user1, user2);
-        friendRepository.save(friend);
+        em.persist(friend);
 
         //when
         Long resultId = friendService.cancelFriendRequest(user1.getId(), user2.getId());
@@ -147,7 +148,7 @@ class FriendServiceTest {
     void cancelFriendRequest_요청_존재X() {
         //given
         Friend friend = Friend.createFriend(user1, user2);
-        friendRepository.save(friend);
+        em.persist(friend);
 
         //when
         assertThatThrownBy(() -> friendService.cancelFriendRequest(user2.getId(), user1.getId()))
@@ -158,7 +159,7 @@ class FriendServiceTest {
     void acceptFriendRequest() {
         //given
         Friend friend = Friend.createFriend(user1, user2);
-        friendRepository.save(friend);
+        em.persist(friend);
 
         //when
         friendService.acceptFriendRequest(user2.getId(), user1.getId());
@@ -180,7 +181,7 @@ class FriendServiceTest {
         //given
         Friend friend = Friend.createFriend(user1, user2);
         friend.accept();
-        friendRepository.save(friend);
+        em.persist(friend);
 
         //when
         assertThatThrownBy(() -> friendService.acceptFriendRequest(user2.getId(), user1.getId()))
@@ -191,7 +192,7 @@ class FriendServiceTest {
     void denyFriendRequest() {
         //given
         Friend friend = Friend.createFriend(user1, user2);
-        friendRepository.save(friend);
+        em.persist(friend);
 
         //when
         Long friendId = friendService.denyFriendRequest(user2.getId(), user1.getId());
@@ -212,22 +213,21 @@ class FriendServiceTest {
     void getFriendWaitList() {
         //given
         Friend friend1 = Friend.createFriend(user2, user1);
-        friendRepository.save(friend1);
-
         Friend friend2 = Friend.createFriend(user3, user1);
-        friendRepository.save(friend2);
 
         Friend friend3 = Friend.createFriend(user4, user1);
         friend3.accept();
-        friendRepository.save(friend3);
+
+        em.persist(friend1);
+        em.persist(friend2);
+        em.persist(friend3);
 
         //when
-        DataListResDto<DefaultUserResDto> result = friendService.getFriendWaitList(user1.getId());
+        List<DefaultUserResDto> result = friendService.getFriendWaitList(user1.getId());
 
         //then
-        List<DefaultUserResDto> senderList = result.getData();
-        assertThat(senderList).hasSize(2);
-        assertThat(senderList)
+        assertThat(result).hasSize(2);
+        assertThat(result)
                 .extracting(DefaultUserResDto::getUserId)
                 .contains(user2.getId(), user3.getId());
 
@@ -237,16 +237,15 @@ class FriendServiceTest {
     void getFriendRequestList() {
         //given
         Friend friend1 = Friend.createFriend(user1, user2);
-        friendRepository.save(friend1);
-
         Friend friend2 = Friend.createFriend(user1, user3);
-        friendRepository.save(friend2);
-
         Friend friend3 = Friend.createFriend(user4, user1);
-        friendRepository.save(friend3);
+
+        em.persist(friend1);
+        em.persist(friend2);
+        em.persist(friend3);
 
         //when
-        List<DefaultUserResDto> result = friendService.getFriendRequestList(user1.getId()).getData();
+        List<DefaultUserResDto> result = friendService.getFriendRequestList(user1.getId());
 
         //then
         assertThat(result).hasSize(2);
@@ -283,12 +282,13 @@ class FriendServiceTest {
         friendRepository.save(friendD1);
 
         //when
-        DataListResDto<ActiveUserResDto> result = friendService.getFriendList(user1.getId(), new FriendFilterDto());
+        List<ActiveUserResDto> result = friendService.getFriendList(user1.getId(), new FriendFilterDto());
 
         //then
-        List<ActiveUserResDto> friendUserList = result.getData();
-        assertThat(friendUserList.size()).isEqualTo(3);
-        assertThat(friendUserList).extracting("userId").containsExactly(user2.getId(), user3.getId(), user4.getId());
+        assertThat(result).hasSize(3);
+        assertThat(result)
+                .extracting(ActiveUserResDto::getUserId)
+                .containsExactly(user2.getId(), user3.getId(), user4.getId());
     }
 
     @Test
@@ -296,26 +296,25 @@ class FriendServiceTest {
         //given
         Friend friendA1 = Friend.createFriend(user1, user2);
         friendA1.accept();
-        friendRepository.save(friendA1);
         Friend friendA2 = Friend.createFriend(user2, user1);
         friendA2.accept();
-        friendRepository.save(friendA2);
+        em.persist(friendA1);
+        em.persist(friendA2);
 
         Friend friendB1 = Friend.createFriend(user3, user1);
         friendB1.accept();
-        friendRepository.save(friendB1);
         Friend friendB2 = Friend.createFriend(user1, user3);
         friendB2.accept();
-        friendRepository.save(friendB2);
+        em.persist(friendB1);
+        em.persist(friendB2);
 
         //when
         FriendFilterDto filterDto = new FriendFilterDto("2");
-        DataListResDto<ActiveUserResDto> result = friendService.getFriendList(user1.getId(), filterDto);
+        List<ActiveUserResDto> result = friendService.getFriendList(user1.getId(), filterDto);
 
         //then
-        List<ActiveUserResDto> friendUserList = result.getData();
-        assertThat(friendUserList.size()).isEqualTo(1);
-        assertThat(friendUserList.get(0).getUserId()).isEqualTo(user2.getId());
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getUserId()).isEqualTo(user2.getId());
     }
 
     @Test
@@ -323,11 +322,12 @@ class FriendServiceTest {
         //given
         Friend friend1 = Friend.createFriend(user1, user2);
         friend1.accept();
-        friendRepository.save(friend1);
 
         Friend friend2 = Friend.createFriend(user2, user1);
         friend2.accept();
-        friendRepository.save(friend2);
+
+        em.persist(friend1);
+        em.persist(friend2);
 
         //when
         friendService.deleteFriend(user1.getId(), user2.getId());
@@ -342,11 +342,12 @@ class FriendServiceTest {
         //given
         Friend friend1 = Friend.createFriend(user1, user2);
         friend1.accept();
-        friendRepository.save(friend1);
 
         Friend friend2 = Friend.createFriend(user2, user1);
         friend2.accept();
-        friendRepository.save(friend2);
+
+        em.persist(friend1);
+        em.persist(friend2);
 
         //when
         friendService.deleteAllFriendsOfUser(user1.getId());
