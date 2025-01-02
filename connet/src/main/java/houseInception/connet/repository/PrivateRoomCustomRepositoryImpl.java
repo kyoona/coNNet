@@ -52,9 +52,11 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                 .from(privateRoomUser)
                 .innerJoin(subPrivateUser).on(privateRoomUser.privateRoom.id.eq(subPrivateUser.privateRoom.id))
                 .innerJoin(privateRoomUser.privateRoom, privateRoom)
-                .where(privateRoomUser.user.id.eq(userId),
+                .where(
+                        privateRoomUser.user.id.eq(userId),
                         subPrivateUser.user.id.eq(targetId),
-                        privateRoom.status.eq(ALIVE))
+                        privateRoom.status.eq(ALIVE)
+                )
                 .fetchOne();
 
         return Optional.ofNullable(fetchedPrivateRoom);
@@ -63,8 +65,10 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     @Override
     public Optional<PrivateRoomUser> findPrivateRoomUser(Long privateRoomId, Long userId) {
         PrivateRoomUser findPrivateRoomUser = query.selectFrom(privateRoomUser)
-                .where(privateRoomUser.privateRoom.id.eq(privateRoomId),
-                        privateRoomUser.user.id.eq(userId))
+                .where(
+                        privateRoomUser.privateRoom.id.eq(privateRoomId),
+                        privateRoomUser.user.id.eq(userId)
+                )
                 .fetchOne();
 
         return Optional.ofNullable(findPrivateRoomUser);
@@ -90,9 +94,11 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     public boolean existsAlivePrivateRoomUser(Long userId, Long privateRoomId) {
         Long count = query.select(privateRoomUser.count())
                 .from(privateRoomUser)
-                .where(privateRoomUser.privateRoom.id.eq(privateRoomId),
+                .where(
+                        privateRoomUser.privateRoom.id.eq(privateRoomId),
                         privateRoomUser.user.id.eq(userId),
-                        privateRoomUser.status.eq(ALIVE))
+                        privateRoomUser.status.eq(ALIVE)
+                )
                 .fetchOne();
 
         return count != null && count > 0;
@@ -103,18 +109,22 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
         return query
                 .select(privateChat.privateRoom.id)
                 .from(privateChat)
-                .where(privateChat.id.eq(privateChatId),
-                        privateChat.status.eq(ALIVE))
+                .where(
+                        privateChat.id.eq(privateChatId),
+                        privateChat.status.eq(ALIVE)
+                )
                 .fetchOne();
     }
 
     public Optional<PrivateRoomUser> findTargetRoomUserInChatRoom(Long userId, Long privateRoomId) {
         PrivateRoomUser targetPrivateRoomUser = query
                 .selectFrom(privateRoomUser)
-                .innerJoin(privateRoom).on(privateRoom.id.eq(privateRoomUser.privateRoom.id))
-                .where(privateRoomUser.user.id.ne(userId),
+                .innerJoin(privateRoom.privateRoomUsers, privateRoomUser)
+                .where(
+                        privateRoomUser.user.id.ne(userId),
                         privateRoom.id.eq(privateRoomId),
-                        privateRoom.status.eq(ALIVE))
+                        privateRoom.status.eq(ALIVE)
+                )
                 .fetchOne();
 
         return Optional.ofNullable(targetPrivateRoomUser);
@@ -124,30 +134,41 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     public List<PrivateChatResDto> getPrivateChatList(Long userId, Long privateRoomId, int page) {
         QPrivateRoomUser subPrivateRoomUser = new QPrivateRoomUser("subPrivateRoomUser");
 
-        return query.select(Projections.constructor(PrivateChatResDto.class,
+        return query.select(Projections.constructor(
+                PrivateChatResDto.class,
                         privateChat.id,
                         privateChat.message,
                         privateChat.image,
                         privateChat.writerRole,
-                        Projections.constructor(DefaultUserResDto.class,
-                                user.id, user.userName, user.userProfile),
+                        Projections.constructor(
+                                DefaultUserResDto.class,
+                                user.id,
+                                user.userName,
+                                user.userProfile
+                        ),
                         privateChat.createdAt,
                         ExpressionUtils.as(
-                                JPAExpressions.select(Expressions.stringTemplate("GROUP_CONCAT({0})", chatEmoji.emojiType))
+                                JPAExpressions
+                                        .select(Expressions.stringTemplate("GROUP_CONCAT({0})", chatEmoji.emojiType))
                                         .from(chatEmoji)
-                                        .where(chatEmoji.chatId.eq(privateChat.id),
-                                                chatEmoji.chatRoomType.eq(ChatRoomType.PRIVATE)),
+                                        .where(
+                                                chatEmoji.chatId.eq(privateChat.id),
+                                                chatEmoji.chatRoomType.eq(ChatRoomType.PRIVATE)
+                                        ),
                                 "emojiAggStr")
                 ))
                 .from(privateChat)
-                .leftJoin(privateRoomUser).on(privateRoomUser.id.eq(privateChat.writer.id))
-                .leftJoin(user).on(user.id.eq(privateRoomUser.user.id))
-                .where(privateChat.privateRoom.id.eq(privateRoomId),
+                .leftJoin(privateChat.writer, privateRoomUser)
+                .leftJoin(privateRoomUser.user, user)
+                .where(
+                        privateChat.privateRoom.id.eq(privateRoomId),
                         privateChat.createdAt.goe(
-                                JPAExpressions.select(subPrivateRoomUser.participationTime)
+                                JPAExpressions
+                                        .select(subPrivateRoomUser.participationTime)
                                         .from(subPrivateRoomUser)
                                         .where(subPrivateRoomUser.user.id.eq(userId))
-                        ))
+                        )
+                )
                 .offset((page - 1) * 30)
                 .limit(31)
                 .orderBy(privateChat.createdAt.desc())
@@ -170,16 +191,20 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                 .from(privateRoomUser)
                 .innerJoin(subPrivateRoomUser).on(
                         subPrivateRoomUser.privateRoom.id.eq(privateRoomUser.privateRoom.id),
-                        subPrivateRoomUser.id.ne(privateRoomUser.id))
+                        subPrivateRoomUser.id.ne(privateRoomUser.id)
+                )
                 .innerJoin(subPrivateRoomUser.user, user)
                 .innerJoin(privateRoomUser.privateRoom, privateRoom)
                 .leftJoin(userBlock).on(
                         userBlock.user.id.eq(privateRoomUser.user.id),
                         userBlock.target.id.eq(subPrivateRoomUser.user.id),
-                        userBlock.blockType.eq(UserBlockType.REQUEST))
-                .where(privateRoomUser.user.id.eq(userId),
+                        userBlock.blockType.eq(UserBlockType.REQUEST)
+                )
+                .where(
+                        privateRoomUser.user.id.eq(userId),
                         privateRoomUser.status.eq(ALIVE),
-                        privateRoom.status.eq(ALIVE))
+                        privateRoom.status.eq(ALIVE)
+                )
                 .offset((page - 1) * 30)
                 .limit(31)
                 .fetch();

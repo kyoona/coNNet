@@ -31,12 +31,18 @@ public class UserBlockCustomRepositoryImpl implements UserBlockCustomRepository{
 
     @Override
     public List<DefaultUserResDto> getBlockUserList(Long userId) {
-        return query.select(Projections.constructor(DefaultUserResDto.class,
-                        user.id, user.userName, user.userProfile))
+        return query
+                .select(Projections.constructor(
+                DefaultUserResDto.class,
+                        user.id,
+                        user.userName,
+                        user.userProfile))
                 .from(userBlock)
-                .innerJoin(user).on(user.id.eq(userBlock.target.id))
-                .where(userBlock.user.id.eq(userId),
-                        userBlock.blockType.eq(REQUEST))
+                .innerJoin(userBlock.target, user)
+                .where(
+                        userBlock.user.id.eq(userId),
+                        userBlock.blockType.eq(REQUEST)
+                )
                 .orderBy(user.userName.asc())
                 .fetch();
     }

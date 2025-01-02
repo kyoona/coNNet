@@ -55,7 +55,8 @@ public class ChatEmojiCustomRepositoryImpl implements ChatEmojiCustomRepository{
                 .select(Projections.constructor(
                         ChatEmojiUserResDto.class,
                         user.userName
-                ))
+                        )
+                )
                 .from(chatEmoji)
                 .innerJoin(chatEmoji.user, user)
                 .where(
