@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface FriendCustomRepository {
 
+    void deleteAllFriendsOfUser(Long userId);
+
     List<ActiveUserResDto> getFriendList(Long userId, FriendFilterDto filterDto);
     List<DefaultUserResDto> getFriendWaitList(Long userId);
     List<DefaultUserResDto> getFriendRequestList(Long userId);
