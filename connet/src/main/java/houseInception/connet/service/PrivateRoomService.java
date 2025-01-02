@@ -10,6 +10,7 @@ import houseInception.connet.dto.privateRoom.*;
 import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
+import houseInception.connet.repository.ChatReadLogRepository;
 import houseInception.connet.repository.PrivateRoomRepository;
 import houseInception.connet.service.util.CommonDomainService;
 import houseInception.connet.socketManager.SocketServiceProvider;
@@ -40,6 +41,7 @@ import static houseInception.connet.service.util.FileUtil.isInValidFile;
 public class PrivateRoomService {
 
     private final PrivateRoomRepository privateRoomRepository;
+    private final ChatReadLogRepository chatReadLogRepository;
     private final EntityManager em;
     private final CommonDomainService domainService;
     private final GptApiProvider gptApiProvider;
@@ -161,8 +163,20 @@ public class PrivateRoomService {
                 .toList();
         List<Long> privateRoomIdOfActiveTimeOrder = privateRoomRepository.findLastChatTimeOfPrivateRooms(privateRoomIdList);
 
+        List<String> privateRoomUuidList = privateRoomMap.values()
+                .stream()
+                .map(PrivateRoomResDto::getChatRoomUuid)
+                .toList();
+        Map<Long, Long> recentReadLogs = chatReadLogRepository.findRecentReadLogOfPrivateRooms(privateRoomUuidList);
+        Map<Long, Long> recentChats = privateRoomRepository.findRecentChatOfRooms(privateRoomIdList);
+
         List<PrivateRoomResDto> resultList = privateRoomIdOfActiveTimeOrder.stream()
-                .map(privateRoomId -> privateRoomMap.get(privateRoomId))
+                .map(privateRoomId -> {
+                    PrivateRoomResDto privateRoomResDto = privateRoomMap.get(privateRoomId);
+                    privateRoomResDto.setUnread(recentChats, recentReadLogs);
+
+                    return privateRoomResDto;
+                })
                 .toList();
 
         return new DataListResDto<>(page, resultList);

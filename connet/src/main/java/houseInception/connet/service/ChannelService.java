@@ -9,6 +9,8 @@ import houseInception.connet.dto.channel.TapDto;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.repository.ChannelRepository;
+import houseInception.connet.repository.ChatReadLogRepository;
+import houseInception.connet.repository.GroupChatRepository;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.dto.ChannelTapDto;
 import jakarta.persistence.EntityManager;
@@ -29,6 +31,8 @@ public class ChannelService {
 
     private final ChannelRepository channelRepository;
     private final GroupRepository groupRepository;
+    private final ChatReadLogRepository chatReadLogRepository;
+    private final GroupChatRepository groupChatRepository;
     private final EntityManager em;
 
     @Transactional
@@ -100,11 +104,20 @@ public class ChannelService {
         checkUserInGroup(userId, groupUuid);
 
         List<ChannelTapDto> channelTapList = channelRepository.getChannelTapListOfGroup(groupUuid);
+
+        List<Long> tapIdList = channelTapList.stream()
+                .filter((tap) -> tap.getTapId() != null)
+                .map(ChannelTapDto::getTapId)
+                .toList();
+        Map<Long, Long> recentReadLogOfTaps = chatReadLogRepository.findRecentReadLogOfTaps(tapIdList);
+        Map<Long, Long> recentChatOfTaps = groupChatRepository.findRecentGroupChatOfTaps(tapIdList);
+
+
         Map<Long, List<ChannelTapDto>> groupedTap = channelTapList.stream()
                 .collect(Collectors.groupingBy(ChannelTapDto::getChannelId));
 
         return groupedTap.values().stream()
-                .map(ChannelResDto::new)
+                .map((dtoList) -> new ChannelResDto(dtoList, recentChatOfTaps, recentReadLogOfTaps))
                 .toList();
     }
 

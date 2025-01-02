@@ -9,4 +9,5 @@ public class TapResDto {
 
     private Long tapId;
     private String tapName;
+    private boolean isUnread;
 }
