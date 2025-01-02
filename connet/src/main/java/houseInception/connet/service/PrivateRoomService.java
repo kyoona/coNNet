@@ -159,7 +159,7 @@ public class PrivateRoomService {
                 .stream()
                 .map(PrivateRoomResDto::getChatRoomId)
                 .toList();
-        List<Long> privateRoomIdOfActiveTimeOrder = privateRoomRepository.getLastChatTimeOfPrivateRooms(privateRoomIdList);
+        List<Long> privateRoomIdOfActiveTimeOrder = privateRoomRepository.findLastChatTimeOfPrivateRooms(privateRoomIdList);
 
         List<PrivateRoomResDto> resultList = privateRoomIdOfActiveTimeOrder.stream()
                 .map(privateRoomId -> privateRoomMap.get(privateRoomId))

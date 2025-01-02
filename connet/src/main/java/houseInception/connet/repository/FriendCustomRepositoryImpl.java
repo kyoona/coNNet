@@ -27,9 +27,11 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
         return query.select(Projections.constructor(DefaultUserResDto.class,
                         user.id, user.userName, user.userProfile))
                 .from(friend)
-                .join(user).on(user.id.eq(friend.sender.id))
-                .where(friend.receiver.id.eq(userId),
-                        friend.acceptStatus.eq(WAIT))
+                .innerJoin(friend.sender, user)
+                .where(
+                        friend.receiver.id.eq(userId),
+                        friend.acceptStatus.eq(WAIT)
+                )
                 .fetch();
     }
 
@@ -38,9 +40,11 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
         return query.select(Projections.constructor(DefaultUserResDto.class,
                         user.id, user.userName, user.userProfile))
                 .from(friend)
-                .join(user).on(user.id.eq(friend.receiver.id))
-                .where(friend.sender.id.eq(userId),
-                        friend.acceptStatus.eq(WAIT))
+                .innerJoin(friend.receiver, user)
+                .where(
+                        friend.sender.id.eq(userId),
+                        friend.acceptStatus.eq(WAIT)
+                )
                 .fetch();
     }
 
@@ -59,10 +63,12 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
         return query.select(Projections.constructor(ActiveUserResDto.class,
                         user.id, user.userName, user.userProfile, user.isActive))
                 .from(friend)
-                .join(user).on(user.id.eq(friend.receiver.id))
-                .where(friend.sender.id.eq(userId),
+                .innerJoin(friend.receiver, user)
+                .where(
+                        friend.sender.id.eq(userId),
                         friend.acceptStatus.eq(ACCEPT),
-                        userNameContains(filterDto.getUserName()))
+                        userNameContains(filterDto.getUserName())
+                )
                 .fetch();
     }
 

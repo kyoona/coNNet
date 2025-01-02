@@ -10,6 +10,7 @@ public interface UserRepository extends JpaRepository<User, Long>, UserCustomRep
 
     Optional<User> findByIdAndStatus(Long userId, Status status);
     Optional<User> findByEmailAndStatus(String email, Status status);
+
     boolean existsByEmailAndStatus(String email, Status status);
     boolean existsByIdAndStatus(Long userId, Status status);
     boolean existsByRefreshTokenAndStatus(String refreshToken, Status status);

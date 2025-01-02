@@ -106,7 +106,7 @@ public class ChatEmojiService {
     }
 
     private Long findPrivateRoomIdOfChat(Long chatId){
-        Long privateRoomId = privateRoomRepository.getPrivateRoomIdOfChat(chatId);
+        Long privateRoomId = privateRoomRepository.findPrivateRoomIdOfChat(chatId);
         if(privateRoomId == null){
             throw new PrivateRoomException(NO_SUCH_CHAT);
         }

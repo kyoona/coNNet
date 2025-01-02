@@ -79,12 +79,8 @@ public class UserBlockService {
     }
 
     private UserBlock findUserBlock(Long userId, Long targetId){
-        UserBlock userBlock = userBlockRepository.findByUserIdAndTargetId(userId, targetId).orElse(null);
-        if (userBlock == null) {
-            throw new UserBlockException(NO_SUCH_USER_BLOCK);
-        }
-
-        return userBlock;
+        return userBlockRepository.findByUserIdAndTargetId(userId, targetId)
+                .orElseThrow(() -> new UserBlockException(NO_SUCH_USER_BLOCK));
     }
 
     private void checkAlreadyRequestBlock(UserBlock findUserBlock) {

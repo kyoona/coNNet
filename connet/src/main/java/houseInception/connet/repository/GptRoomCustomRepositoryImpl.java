@@ -27,8 +27,10 @@ public class GptRoomCustomRepositoryImpl implements GptRoomCustomRepository {
     public List<GptRoomChat> getChatListOfGptRoom(Long gptRoomId) {
         return query
                 .selectFrom(gptRoomChat)
-                .where(gptRoomChat.gptRoom.id.eq(gptRoomId),
-                        gptRoomChat.status.eq(ALIVE))
+                .where(
+                        gptRoomChat.gptRoom.id.eq(gptRoomId),
+                        gptRoomChat.status.eq(ALIVE)
+                )
                 .orderBy(gptRoomChat.createdAt.asc())
                 .fetch();
     }
@@ -38,9 +40,11 @@ public class GptRoomCustomRepositoryImpl implements GptRoomCustomRepository {
         Long userCount = query
                 .select(gptRoomUser.count())
                 .from(gptRoomUser)
-                .where(gptRoomUser.gptRoom.id.eq(gptRoomId),
+                .where(
+                        gptRoomUser.gptRoom.id.eq(gptRoomId),
                         gptRoomUser.user.id.eq(userId),
-                        gptRoomUser.status.eq(status))
+                        gptRoomUser.status.eq(status)
+                )
                 .fetchOne();
 
         return userCount > 0;
@@ -52,11 +56,13 @@ public class GptRoomCustomRepositoryImpl implements GptRoomCustomRepository {
                 .select(Projections.constructor(GptRoomListResDto.class,
                         gptRoom.gptRoomUuid, gptRoom.title, gptRoom.createdAt))
                 .from(gptRoom)
-                .innerJoin(gptRoomUser).on(gptRoomUser.gptRoom.id.eq(gptRoom.id))
-                .innerJoin(user).on(user.id.eq(gptRoomUser.user.id))
-                .where(user.id.eq(userId),
+                .innerJoin(gptRoom.gptRoomUsers, gptRoomUser)
+                .innerJoin(gptRoomUser.user, user)
+                .where(
+                        user.id.eq(userId),
                         gptRoomUser.status.eq(ALIVE),
-                        gptRoom.status.eq(ALIVE))
+                        gptRoom.status.eq(ALIVE)
+                )
                 .orderBy(gptRoom.createdAt.desc())
                 .offset((page - 1) * 30)
                 .limit(31)
@@ -66,14 +72,22 @@ public class GptRoomCustomRepositoryImpl implements GptRoomCustomRepository {
     @Override
     public List<GptRoomChatResDto> getGptChatRoomChatList(Long gptRoomId, int page) {
         return query
-                .select(Projections.constructor(GptRoomChatResDto.class,
-                        gptRoomChat.id, gptRoomChat.content, gptRoomChat.writerRole, user.id, user.userName, user.userProfile, gptRoomChat.createdAt))
+                .select(Projections.constructor(
+                        GptRoomChatResDto.class,
+                        gptRoomChat.id,
+                        gptRoomChat.content,
+                        gptRoomChat.writerRole,
+                        user.id, user.userName,
+                        user.userProfile,
+                        gptRoomChat.createdAt))
                 .from(gptRoomChat)
-                .innerJoin(gptRoom).on(gptRoom.id.eq(gptRoomChat.gptRoom.id))
-                .leftJoin(gptRoomUser).on(gptRoomUser.gptRoom.id.eq(gptRoom.id))
-                .leftJoin(user).on(user.id.eq(gptRoomUser.user.id))
-                .where(gptRoom.id.eq(gptRoomId),
-                        gptRoomChat.status.eq(ALIVE))
+                .innerJoin(gptRoomChat.gptRoom, gptRoom)
+                .leftJoin(gptRoom.gptRoomUsers, gptRoomUser)
+                .leftJoin(gptRoomUser.user, user)
+                .where(
+                        gptRoom.id.eq(gptRoomId),
+                        gptRoomChat.status.eq(ALIVE)
+                )
                 .orderBy(gptRoomChat.createdAt.desc())
                 .offset((page - 1) * 30)
                 .limit(31)
