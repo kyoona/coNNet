@@ -12,6 +12,7 @@ public interface ChannelCustomRepository {
 
     Optional<ChannelTap> findChannelTapWithChannel(Long tapId);
     Optional<ChannelTap> findChannelTap(Long tapId);
+
     boolean existsTapInGroup(Long tapId, String groupUuid);
 
     List<ChannelTapDto> getChannelTapListOfGroup(String groupUuid);

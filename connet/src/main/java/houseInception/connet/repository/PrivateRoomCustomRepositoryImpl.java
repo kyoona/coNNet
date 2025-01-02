@@ -105,7 +105,7 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     }
 
     @Override
-    public Long getPrivateRoomIdOfChat(Long privateChatId) {
+    public Long findPrivateRoomIdOfChat(Long privateChatId) {
         return query
                 .select(privateChat.privateRoom.id)
                 .from(privateChat)
@@ -114,20 +114,6 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                         privateChat.status.eq(ALIVE)
                 )
                 .fetchOne();
-    }
-
-    public Optional<PrivateRoomUser> findTargetRoomUserInChatRoom(Long userId, Long privateRoomId) {
-        PrivateRoomUser targetPrivateRoomUser = query
-                .selectFrom(privateRoomUser)
-                .innerJoin(privateRoom.privateRoomUsers, privateRoomUser)
-                .where(
-                        privateRoomUser.user.id.ne(userId),
-                        privateRoom.id.eq(privateRoomId),
-                        privateRoom.status.eq(ALIVE)
-                )
-                .fetchOne();
-
-        return Optional.ofNullable(targetPrivateRoomUser);
     }
 
     @Override
@@ -216,7 +202,7 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     }
 
     @Override
-    public List<Long> getLastChatTimeOfPrivateRooms(List<Long> privateRoomIdList) {
+    public List<Long> findLastChatTimeOfPrivateRooms(List<Long> privateRoomIdList) {
         return query.select(privateChat.privateRoom.id)
                 .from(privateChat)
                 .where(privateChat.privateRoom.id.in(privateRoomIdList))
