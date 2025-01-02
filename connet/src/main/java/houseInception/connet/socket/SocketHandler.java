@@ -1,5 +1,6 @@
 package houseInception.connet.socket;
 
+import houseInception.connet.service.ChatReadLogService;
 import houseInception.connet.service.UserService;
 import houseInception.connet.socketManager.SocketManager;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +17,14 @@ public class SocketHandler extends TextWebSocketHandler {
 
     private final SocketManager socketManager;
     private final UserService userService;
+    private final ChatReadLogService chatReadLogService;
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         super.handleTextMessage(session, message);
 
+        Long userId = (Long) session.getAttributes().get("Socket-User-Id");
+        chatReadLogService.updateReadLog(userId, message.getPayload());
     }
 
     @Override
