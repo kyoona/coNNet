@@ -1,6 +1,7 @@
 package houseInception.connet.event.handler;
 
 import houseInception.connet.event.domain.UserBlockEvent;
+import houseInception.connet.event.domain.UserDeleteEvent;
 import houseInception.connet.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +21,13 @@ public class EventFriendHandler {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-//    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteFriend(UserBlockEvent event){
         friendService.deleteFriend(event.getUserId(), event.getTargetId());
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void deleteAllFriendsOfUser(UserDeleteEvent event){
+        friendService.deleteAllFriendsOfUser(event.getUserId());
     }
 }

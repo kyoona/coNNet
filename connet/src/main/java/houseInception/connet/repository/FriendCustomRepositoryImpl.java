@@ -45,6 +45,16 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
     }
 
     @Override
+    public void deleteAllFriendsOfUser(Long userId) {
+        query.delete(friend)
+                .where(
+                        friend.receiver.id.eq(userId)
+                                .or(friend.sender.id.eq(userId))
+                )
+                .execute();
+    }
+
+    @Override
     public List<ActiveUserResDto> getFriendList(Long userId, FriendFilterDto filterDto) {
         return query.select(Projections.constructor(ActiveUserResDto.class,
                         user.id, user.userName, user.userProfile, user.isActive))

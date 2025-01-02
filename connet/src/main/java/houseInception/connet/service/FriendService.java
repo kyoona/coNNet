@@ -135,6 +135,11 @@ public class FriendService {
         return new DataListResDto<>(0, friendList);
     }
 
+    @Transactional
+    public void deleteAllFriendsOfUser(Long userId) {
+        friendRepository.deleteAllFriendsOfUser(userId);
+    }
+
     private Friend findFriend(Long senderId, Long receiverId, FriendStatus acceptStatus){
         return friendRepository.findBySenderIdAndReceiverIdAndAcceptStatus(senderId, receiverId, acceptStatus)
                 .orElseThrow(() -> new FriendException(NO_SUCH_FRIEND));

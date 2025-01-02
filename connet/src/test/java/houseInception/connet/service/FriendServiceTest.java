@@ -336,4 +336,23 @@ class FriendServiceTest {
         assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user1.getId(), user2.getId(), ACCEPT)).isFalse();
         assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user2.getId(), user1.getId(), ACCEPT)).isFalse();
     }
+
+    @Test
+    void deleteAllFriendsOfUser() {
+        //given
+        Friend friend1 = Friend.createFriend(user1, user2);
+        friend1.accept();
+        friendRepository.save(friend1);
+
+        Friend friend2 = Friend.createFriend(user2, user1);
+        friend2.accept();
+        friendRepository.save(friend2);
+
+        //when
+        friendService.deleteAllFriendsOfUser(user1.getId());
+
+        //then
+        assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user1.getId(), user2.getId(), ACCEPT)).isFalse();
+        assertThat(friendRepository.existsBySenderIdAndReceiverIdAndAcceptStatus(user2.getId(), user1.getId(), ACCEPT)).isFalse();
+    }
 }
