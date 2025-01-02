@@ -21,7 +21,7 @@ public class CommonDomainService {
     private final UserBlockRepository userBlockRepository;
 
     public User findUser(Long userId){
-        return userRepository.findById(userId)
+        return userRepository.findByIdAndStatus(userId, ALIVE)
                 .orElseThrow(() -> new UserException(NO_SUCH_USER));
     }
 
