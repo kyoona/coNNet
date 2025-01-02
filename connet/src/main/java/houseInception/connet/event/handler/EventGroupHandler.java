@@ -1,6 +1,7 @@
 package houseInception.connet.event.handler;
 
 import houseInception.connet.event.domain.GroupInviteAcceptEvent;
+import houseInception.connet.event.domain.UserDeleteEvent;
 import houseInception.connet.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,5 +21,11 @@ public class EventGroupHandler {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void acceptGroupInvite(GroupInviteAcceptEvent event){
         groupService.addGroupUser(event.getUserId(), event.getGroupUuid());
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void exitGroupsOfDeletedUser(UserDeleteEvent event){
+        groupService.exitGroupsOfUser(event.getUserId());
     }
 }

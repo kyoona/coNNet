@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static houseInception.connet.domain.Status.ALIVE;
+import static houseInception.connet.domain.Status.DELETED;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -71,6 +72,10 @@ public class Group extends BaseTime {
         }
     }
 
+    public void removeAllUser(){
+        this.groupUserList.forEach((groupUser) -> groupUser.delete());
+    }
+
     public boolean addTag(List<String> tags){
         if(!isValidTag(tags)){
             return false;
@@ -78,6 +83,10 @@ public class Group extends BaseTime {
 
         tags.forEach(tag -> this.groupTagList.add(new GroupTag(tag, this)));
         return true;
+    }
+
+    public void delete(){
+        this.status = DELETED;
     }
 
     private boolean isValidTag(List<String> tags){

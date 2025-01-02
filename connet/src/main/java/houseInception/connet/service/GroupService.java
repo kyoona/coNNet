@@ -12,6 +12,7 @@ import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.service.util.CommonDomainService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,7 @@ import static houseInception.connet.response.status.BaseErrorCode.*;
 import static houseInception.connet.service.util.FileUtil.getUniqueFileName;
 import static houseInception.connet.service.util.FileUtil.isInValidFile;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -138,6 +140,21 @@ public class GroupService {
         publicGroupList.forEach((res) -> res.setUserCount(groupUserCountMap.get(res.getGroupId())));
 
         return new DataListResDto<>(filter.getPage(), publicGroupList);
+    }
+
+    @Transactional
+    public void exitGroupsOfUser(Long userId) {
+        List<Group> groupOfOwner = groupRepository.findGroupListOfOwnerWithGroupUsers(userId);
+        groupOfOwner.forEach((group) -> {
+            group.removeAllUser();
+            group.delete();
+        });
+
+        List<GroupUser> groupUsers = groupRepository.findGroupUserListOfNotOwnerWithGroup(userId);
+        groupUsers.forEach((groupUser) -> {
+            Group group = groupUser.getGroup();
+            group.removeUser(groupUser);
+        });
     }
 
     private Group findGroup(String groupUuid){

@@ -340,4 +340,34 @@ class GroupServiceTest {
         assertThatThrownBy(() -> groupService.getGroupDetail(user2.getId(), group.getGroupUuid()))
                 .isInstanceOf(GroupException.class);
     }
+
+    @Test
+    void exitGroupsOfUser() {
+        //given
+        Group group1 = Group.create(user1, "group1", null, null, 10, true);
+        group1.addUser(user2);
+        group1.addUser(user3);
+
+        Group group2 = Group.create(user2, "group2", null, null, 10, true);
+        group2.addUser(user1);
+
+        em.persist(group1);
+        em.persist(group2);
+
+        //when
+        groupService.exitGroupsOfUser(user1.getId());
+
+        //then
+        Group testGroup1 = groupRepository.findById(group1.getId()).get();
+        assertThat(testGroup1.getStatus()).isEqualTo(Status.DELETED);
+        assertThat(testGroup1.getGroupUserList())
+                .extracting(GroupUser::getStatus)
+                .containsExactly(Status.DELETED, Status.DELETED, Status.DELETED);
+
+        Group testGroup2 = groupRepository.findById(group2.getId()).get();
+        assertThat(testGroup2.getStatus()).isEqualTo(Status.ALIVE);
+        assertThat(testGroup2.getGroupUserList())
+                .extracting(GroupUser::getStatus)
+                .contains(Status.ALIVE, Status.DELETED);
+    }
 }

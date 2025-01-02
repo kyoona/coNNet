@@ -6,6 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.group.GroupUser;
 import houseInception.connet.domain.group.QGroup;
 import houseInception.connet.domain.group.QGroupUser;
@@ -31,6 +32,27 @@ import static houseInception.connet.domain.user.QUser.user;
 public class GroupCustomRepositoryImpl implements GroupCustomRepository{
 
     private final JPAQueryFactory query;
+
+    @Override
+    public List<Group> findGroupListOfOwnerWithGroupUsers(Long userId) {
+        QGroupUser subGroupUser = new QGroupUser("subGroupUser");
+        return query
+                .selectFrom(group)
+                .leftJoin(group.groupUserList, groupUser).fetchJoin()
+                .where(
+                        group.id.in(
+                                JPAExpressions.select(subGroupUser.group.id)
+                                        .from(subGroupUser)
+                                        .where(
+                                                subGroupUser.user.id.eq(userId),
+                                                subGroupUser.isOwner.isTrue(),
+                                                subGroupUser.status.eq(ALIVE)
+                                        )
+                        ),
+                        group.status.eq(ALIVE)
+                )
+                .fetch();
+    }
 
     @Override
     public Optional<GroupUser> findGroupUser(Long groupId, Long userId) {
@@ -59,6 +81,19 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository{
                 .fetchOne();
 
         return Optional.ofNullable(fetchedGroupUser);
+    }
+
+    @Override
+    public List<GroupUser> findGroupUserListOfNotOwnerWithGroup(Long userId) {
+        return query
+                .selectFrom(groupUser)
+                .innerJoin(groupUser.group, group)
+                .where(
+                        groupUser.user.id.eq(userId),
+                        groupUser.isOwner.isFalse(),
+                        groupUser.status.eq(ALIVE)
+                )
+                .fetch();
     }
 
     @Override
