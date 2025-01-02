@@ -113,6 +113,56 @@ class GroupServiceTest {
     }
 
     @Test
+    void updateGroup() {
+        //given
+        Group group = Group.create(user1, "groupName", null, null, 3, true);
+        group.addTag(List.of("tag1", "tag2", "deleteTag1", "deleteTag2"));
+        em.persist(group);
+
+        //when
+        List<String> addedTags = List.of("addTag1", "addTag2");
+        List<String> deletedTags = List.of("deleteTag1", "deleteTag2");
+        GroupUpdateDto updateDto = new GroupUpdateDto("update!", null, "des", addedTags, deletedTags, false);
+        groupService.updateGroup(user1.getId(), group.getGroupUuid(), updateDto);
+
+        //then
+        Group testGroup = groupRepository.findGroupWithTags(group.getGroupUuid()).get();
+        assertThat(testGroup.getGroupName()).isEqualTo(updateDto.getGroupName());
+        assertThat(testGroup.getGroupDescription()).isEqualTo(updateDto.getGroupDescription());
+        assertThat(testGroup.getGroupTagList()).hasSize(4);
+        assertThat(testGroup.getGroupTagList())
+                .extracting(GroupTag::getTagName)
+                .containsExactlyInAnyOrder("tag1", "tag2", addedTags.get(0), addedTags.get(1));
+    }
+
+    @Test
+    void updateGroup_방장x() {
+        //given
+        Group group = Group.create(user2, "groupName", null, null, 3, true);
+        em.persist(group);
+
+        //when
+        GroupUpdateDto updateDto = new GroupUpdateDto("update!", null, "des", List.of(), List.of(), false);
+        assertThatThrownBy(() -> groupService.updateGroup(user1.getId(), group.getGroupUuid(), updateDto))
+                .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void updateGroup_태그10개_초과() {
+        //given
+        Group group = Group.create(user2, "groupName", null, null, 3, true);
+        group.addTag(List.of("tag1", "tag2", "deleteTag1", "deleteTag2"));
+        em.persist(group);
+
+        //when
+        List<String> addedTags = List.of("addTag1", "addTag2", "addTag3", "addTag4", "addTag5", "addTag6", "addTag7", "addTag8", "addTag9", "addTag10");
+        List<String> deletedTags = List.of("deleteTag1", "deleteTag2");
+        GroupUpdateDto updateDto = new GroupUpdateDto("update!", null, "des", addedTags, deletedTags, false);
+        assertThatThrownBy(() -> groupService.updateGroup(user1.getId(), group.getGroupUuid(), updateDto))
+                .isInstanceOf(GroupException.class);
+    }
+
+    @Test
     void getGroupUserList() {
         //given
         Group group = Group.create(user2, "groupName", null, null, 3, true);
@@ -190,14 +240,19 @@ class GroupServiceTest {
     }
 
     @Test
-    void exitGroup_방장_퇴장_불가() {
+    void exitGroup_방장() {
         //given
         Group group = Group.create(user1, "groupName", null, null, 3, false);
+        group.addUser(user2);
         em.persist(group);
 
         //when
-        assertThatThrownBy(() -> groupService.exitGroup(user1.getId(), group.getGroupUuid()))
-                .isInstanceOf(GroupException.class);
+        groupService.exitGroup(user1.getId(), group.getGroupUuid());
+
+        //then
+        assertThat(group.getStatus()).isEqualTo(Status.DELETED);
+        assertThat(groupRepository.existUserInGroup(user1.getId(), group.getGroupUuid())).isFalse();
+        assertThat(groupRepository.existUserInGroup(user2.getId(), group.getGroupUuid())).isFalse();
     }
 
     @Test
@@ -339,5 +394,35 @@ class GroupServiceTest {
         //when
         assertThatThrownBy(() -> groupService.getGroupDetail(user2.getId(), group.getGroupUuid()))
                 .isInstanceOf(GroupException.class);
+    }
+
+    @Test
+    void exitGroupsOfUser() {
+        //given
+        Group group1 = Group.create(user1, "group1", null, null, 10, true);
+        group1.addUser(user2);
+        group1.addUser(user3);
+
+        Group group2 = Group.create(user2, "group2", null, null, 10, true);
+        group2.addUser(user1);
+
+        em.persist(group1);
+        em.persist(group2);
+
+        //when
+        groupService.exitGroupsOfUser(user1.getId());
+
+        //then
+        Group testGroup1 = groupRepository.findById(group1.getId()).get();
+        assertThat(testGroup1.getStatus()).isEqualTo(Status.DELETED);
+        assertThat(testGroup1.getGroupUserList())
+                .extracting(GroupUser::getStatus)
+                .containsExactly(Status.DELETED, Status.DELETED, Status.DELETED);
+
+        Group testGroup2 = groupRepository.findById(group2.getId()).get();
+        assertThat(testGroup2.getStatus()).isEqualTo(Status.ALIVE);
+        assertThat(testGroup2.getGroupUserList())
+                .extracting(GroupUser::getStatus)
+                .contains(Status.ALIVE, Status.DELETED);
     }
 }

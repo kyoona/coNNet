@@ -50,8 +50,6 @@ public class GptRoomService {
 
             content = gptResDto.getContent();
         } else {
-            checkExistChatRoom(chatRoomUuid);
-
             gptRoom = findGptRoomByUuid(chatRoomUuid);
             checkGptRoomUser(gptRoom.getId(), userId);
             content = gptApiProvider.getChatCompletion(gptRoomChatAddDto.getMessage());
@@ -67,7 +65,6 @@ public class GptRoomService {
 
     @Transactional
     public Long updateGptRoom(Long userId, String gptRoomUuid, String title) {
-        checkExistChatRoom(gptRoomUuid);
         GptRoom gptRoom = findGptRoomByUuid(gptRoomUuid);
         checkGptRoomUser(gptRoom.getId(), userId);
 
@@ -78,7 +75,6 @@ public class GptRoomService {
 
     @Transactional
     public Long deleteGptRoom(Long userId, String gptRoomUuid) {
-        checkExistChatRoom(gptRoomUuid);
         GptRoom gptRoom = findGptRoomByUuid(gptRoomUuid);
         checkGptRoomUser(gptRoom.getId(), userId);
 
@@ -90,23 +86,16 @@ public class GptRoomService {
     public DataListResDto<GptRoomListResDto> getGptChatRoomList(Long userId, int page) {
         List<GptRoomListResDto> gptRoomList = gptRoomRepository.getGptRoomListByUserId(userId, page);
 
-        return new DataListResDto<GptRoomListResDto>(page, gptRoomList);
+        return new DataListResDto<>(page, gptRoomList);
     }
 
     public GptChatRoomChatListResDto getGptChatRoomChatList(Long userId, String gptRoomUuid, int page) {
-        checkExistChatRoom(gptRoomUuid);
         GptRoom gptRoom = findGptRoomByUuid(gptRoomUuid);
         checkGptRoomUser(gptRoom.getId(), userId);
 
         List<GptRoomChatResDto> chatList = gptRoomRepository.getGptChatRoomChatList(gptRoom.getId(), page);
 
         return new GptChatRoomChatListResDto(gptRoomUuid, gptRoom.getTitle(), page, chatList);
-    }
-
-    private void checkExistChatRoom(String gptRoomUuid) {
-        if(!gptRoomRepository.existsByGptRoomUuidAndStatus(gptRoomUuid, ALIVE)){
-            throw new GptRoomException(NO_SUCH_CHATROOM);
-        }
     }
 
     private void checkGptRoomUser(Long gptRoomId, Long userId){
@@ -116,11 +105,7 @@ public class GptRoomService {
     }
 
     private GptRoom findGptRoomByUuid(String gptRoomUuid){
-        GptRoom gptRoom = gptRoomRepository.findByGptRoomUuidAndStatus(gptRoomUuid, ALIVE).orElse(null);
-        if (gptRoom == null) {
-            throw new GptRoomException(NO_SUCH_CHATROOM);
-        }
-
-        return gptRoom;
+        return gptRoomRepository.findByGptRoomUuidAndStatus(gptRoomUuid, ALIVE)
+                .orElseThrow(() -> new GptRoomException(NO_SUCH_CHATROOM));
     }
 }

@@ -15,15 +15,13 @@ public interface PrivateRoomCustomRepository {
     Optional<PrivateRoom> findPrivateRoomWithUser(String privateRoomUuid);
     Optional<PrivateRoom> findPrivateRoomByUsers(Long userId, Long targetId);
     Optional<PrivateRoomUser> findPrivateRoomUser(Long privateRoomId, Long userId);
-    Optional<PrivateRoomUser> findTargetRoomUserInChatRoom(Long userId, Long privateRoomId);
     List<PrivateChat> findPrivateChatsInPrivateRoom(Long privateRoomId);
     Optional<PrivateChat> findPrivateChatsById(Long privateChatId);
 
-    Map<Long, PrivateRoomResDto> getPrivateRoomList(Long userId, int page);
-    List<Long> getLastChatTimeOfPrivateRooms(List<Long> privateRoomIdList);
-
+    List<Long> findLastChatTimeOfPrivateRooms(List<Long> privateRoomIdList);
     boolean existsAlivePrivateRoomUser(Long userId, Long privateRoomId);
-    Long getPrivateRoomIdOfChat(Long privateChatId);
+    Long findPrivateRoomIdOfChat(Long privateChatId);
 
+    Map<Long, PrivateRoomResDto> getPrivateRoomList(Long userId, int page);
     List<PrivateChatResDto> getPrivateChatList(Long userId, Long privateRoomId, int page);
 }

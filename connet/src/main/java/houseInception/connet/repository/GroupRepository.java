@@ -17,6 +17,4 @@ public interface GroupRepository extends JpaRepository<Group, Long>, GroupCustom
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT g FROM Group g WHERE g.groupUuid = :groupUuid AND g.status = :status")
     Optional<Group> findByGroupUuidAndStatusWithLock(@Param("groupUuid") String groupUuid, @Param("status") Status status);
-
-    boolean existsByGroupUuidAndStatus(String groupUuid, Status status);
 }

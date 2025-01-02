@@ -12,6 +12,7 @@ import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.service.util.CommonDomainService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,7 @@ import static houseInception.connet.response.status.BaseErrorCode.*;
 import static houseInception.connet.service.util.FileUtil.getUniqueFileName;
 import static houseInception.connet.service.util.FileUtil.isInValidFile;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -69,6 +71,30 @@ public class GroupService {
     }
 
     @Transactional
+    public String updateGroup(Long userId, String groupUuid, GroupUpdateDto updateDto) {
+        Group group = findGroupWithTags(groupUuid);
+        checkGroupOwner(groupUuid, userId);
+
+        String imageUrl = uploadImages(updateDto.getGroupProfile());
+        imageUrl = (imageUrl == null)
+                ? group.getGroupProfile()
+                : imageUrl;
+
+        group.update(
+                updateDto.getGroupName(),
+                imageUrl,
+                updateDto.getGroupDescription(),
+                updateDto.getAddedTags(),
+                updateDto.getDeletedTags(),
+                updateDto.getIsOpen()
+        );
+
+        checkGroupTagLimit(group);
+
+        return groupUuid;
+    }
+
+    @Transactional
     public String enterGroup(Long userId, String groupUuid) {
         Group group = findGroupWithLock(groupUuid);
         checkOpenGroup(group);
@@ -89,10 +115,12 @@ public class GroupService {
                 .orElseThrow(() -> new GroupException(NOT_IN_GROUP));
 
         if(groupUser.isOwner()){
-            throw new GroupException(OWNER_CAN_NOT_EXIT);
+            Group groupWithGroupUsers = groupRepository.findGroupWithGroupUsers(group.getId()).get();
+            groupWithGroupUsers.removeAllUser();
+            groupWithGroupUsers.delete();
+        }else {
+            group.removeUser(groupUser);
         }
-
-        group.removeUser(groupUser);
 
         return groupUser.getId();
     }
@@ -140,8 +168,28 @@ public class GroupService {
         return new DataListResDto<>(filter.getPage(), publicGroupList);
     }
 
+    @Transactional
+    public void exitGroupsOfUser(Long userId) {
+        List<Group> groupOfOwner = groupRepository.findGroupListOfOwnerWithGroupUsers(userId);
+        groupOfOwner.forEach((group) -> {
+            group.removeAllUser();
+            group.delete();
+        });
+
+        List<GroupUser> groupUsers = groupRepository.findGroupUserListOfNotOwnerWithGroup(userId);
+        groupUsers.forEach((groupUser) -> {
+            Group group = groupUser.getGroup();
+            group.removeUser(groupUser);
+        });
+    }
+
     private Group findGroup(String groupUuid){
         return groupRepository.findByGroupUuidAndStatus(groupUuid, Status.ALIVE)
+                .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
+    }
+
+    private Group findGroupWithTags(String groupUuid) {
+        return groupRepository.findGroupWithTags(groupUuid)
                 .orElseThrow(() -> new GroupException(NO_SUCH_GROUP));
     }
 
@@ -170,6 +218,18 @@ public class GroupService {
     private void checkOpenGroup(Group group){
         if(!group.isOpen()){
             throw new GroupException(PRIVATE_GROUP);
+        }
+    }
+
+    private void checkGroupOwner(String groupUuid, Long userId) {
+        if(!groupRepository.existGroupOwner(userId, groupUuid)){
+            throw new GroupException(ONLY_GROUP_OWNER);
+        }
+    }
+
+    private void checkGroupTagLimit(Group group) {
+        if(group.getGroupTagList().size() > 10){
+            throw new GroupException(OVER_TAG_LIMIT);
         }
     }
 }

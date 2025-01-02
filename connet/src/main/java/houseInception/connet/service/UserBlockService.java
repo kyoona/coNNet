@@ -2,7 +2,6 @@ package houseInception.connet.service;
 
 import houseInception.connet.domain.user.User;
 import houseInception.connet.domain.UserBlock;
-import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.event.publisher.UserBlockEventPublisher;
 import houseInception.connet.exception.UserBlockException;
@@ -68,19 +67,17 @@ public class UserBlockService {
         return userBlock.getId();
     }
 
-    public DataListResDto<DefaultUserResDto> getBlockUserList(Long userId) {
-        List<DefaultUserResDto> blockUserList = userBlockRepository.getBlockUserList(userId);
+    public List<DefaultUserResDto> getBlockUserList(Long userId) {
+        return userBlockRepository.getBlockUserList(userId);
+    }
 
-        return new DataListResDto<>(0, blockUserList);
+    public void deleteAllUserBlockOfUser(Long userId) {
+        userBlockRepository.deleteAllUserBlockOfUser(userId);
     }
 
     private UserBlock findUserBlock(Long userId, Long targetId){
-        UserBlock userBlock = userBlockRepository.findByUserIdAndTargetId(userId, targetId).orElse(null);
-        if (userBlock == null) {
-            throw new UserBlockException(NO_SUCH_USER_BLOCK);
-        }
-
-        return userBlock;
+        return userBlockRepository.findByUserIdAndTargetId(userId, targetId)
+                .orElseThrow(() -> new UserBlockException(NO_SUCH_USER_BLOCK));
     }
 
     private void checkAlreadyRequestBlock(UserBlock findUserBlock) {

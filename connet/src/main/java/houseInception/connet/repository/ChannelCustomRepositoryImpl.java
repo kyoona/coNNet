@@ -59,8 +59,10 @@ public class ChannelCustomRepositoryImpl implements ChannelCustomRepository{
                 .from(channelTap)
                 .innerJoin(channelTap.channel, channel)
                 .innerJoin(group).on(group.id.eq(channel.groupId))
-                .where(channelTap.id.eq(tapId),
-                        group.groupUuid.eq(groupUuid))
+                .where(
+                        channelTap.id.eq(tapId),
+                        group.groupUuid.eq(groupUuid)
+                )
                 .fetchOne();
 
         return count != null && count > 0;
@@ -78,7 +80,7 @@ public class ChannelCustomRepositoryImpl implements ChannelCustomRepository{
                 ))
                 .from(channel)
                 .innerJoin(group).on(group.id.eq(channel.groupId))
-                .leftJoin(channelTap).on(channelTap.channel.id.eq(channel.id))
+                .leftJoin(channel.tapList, channelTap)
                 .where(group.groupUuid.eq(groupUuid))
                 .orderBy(channel.createdAt.asc(), channelTap.createdAt.asc())
                 .fetch();

@@ -10,6 +10,7 @@ import java.util.List;
 public interface GptRoomCustomRepository {
 
     List<GptRoomChat> getChatListOfGptRoom(Long gptRoomId);
+
     boolean existsGptRoomUser(Long gptRoomId, Long userId, Status status);
 
     List<GptRoomListResDto> getGptRoomListByUserId(Long userId, int page);

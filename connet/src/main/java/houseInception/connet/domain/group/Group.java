@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static houseInception.connet.domain.Status.ALIVE;
+import static houseInception.connet.domain.Status.DELETED;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -60,6 +61,16 @@ public class Group extends BaseTime {
         this.groupUserList.add(groupUser);
     }
 
+    public void update(String groupName, String groupProfile, String groupDescription, List<String> addedTags, List<String> deletedTags, Boolean isOpen) {
+        this.groupName = groupName;
+        this.groupProfile = groupProfile;
+        this.groupDescription = groupDescription;
+        this.isOpen = isOpen;
+
+        addTag(addedTags);
+        removeTag(deletedTags);
+    }
+
     public void addUser(User user){
         GroupUser groupUser = new GroupUser(user, this, false);
         this.groupUserList.add(groupUser);
@@ -71,6 +82,10 @@ public class Group extends BaseTime {
         }
     }
 
+    public void removeAllUser(){
+        this.groupUserList.forEach((groupUser) -> groupUser.delete());
+    }
+
     public boolean addTag(List<String> tags){
         if(!isValidTag(tags)){
             return false;
@@ -78,6 +93,18 @@ public class Group extends BaseTime {
 
         tags.forEach(tag -> this.groupTagList.add(new GroupTag(tag, this)));
         return true;
+    }
+
+    public void removeTag(List<String> deletedTags){
+        List<GroupTag> deletedGroupTags = groupTagList.stream()
+                .filter((tag) -> deletedTags.contains(tag.getTagName()))
+                .toList();
+
+        this.groupTagList.removeAll(deletedGroupTags);
+    }
+
+    public void delete(){
+        this.status = DELETED;
     }
 
     private boolean isValidTag(List<String> tags){
