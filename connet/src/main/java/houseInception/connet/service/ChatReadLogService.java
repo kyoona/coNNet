@@ -18,7 +18,6 @@ public class ChatReadLogService {
     @Transactional
     public Long updateReadLog(Long userId, String payload){
         ChatReadLogDto dto = ObjectMapperUtil.parseJson(payload, ChatReadLogDto.class);
-
         ChatReadLog chatReadLog;
         switch (dto.getType()){
             case GROUP -> chatReadLog = ChatReadLog.createGroupChatLog(userId, dto.getTapId(), dto.getChatId());
