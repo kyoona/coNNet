@@ -21,6 +21,7 @@ public interface PrivateRoomCustomRepository {
     List<Long> findLastChatTimeOfPrivateRooms(List<Long> privateRoomIdList);
     boolean existsAlivePrivateRoomUser(Long userId, Long privateRoomId);
     Long findPrivateRoomIdOfChat(Long privateChatId);
+    Map<Long, Long> findRecentChatOfRooms(List<Long> privateRoomUuidList);
 
     Map<Long, PrivateRoomResDto> getPrivateRoomList(Long userId, int page);
     List<PrivateChatResDto> getPrivateChatList(Long userId, Long privateRoomId, int page);

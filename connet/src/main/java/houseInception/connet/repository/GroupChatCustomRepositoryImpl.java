@@ -1,5 +1,6 @@
 package houseInception.connet.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -12,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static houseInception.connet.domain.QChatEmoji.chatEmoji;
 import static houseInception.connet.domain.QGroupChat.groupChat;
@@ -34,6 +37,22 @@ public class GroupChatCustomRepositoryImpl implements GroupChatCustomRepository{
                 .fetchOne();
 
         return Optional.ofNullable(groupId);
+    }
+
+    @Override
+    public Map<Long, Long> findRecentGroupChatOfTaps(List<Long> tapList) {
+        List<Tuple> fetchedData = query
+                .select(groupChat.tapId, groupChat.id.max())
+                .from(groupChat)
+                .where(groupChat.tapId.in(tapList))
+                .groupBy(groupChat.tapId)
+                .fetch();
+
+        return fetchedData.stream()
+                .collect(Collectors.toMap(
+                        (tuple) -> tuple.get(groupChat.tapId),
+                        (tuple) -> tuple.get(groupChat.id.max())
+                ));
     }
 
     @Override

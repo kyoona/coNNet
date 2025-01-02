@@ -1,5 +1,6 @@
 package houseInception.connet.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static houseInception.connet.domain.QChatEmoji.chatEmoji;
+import static houseInception.connet.domain.QChatReadLog.chatReadLog;
 import static houseInception.connet.domain.QUserBlock.userBlock;
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.privateRoom.QPrivateChat.privateChat;
@@ -114,6 +116,22 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                         privateChat.status.eq(ALIVE)
                 )
                 .fetchOne();
+    }
+
+    @Override
+    public Map<Long, Long> findRecentChatOfRooms(List<Long> privateRoomUuidList) {
+        List<Tuple> fetchedData = query
+                .select(privateChat.privateRoom.id, privateChat.id.max())
+                .from(privateChat)
+                .where(privateChat.privateRoom.id.in(privateRoomUuidList))
+                .groupBy(privateChat.privateRoom.id)
+                .fetch();
+
+        return fetchedData.stream()
+                .collect(Collectors.toMap(
+                        (tuple) -> tuple.get(privateChat.privateRoom.id),
+                        (tuple) -> tuple.get(privateChat.id.max())
+                ));
     }
 
     @Override
