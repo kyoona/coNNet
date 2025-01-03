@@ -53,7 +53,7 @@ public class AlarmService {
     }
 
     @Transactional
-    public void createFriendAlarm(AlarmType alarmType, Long alarmUserId, Long requestUserId) {
+    public Long createFriendAlarm(AlarmType alarmType, Long alarmUserId, Long requestUserId) {
         User alarmUser = userRepository.findById(alarmUserId).get();
         User requestUser = userRepository.findById(requestUserId).get();
 
@@ -65,10 +65,12 @@ public class AlarmService {
         }
 
         alarmRepository.save(alarm);
+
+        return alarm.getId();
     }
 
     @Transactional
-    public void createGroupAlarm(AlarmType alarmType, Long alarmUserId, String groupUuid) {
+    public Long createGroupAlarm(AlarmType alarmType, Long alarmUserId, String groupUuid) {
         User alarmUser = userRepository.findById(alarmUserId).get();
         Group group = groupRepository.findByGroupUuidAndStatus(groupUuid, Status.ALIVE).get();
 
@@ -80,5 +82,7 @@ public class AlarmService {
         }
 
         alarmRepository.save(alarm);
+
+        return alarm.getId();
     }
 }
