@@ -1,7 +1,5 @@
 package houseInception.connet.dto.alarm;
 
-import houseInception.connet.domain.alarm.Alarm;
-import houseInception.connet.domain.alarm.AlarmType;
 import houseInception.connet.domain.alarm.FriendAlarm;
 import houseInception.connet.domain.user.User;
 import lombok.Getter;
@@ -14,7 +12,7 @@ public class FriendAlarmResDto extends AlarmResDto{
     private String userProfile;
 
     public FriendAlarmResDto(FriendAlarm alarm, User requester) {
-        super(alarm.getAlarmType(), alarm.isChecked());
+        super(alarm.getAlarmType(), alarm.isChecked(), alarm.getCreatedAt());
         this.userId = requester.getId();
         this.userName = requester.getUserName();
         this.userProfile = requester.getUserProfile();

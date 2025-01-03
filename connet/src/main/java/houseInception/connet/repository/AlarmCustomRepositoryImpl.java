@@ -13,6 +13,15 @@ public class AlarmCustomRepositoryImpl implements AlarmCustomRepository{
     private final JPAQueryFactory query;
 
     @Override
+    public void deleteAlarmOver7days() {
+        query.delete(alarm)
+                .where(alarm.createdAt.before(
+                        java.time.LocalDateTime.now().minusDays(7)
+                ))
+                .execute();
+    }
+
+    @Override
     public AlarmCountResDto getUncheckedAlarmCount(Long userId) {
         return query
                 .select(Projections.constructor(
