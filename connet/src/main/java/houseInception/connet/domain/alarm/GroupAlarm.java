@@ -4,8 +4,10 @@ import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorValue("Group")
 @Entity
