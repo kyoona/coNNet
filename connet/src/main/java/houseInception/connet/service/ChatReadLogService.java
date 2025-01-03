@@ -27,6 +27,6 @@ public class ChatReadLogService {
 
         chatReadLogRepository.save(chatReadLog);
 
-        return chatReadLog.getChatId();
+        return chatReadLog.getId();
     }
 }
