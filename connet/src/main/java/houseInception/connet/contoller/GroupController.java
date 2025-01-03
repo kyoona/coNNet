@@ -77,7 +77,7 @@ public class GroupController {
     }
 
     @GetMapping("/{groupUuid}")
-    public BaseResponse<GroupDetailResDto> getGroupDetail(@RequestParam String groupUuid){
+    public BaseResponse<GroupDetailResDto> getGroupDetail(@PathVariable String groupUuid){
         Long userId = UserAuthorizationUtil.getLoginUserId();
         GroupDetailResDto result = groupService.getGroupDetail(userId, groupUuid);
 

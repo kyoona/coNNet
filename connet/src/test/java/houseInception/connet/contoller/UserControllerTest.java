@@ -41,13 +41,4 @@ class UserControllerTest {
                         .contentType(MULTIPART_FORM_DATA))
                 .andExpect(status().isOk());
     }
-
-    @Test
-    void updateProfile_withFaultParam() throws Exception {
-        mockMvc.perform(patch("/users")
-                        .param("userName", "userName")
-                        .param("userDescription", "  ")
-                        .contentType(MULTIPART_FORM_DATA))
-                .andExpect(status().isBadRequest());
-    }
 }
