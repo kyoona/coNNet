@@ -5,6 +5,7 @@ import houseInception.connet.domain.alarm.GroupAlarm;
 import houseInception.connet.domain.group.Group;
 import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.alarm.AlarmCountResDto;
+import houseInception.connet.dto.alarm.AlarmResDto;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
@@ -14,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -66,5 +69,28 @@ class AlarmServiceTest {
 
         //then
         assertThat(result.getCount()).isEqualTo(2);
+    }
+
+    @Test
+    void getAlarmList() {
+        //given
+        Group group = Group.create(user2, "groupName", null, null, 3, false);
+        em.persist(group);
+
+        FriendAlarm friendAlarm1 = FriendAlarm.createRequestAlarm(user1, user2);
+        FriendAlarm friendAlarm2 = FriendAlarm.createRequestAlarm(user1, user2);
+        friendAlarm2.check();
+
+        GroupAlarm groupAlarm = GroupAlarm.createInviteAlarm(user1, group);
+
+        em.persist(friendAlarm1);
+        em.persist(friendAlarm2);
+        em.persist(groupAlarm);
+
+        //when
+        List<AlarmResDto> result = alarmService.getAlarmList(user1.getId());
+
+        //then
+        assertThat(result).hasSize(3);
     }
 }

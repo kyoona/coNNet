@@ -27,7 +27,7 @@ public class AlarmService {
     }
 
     public List<AlarmResDto> getAlarmList(Long userId) {
-        List<Alarm> alarmList = alarmRepository.findByUserId(userId);
+        List<Alarm> alarmList = alarmRepository.findByUserIdOrderByCreatedAtDesc(userId);
 
         List<AlarmResDto> resDtoList = new ArrayList<>();
         alarmList.forEach((alarm) -> {

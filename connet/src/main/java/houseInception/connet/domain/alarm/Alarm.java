@@ -1,5 +1,6 @@
 package houseInception.connet.domain.alarm;
 
+import houseInception.connet.domain.BaseTime;
 import houseInception.connet.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Entity
-public abstract class Alarm {
+public abstract class Alarm extends BaseTime {
 
     @Column(name = "alarmId")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
