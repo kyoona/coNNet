@@ -25,20 +25,18 @@ class ChatReadLogServiceTest {
     @Autowired
     EntityManager em;
 
-/*    @Test
+    @Test
     void updateReadLog() {
         //given
         User user = User.create("user", null, null, null);
         em.persist(user);
 
         //when
-        ChatReadLogDto logDto = new ChatReadLogDto(ChatRoomType.GROUP, 1L, null, 1L);
+        ChatReadLogDto logDto = new ChatReadLogDto(ChatRoomType.GROUP, null, null, null);
         Long resultId = chatReadLogService.updateReadLog(user.getId(), ObjectMapperUtil.toJson(logDto));
-        em.flush();
-        em.clear();
 
         //then
         ChatReadLog chatReadLog = chatReadLogRepository.findById(resultId).get();
-        assertThat(chatReadLog.getChatId()).isEqualTo(1L);
-    }*/
+        assertThat(chatReadLog.getUserId()).isEqualTo(user.getId());
+    }
 }
