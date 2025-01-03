@@ -4,6 +4,7 @@ import houseInception.connet.domain.GroupInvite;
 import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.group_invite.GroupInviteDto;
 import houseInception.connet.dto.group_invite.GroupInviteResDto;
+import houseInception.connet.event.publisher.AlarmEventPublisher;
 import houseInception.connet.event.publisher.GroupInviteEventPublisher;
 import houseInception.connet.exception.GroupException;
 import houseInception.connet.exception.GroupInviteException;
@@ -27,6 +28,7 @@ public class GroupInviteService {
     private final GroupRepository groupRepository;
     private final CommonDomainService domainService;
     private final GroupInviteEventPublisher groupInviteEventPublisher;
+    private final AlarmEventPublisher alarmEventPublisher;
 
     @Transactional
     public Long inviteGroup(Long userId, String groupUuid, GroupInviteDto inviteDto) {
@@ -39,6 +41,8 @@ public class GroupInviteService {
 
         GroupInvite groupInvite = GroupInvite.create(groupUuid, user, targetUser);
         groupInviteRepository.save(groupInvite);
+
+        alarmEventPublisher.publishGroupInviteAlarmEvent(targetUser.getId(), groupUuid);
 
         return groupInvite.getId();
     }
