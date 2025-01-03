@@ -1,6 +1,7 @@
 package houseInception.connet.domain.alarm;
 
 import houseInception.connet.domain.group.Group;
+import houseInception.connet.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -14,14 +15,14 @@ public class GroupAlarm extends Alarm{
     @ManyToOne(fetch = FetchType.LAZY)
     private Group group;
 
-    private GroupAlarm(AlarmType alarmType) {
-        super(alarmType);
+    private GroupAlarm(AlarmType alarmType, User user) {
+        super(alarmType, user);
     }
 
-    public static GroupAlarm createInviteAlarm(Group group){
-        GroupAlarm alarm = new GroupAlarm(AlarmType.GROUP_INVITE);
+    public static GroupAlarm createInviteAlarm(User user, Group group){
+        GroupAlarm alarm = new GroupAlarm(AlarmType.GROUP_INVITE, user);
         alarm.group = group;
-        
+
         return alarm;
     }
 }

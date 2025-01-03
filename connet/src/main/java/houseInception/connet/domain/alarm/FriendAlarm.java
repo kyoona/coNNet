@@ -14,12 +14,12 @@ public class FriendAlarm extends Alarm{
     @ManyToOne(fetch = FetchType.LAZY)
     private User friendRequester;
 
-    private FriendAlarm(AlarmType alarmType) {
-        super(alarmType);
+    private FriendAlarm(AlarmType alarmType, User user) {
+        super(alarmType, user);
     }
 
-    public static FriendAlarm createRequestAlarm(User friendRequester){
-        FriendAlarm alarm = new FriendAlarm(AlarmType.FRIEND_REQUEST);
+    public static FriendAlarm createRequestAlarm(User user, User friendRequester){
+        FriendAlarm alarm = new FriendAlarm(AlarmType.FRIEND_REQUEST, user);
         alarm.friendRequester = friendRequester;
 
         return alarm;

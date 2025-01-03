@@ -1,11 +1,12 @@
 package houseInception.connet.domain.alarm;
 
+import houseInception.connet.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorColumn(name = "dtype")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Entity
 public abstract class Alarm {
@@ -18,10 +19,14 @@ public abstract class Alarm {
     @Enumerated(EnumType.STRING)
     private AlarmType alarmType;
 
+    @JoinColumn(name = "userId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
     private boolean isChecked;
 
-    public Alarm(AlarmType alarmType) {
+    public Alarm(AlarmType alarmType, User user) {
         this.alarmType = alarmType;
+        this.user = user;
         this.isChecked = false;
     }
 }
