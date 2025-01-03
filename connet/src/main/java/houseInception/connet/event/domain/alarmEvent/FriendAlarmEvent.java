@@ -1,5 +1,8 @@
 package houseInception.connet.event.domain.alarmEvent;
 
+import lombok.Getter;
+
+@Getter
 public class FriendAlarmEvent extends AlarmEvent{
 
     private Long requestUserId;
