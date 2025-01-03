@@ -1,13 +1,16 @@
 package houseInception.connet.event.domain.alarmEvent;
 
+import houseInception.connet.domain.alarm.AlarmType;
 import lombok.Getter;
 
 @Getter
 public abstract class AlarmEvent {
 
-    private Long userId;
+    private AlarmType alarmType;
+    private Long alarmUserId;
 
-    public AlarmEvent(Long userId) {
-        this.userId = userId;
+    public AlarmEvent(AlarmType alarmType, Long alarmUserId) {
+        this.alarmType = alarmType;
+        this.alarmUserId = alarmUserId;
     }
 }

@@ -7,6 +7,7 @@ import houseInception.connet.dto.ActiveUserResDto;
 import houseInception.connet.dto.DataListResDto;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.friend.FriendFilterDto;
+import houseInception.connet.event.publisher.AlarmEventPublisher;
 import houseInception.connet.exception.FriendException;
 import houseInception.connet.repository.FriendRepository;
 import houseInception.connet.service.util.CommonDomainService;
@@ -29,6 +30,7 @@ public class FriendService {
 
     private final FriendRepository friendRepository;
     private final CommonDomainService domainService;
+    private final AlarmEventPublisher alarmEventPublisher;
 
     @Transactional
     public Long requestFriendById(Long userId, Long targetId) {
@@ -44,6 +46,8 @@ public class FriendService {
 
         Friend friend = Friend.createFriend(user, targetUser);
         friendRepository.save(friend);
+
+        alarmEventPublisher.publishFriendRequestAlarmEvent(targetId, userId);
 
         return friend.getId();
     }
