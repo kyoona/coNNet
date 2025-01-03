@@ -92,5 +92,11 @@ class AlarmServiceTest {
 
         //then
         assertThat(result).hasSize(3);
+        assertThat(result)
+                .extracting(AlarmResDto::isChecked)
+                .containsExactly(false, true, false);
+        assertThat(friendAlarm1.isChecked()).isTrue();
+        assertThat(friendAlarm2.isChecked()).isTrue();
+        assertThat(groupAlarm.isChecked()).isTrue();
     }
 }

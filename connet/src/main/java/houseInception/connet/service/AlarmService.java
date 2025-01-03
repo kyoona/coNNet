@@ -38,6 +38,7 @@ public class AlarmService {
                 GroupAlarm groupAlarm = (GroupAlarm) alarm;
                 resDtoList.add(new GroupAlarmResDto(groupAlarm, groupAlarm.getGroup()));
             }
+            alarm.check();
         });
 
         return resDtoList;
