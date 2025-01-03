@@ -15,6 +15,7 @@ import houseInception.connet.repository.AlarmRepository;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,5 +85,10 @@ public class AlarmService {
         alarmRepository.save(alarm);
 
         return alarm.getId();
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void deleteAlarmOver7days() {
+        alarmRepository.deleteAlarmOver7days();
     }
 }
