@@ -1,11 +1,17 @@
 package houseInception.connet.dto.alarm;
 
-import lombok.AllArgsConstructor;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor
 public class AlarmCountResDto {
 
     private int count;
+
+    @QueryProjection
+    public AlarmCountResDto(Long count) {
+        this.count = count.intValue();
+    }
 }

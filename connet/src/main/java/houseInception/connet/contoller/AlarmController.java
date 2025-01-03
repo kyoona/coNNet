@@ -16,7 +16,7 @@ public class AlarmController {
     @GetMapping("/count")
     public BaseResponse<AlarmCountResDto> getAlarmCount(){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        AlarmCountResDto result = alarmService.getAlarmCount(userId);
+        AlarmCountResDto result = alarmService.getUncheckedAlarmCount(userId);
 
         return new BaseResponse<>(result);
     }

@@ -13,7 +13,7 @@ public class AlarmCustomRepositoryImpl implements AlarmCustomRepository{
     private final JPAQueryFactory query;
 
     @Override
-    public AlarmCountResDto getUnreadAlarmCount(Long userId) {
+    public AlarmCountResDto getUncheckedAlarmCount(Long userId) {
         return query
                 .select(Projections.constructor(
                         AlarmCountResDto.class,

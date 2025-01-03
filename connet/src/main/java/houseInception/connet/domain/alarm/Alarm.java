@@ -29,4 +29,8 @@ public abstract class Alarm {
         this.user = user;
         this.isChecked = false;
     }
+
+    public void check(){
+        this.isChecked = true;
+    }
 }

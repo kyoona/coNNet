@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DiscriminatorValue("Friend")
+@DiscriminatorValue("Group")
 @Entity
 public class GroupAlarm extends Alarm{
 

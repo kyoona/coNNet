@@ -13,7 +13,7 @@ public class AlarmService {
 
     private final AlarmRepository alarmRepository;
 
-    public AlarmCountResDto getAlarmCount(Long userId) {
-        return alarmRepository.getUnreadAlarmCount(userId);
+    public AlarmCountResDto getUncheckedAlarmCount(Long userId) {
+        return alarmRepository.getUncheckedAlarmCount(userId);
     }
 }
