@@ -1,9 +1,8 @@
 package houseInception.connet.repository;
 
-
-import houseInception.connet.dto.DefaultUserResDto;
+import houseInception.connet.dto.user.UserProfileResDto;
 
 public interface UserCustomRepository {
 
-    DefaultUserResDto getUserProfile(Long userId);
+    UserProfileResDto getUserProfile(Long userId);
 }
