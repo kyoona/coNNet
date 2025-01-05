@@ -1,5 +1,6 @@
 package houseInception.connet.contoller;
 
+import houseInception.connet.dto.login.AccessTokenDto;
 import houseInception.connet.dto.login.TokenResDto;
 import houseInception.connet.dto.login.RefreshDto;
 import houseInception.connet.dto.login.SignInDto;
@@ -44,6 +45,13 @@ public class LoginController {
         loginService.checkRefreshToken(refreshDto.getRefreshToken());
 
         return new BaseResponse<>(Map.of("isValid", true));
+    }
+
+    @PostMapping("/access/check")
+    public BaseResponse<Map<String, Boolean>> checkAccessToken(@RequestBody @Valid AccessTokenDto accessTokenDto){
+        boolean isValid = loginService.checkAccessToken(accessTokenDto.getAccessToken());
+
+        return new BaseResponse<>(Map.of("isValid", isValid));
     }
 
     @PostMapping("/sign-out")

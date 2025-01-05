@@ -71,6 +71,10 @@ public class LoginService {
         }
     }
 
+    public boolean checkAccessToken(String accessToken) {
+        return tokenProvider.validateToken(accessToken);
+    }
+
     @Transactional
     public Long signOut(Long userId) {
         User user = domainService.findUser(userId);
