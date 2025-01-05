@@ -34,4 +34,12 @@ public class SocketServiceProvider {
             throw new SocketException(CANT_NOT_PARSE_SOCKET_MESSAGE);
         }
     }
+
+    public boolean isUserConnectedSocket(Long userId){
+        if (socketManager.getSocketSession(userId) == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

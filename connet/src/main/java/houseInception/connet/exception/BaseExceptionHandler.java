@@ -1,6 +1,5 @@
 package houseInception.connet.exception;
 
-import houseInception.connet.domain.group.Group;
 import houseInception.connet.response.BaseErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TypeMismatchException;
