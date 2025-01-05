@@ -71,7 +71,7 @@ public class PrivateRoomService {
 
         sendMessageThrowSocket(targetId, privateRoom.getPrivateRoomUuid(), privateChat, USER, user);
 
-        return new PrivateChatAddResDto(privateRoom.getPrivateRoomUuid(), privateChat.getId());
+        return new PrivateChatAddResDto(privateRoom.getPrivateRoomUuid(), privateChat.getId(), privateChat.getCreatedAt());
     }
 
     private void checkRoomUserDeletedAndSetAlive(PrivateRoomUser privateRoomUser, PrivateRoom privateRoom, LocalDateTime participationTime){
