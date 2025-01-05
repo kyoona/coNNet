@@ -50,7 +50,8 @@ public enum BaseErrorCode implements StatusCode{
     //5XX 서버 에러
     INTERNAL_SERVER_ERROR(50000, HttpStatus.INTERNAL_SERVER_ERROR.name(), HttpStatus.INTERNAL_SERVER_ERROR),
     CANT_NOT_PARSE_SOCKET_MESSAGE(50001, HttpStatus.INTERNAL_SERVER_ERROR.name(), HttpStatus.INTERNAL_SERVER_ERROR),
-    CAN_NOT_UPLOAD_FILE_TO_S3(50002, "파일 업로드가 불가능합니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    CAN_NOT_UPLOAD_FILE_TO_S3(50002, "파일 업로드가 불가능합니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    CAN_NOT_PARSE(50003, "json 직렬화 또는 역직렬화가 불가능합니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private int code; //서버 내부 오류 코드
     private String message; //서버 내부 오류 메세지

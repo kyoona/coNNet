@@ -33,7 +33,7 @@ public class UserBlockCustomRepositoryImpl implements UserBlockCustomRepository{
     public List<DefaultUserResDto> getBlockUserList(Long userId) {
         return query
                 .select(Projections.constructor(
-                DefaultUserResDto.class,
+                        DefaultUserResDto.class,
                         user.id,
                         user.userName,
                         user.userProfile))

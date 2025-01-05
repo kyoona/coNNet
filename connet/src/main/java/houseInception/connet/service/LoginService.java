@@ -64,11 +64,16 @@ public class LoginService {
         return new TokenResDto(accessToken, refreshToken);
     }
 
-    public void checkRefreshToken(String refreshToken) {
-        checkValidToken(refreshToken);
-        if(!userRepository.existsByRefreshTokenAndStatus(refreshToken, ALIVE)){
-            throw new InValidTokenException(INVALID_REFRESH_TOKEN);
+    public boolean checkRefreshToken(String refreshToken) {
+        if (tokenProvider.validateToken(refreshToken) && userRepository.existsByRefreshTokenAndStatus(refreshToken, ALIVE)) {
+            return true;
+        } else {
+            return false;
         }
+    }
+
+    public boolean checkAccessToken(String accessToken) {
+        return tokenProvider.validateToken(accessToken);
     }
 
     @Transactional

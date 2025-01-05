@@ -14,7 +14,8 @@ public class AlarmCustomRepositoryImpl implements AlarmCustomRepository{
 
     @Override
     public void deleteAlarmOver7days() {
-        query.delete(alarm)
+        query
+                .delete(alarm)
                 .where(alarm.createdAt.before(
                         java.time.LocalDateTime.now().minusDays(7)
                 ))

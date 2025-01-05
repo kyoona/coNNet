@@ -5,6 +5,7 @@ import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.user.CommonGroupOfUserResDto;
 import houseInception.connet.dto.user.SettingUpdateDto;
+import houseInception.connet.dto.user.UserProfileResDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
 import houseInception.connet.event.publisher.UserEventPublisher;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
@@ -32,14 +33,14 @@ public class UserService {
     private final S3ServiceProvider s3ServiceProvider;
     private final UserEventPublisher userEventPublisher;
 
-    public DefaultUserResDto getSelfProfile(Long userId) {
+    public UserProfileResDto getSelfProfile(Long userId) {
         return userRepository.getUserProfile(userId);
     }
 
-    public DefaultUserResDto getUserProfile(Long userId) {
+    public UserProfileResDto getUserProfile(Long userId) {
         User user = domainService.findUser(userId);
 
-        return new DefaultUserResDto(user);
+        return new UserProfileResDto(user);
     }
 
     @Transactional
