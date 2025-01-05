@@ -87,4 +87,10 @@ public class LoginService {
     private boolean isNotServiceUser(String email){
         return !userRepository.existsByEmailAndStatus(email, ALIVE);
     }
+
+    private void checkValidToken(String refreshToken) {
+        if(!tokenProvider.validateToken(refreshToken)){
+            throw new InValidTokenException(INVALID_REFRESH_TOKEN);
+        }
+    }
 }
