@@ -60,7 +60,15 @@ public class GptRoomService {
         GptRoomChat gptChat = gptRoom.addGptChat(content);
         em.flush();
 
-        return new GptChatResDto(gptRoom.getGptRoomUuid(), gptRoom.getTitle(), userChat.getId(), gptChat.getId(), content);
+        return new GptChatResDto(
+                gptRoom.getGptRoomUuid(),
+                gptRoom.getTitle(),
+                userChat.getId(),
+                userChat.getCreatedAt(),
+                gptChat.getId(),
+                gptChat.getCreatedAt(),
+                content
+        );
     }
 
     @Transactional
