@@ -4,6 +4,7 @@ import houseInception.connet.domain.user.Setting;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.user.CommonGroupOfUserResDto;
 import houseInception.connet.dto.user.SettingUpdateDto;
+import houseInception.connet.dto.user.UserProfileResDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
 import houseInception.connet.response.BaseResponse;
 import houseInception.connet.response.DefaultIdDto;
@@ -22,17 +23,17 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public BaseResponse<DefaultUserResDto> getSelfProfile(){
+    public BaseResponse<UserProfileResDto> getSelfProfile(){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        DefaultUserResDto result = userService.getSelfProfile(userId);
+        UserProfileResDto result = userService.getSelfProfile(userId);
 
         return new BaseResponse<>(result);
     }
 
     @GetMapping("/{userId}")
-    public BaseResponse<DefaultUserResDto> getUserProfile(){
+    public BaseResponse<UserProfileResDto> getUserProfile(){
         Long userId = UserAuthorizationUtil.getLoginUserId();
-        DefaultUserResDto result = userService.getUserProfile(userId);
+        UserProfileResDto result = userService.getUserProfile(userId);
 
         return new BaseResponse<>(result);
     }

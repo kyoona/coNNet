@@ -24,8 +24,13 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
 
     @Override
     public List<DefaultUserResDto> getFriendWaitList(Long userId) {
-        return query.select(Projections.constructor(DefaultUserResDto.class,
-                        user.id, user.userName, user.userProfile))
+        return query
+                .select(Projections.constructor(
+                        DefaultUserResDto.class,
+                        user.id,
+                        user.userName,
+                        user.userProfile
+                ))
                 .from(friend)
                 .innerJoin(friend.sender, user)
                 .where(
@@ -37,8 +42,13 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
 
     @Override
     public List<DefaultUserResDto> getFriendRequestList(Long userId) {
-        return query.select(Projections.constructor(DefaultUserResDto.class,
-                        user.id, user.userName, user.userProfile))
+        return query
+                .select(Projections.constructor(
+                        DefaultUserResDto.class,
+                        user.id,
+                        user.userName,
+                        user.userProfile
+                ))
                 .from(friend)
                 .innerJoin(friend.receiver, user)
                 .where(
@@ -60,8 +70,14 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository{
 
     @Override
     public List<ActiveUserResDto> getFriendList(Long userId, FriendFilterDto filterDto) {
-        return query.select(Projections.constructor(ActiveUserResDto.class,
-                        user.id, user.userName, user.userProfile, user.isActive))
+        return query
+                .select(Projections.constructor(
+                        ActiveUserResDto.class,
+                        user.id,
+                        user.userName,
+                        user.userProfile,
+                        user.isActive
+                ))
                 .from(friend)
                 .innerJoin(friend.receiver, user)
                 .where(

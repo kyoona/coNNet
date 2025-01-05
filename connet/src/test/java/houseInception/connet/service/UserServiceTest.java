@@ -7,6 +7,7 @@ import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.user.CommonGroupOfUserResDto;
 import houseInception.connet.dto.user.SettingUpdateDto;
+import houseInception.connet.dto.user.UserProfileResDto;
 import houseInception.connet.dto.user.UserProfileUpdateDto;
 import houseInception.connet.repository.FriendRepository;
 import houseInception.connet.repository.UserRepository;
@@ -56,7 +57,7 @@ class UserServiceTest {
     @Test
     void getSelfProfile() {
         //when
-        DefaultUserResDto result = userService.getSelfProfile(user1.getId());
+        UserProfileResDto result = userService.getSelfProfile(user1.getId());
 
         //then
         assertThat(result.getUserId()).isEqualTo(user1.getId());
@@ -66,7 +67,7 @@ class UserServiceTest {
     @Test
     void getUserProfile() {
         //when
-        DefaultUserResDto result = userService.getSelfProfile(user2.getId());
+        UserProfileResDto result = userService.getSelfProfile(user2.getId());
 
         //then
         assertThat(result.getUserId()).isEqualTo(user2.getId());
