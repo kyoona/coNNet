@@ -64,10 +64,11 @@ public class LoginService {
         return new TokenResDto(accessToken, refreshToken);
     }
 
-    public void checkRefreshToken(String refreshToken) {
-        checkValidToken(refreshToken);
-        if(!userRepository.existsByRefreshTokenAndStatus(refreshToken, ALIVE)){
-            throw new InValidTokenException(INVALID_REFRESH_TOKEN);
+    public boolean checkRefreshToken(String refreshToken) {
+        if (tokenProvider.validateToken(refreshToken) && userRepository.existsByRefreshTokenAndStatus(refreshToken, ALIVE)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -85,11 +86,5 @@ public class LoginService {
 
     private boolean isNotServiceUser(String email){
         return !userRepository.existsByEmailAndStatus(email, ALIVE);
-    }
-
-    private void checkValidToken(String refreshToken) {
-        if(!tokenProvider.validateToken(refreshToken)){
-            throw new InValidTokenException(INVALID_REFRESH_TOKEN);
-        }
     }
 }

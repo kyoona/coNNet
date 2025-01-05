@@ -42,9 +42,9 @@ public class LoginController {
 
     @PostMapping("/refresh/check")
     public BaseResponse<Map<String, Boolean>> checkRefreshToken(@RequestBody @Valid RefreshDto refreshDto){
-        loginService.checkRefreshToken(refreshDto.getRefreshToken());
+        boolean isValid = loginService.checkRefreshToken(refreshDto.getRefreshToken());
 
-        return new BaseResponse<>(Map.of("isValid", true));
+        return new BaseResponse<>(Map.of("isValid", isValid));
     }
 
     @PostMapping("/access/check")
