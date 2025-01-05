@@ -47,9 +47,15 @@ public class BaseExceptionHandler {
         return BaseErrorResponse.get(NOT_FOUND);
     }
 
+    @ExceptionHandler(SerializationException.class)
+    public ResponseEntity<BaseErrorResponse> handleSerializationException(SerializationException e) {
+        log.error("{}:{}<{}:{}>", e.getStatus().getCode(), e.getStatus().getHttpStatus().getReasonPhrase(), e.getStatus().getMessage(), e.getPayload(), e);
+        return BaseErrorResponse.get(e.getStatus());
+    }
+
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<BaseErrorResponse> handleFileException(BaseException e) {
-        log.error("{}:{}<{}:{}>", e.getStatus().getCode(), e.getStatus().getHttpStatus().getReasonPhrase(), e.getStatus().getMessage(), e);
+        log.error("{}:{}<{}>", e.getStatus().getCode(), e.getStatus().getHttpStatus().getReasonPhrase(), e.getStatus().getMessage(), e);
         return BaseErrorResponse.get(e.getStatus());
     }
 
