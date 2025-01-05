@@ -38,7 +38,8 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
 
     @Override
     public Optional<PrivateRoom> findPrivateRoomWithUser(String privateRoomUuid) {
-        PrivateRoom findPrivateRoom = query.selectFrom(privateRoom)
+        PrivateRoom findPrivateRoom = query
+                .selectFrom(privateRoom)
                 .join(privateRoom.privateRoomUsers).fetchJoin()
                 .where(privateRoom.privateRoomUuid.eq(privateRoomUuid))
                 .fetchOne();
@@ -66,7 +67,8 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
 
     @Override
     public Optional<PrivateRoomUser> findPrivateRoomUser(Long privateRoomId, Long userId) {
-        PrivateRoomUser findPrivateRoomUser = query.selectFrom(privateRoomUser)
+        PrivateRoomUser findPrivateRoomUser = query
+                .selectFrom(privateRoomUser)
                 .where(
                         privateRoomUser.privateRoom.id.eq(privateRoomId),
                         privateRoomUser.user.id.eq(userId)
@@ -78,14 +80,16 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
 
     @Override
     public List<PrivateChat> findPrivateChatsInPrivateRoom(Long privateRoomId) {
-        return query.selectFrom(privateChat)
+        return query
+                .selectFrom(privateChat)
                 .where(privateChat.privateRoom.id.eq(privateRoomId))
                 .fetch();
     }
 
     @Override
     public Optional<PrivateChat> findPrivateChatsById(Long privateChatId) {
-        PrivateChat findPrivateChat = query.selectFrom(privateChat)
+        PrivateChat findPrivateChat = query
+                .selectFrom(privateChat)
                 .where(privateChat.id.eq(privateChatId))
                 .fetchOne();
 
@@ -94,7 +98,8 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
 
     @Override
     public boolean existsAlivePrivateRoomUser(Long userId, Long privateRoomId) {
-        Long count = query.select(privateRoomUser.count())
+        Long count = query
+                .select(privateRoomUser.count())
                 .from(privateRoomUser)
                 .where(
                         privateRoomUser.privateRoom.id.eq(privateRoomId),
@@ -138,8 +143,9 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
     public List<PrivateChatResDto> getPrivateChatList(Long userId, Long privateRoomId, int page) {
         QPrivateRoomUser subPrivateRoomUser = new QPrivateRoomUser("subPrivateRoomUser");
 
-        return query.select(Projections.constructor(
-                PrivateChatResDto.class,
+        return query
+                .select(Projections.constructor(
+                        PrivateChatResDto.class,
                         privateChat.id,
                         privateChat.message,
                         privateChat.image,
