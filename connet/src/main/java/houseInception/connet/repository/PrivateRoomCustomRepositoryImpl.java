@@ -176,7 +176,10 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                                 JPAExpressions
                                         .select(subPrivateRoomUser.participationTime)
                                         .from(subPrivateRoomUser)
-                                        .where(subPrivateRoomUser.user.id.eq(userId))
+                                        .where(
+                                                subPrivateRoomUser.user.id.eq(userId),
+                                                subPrivateRoomUser.status.eq(ALIVE)
+                                                )
                         )
                 )
                 .offset((page - 1) * 30)
