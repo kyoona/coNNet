@@ -178,6 +178,7 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                                         .from(subPrivateRoomUser)
                                         .where(
                                                 subPrivateRoomUser.user.id.eq(userId),
+                                                subPrivateRoomUser.privateRoom.id.eq(privateRoomId),
                                                 subPrivateRoomUser.status.eq(ALIVE)
                                                 )
                         )
