@@ -8,6 +8,7 @@ import houseInception.connet.dto.groupChat.*;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.exception.GroupChatException;
 import houseInception.connet.exception.GroupException;
+import houseInception.connet.exception.SocketException;
 import houseInception.connet.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.ChannelRepository;
@@ -47,6 +48,8 @@ public class GroupChatService {
 
     @Transactional
     public GroupChatAddResDto addChat(Long userId, String groupUuid, GroupChatAddDto chatAddDto) {
+        checkConnectedUserSocket(userId);
+
         Long groupId = findGroupIdByUuid(groupUuid);
         checkExistTapInGroup(chatAddDto.getTapId(), groupUuid);
         checkValidContent(chatAddDto.getImage(), chatAddDto.getMessage());
@@ -80,6 +83,8 @@ public class GroupChatService {
 
     @Transactional
     public GroupGptChatAddResDto addGptChat(Long userId, String groupUuid, GroupGptChatAddDto chatAddDto) {
+        checkConnectedUserSocket(userId);
+        
         Long groupId = findGroupIdByUuid(groupUuid);
         checkExistTapInGroup(chatAddDto.getTapId(), groupUuid);
         GroupUser groupUser = findGroupUser(userId, groupUuid);
@@ -144,6 +149,12 @@ public class GroupChatService {
     private void checkExistGroupUser(Long userId, String groupUuid){
         if(!groupRepository.existUserInGroup(userId, groupUuid)){
             throw new GroupException(NOT_IN_GROUP);
+        }
+    }
+
+    private void checkConnectedUserSocket(Long userId){
+        if(!socketServiceProvider.isUserConnectedSocket(userId)){
+            throw new SocketException(UNCONNECTED_SOCKET);
         }
     }
 }
