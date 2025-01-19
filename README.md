@@ -3,8 +3,8 @@
   <img src='https://github.com/user-attachments/assets/bbaf9bc7-0469-47fd-8116-79203291d049' width="100"/></img>
   
   모든 아이디어와 대화를 하나로, GPT와 연결된 새로운 커뮤니티 Connet</br>
-  프리픽스 '$' 입력만으로 GPT 기능을 손쉽게 사용할 수 있으며, Discord와 Slack의 협업 기능을 제공합니다.
-  Connet 서비스 > http://woohyeon.duckdns.org/login
+  프리픽스 '$' 입력만으로 GPT 기능을 손쉽게 사용할 수 있으며, Discord와 Slack의 협업 기능을 제공합니다. </br.
+  Connet 서비스 👉 http://woohyeon.duckdns.org/login 👈
 </p>
 
 <h2 id="technologies">🛠️ 기술</h2>
