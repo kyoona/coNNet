@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static houseInception.connet.domain.ChatterRole.GPT;
 import static houseInception.connet.domain.ChatterRole.USER;
@@ -91,7 +92,10 @@ public class GroupChatService {
         GroupChatSocketDto userSocketDto = new GroupChatSocketDto(groupUuid, userChat, USER, user);
         sendMessageToGroupUsers(groupUserIds, userSocketDto);
 
-        String gptMessage = gptApiProvider.getChatCompletion(userChat.getMessage());
+        Optional<String> lastGptChat = groupChatRepository.findLastGptChatOfTap(chatAddDto.getTapId());
+        String gptMessage = lastGptChat.isEmpty()
+                ? gptApiProvider.getChatCompletion(userChat.getMessage())
+                : gptApiProvider.getChatCompletionWithPrevContent(userChat.getMessage(), lastGptChat.get());
         GroupChat gptChat = GroupChat.createGptToUser(groupId, chatAddDto.getTapId(), gptMessage);
         groupChatRepository.save(gptChat);
 
