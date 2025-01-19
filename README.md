@@ -1,4 +1,4 @@
-<h1>Connet : Connect Network🔗</h1>
+<h1>🔗Connet : Connect Network</h1>
 <p>
   <img src='https://github.com/user-attachments/assets/bbaf9bc7-0469-47fd-8116-79203291d049' width="100"/></img>
   
