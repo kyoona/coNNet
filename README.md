@@ -6,7 +6,7 @@
   프리픽스 '$' 입력만으로 GPT 기능을 손쉽게 사용할 수 있으며, Discord와 Slack의 협업 기능을 제공합니다. </br>
   Connet 서비스 👉 http://woohyeon.duckdns.org/login 👈
 </p>
-
+</br>
 <h2 id="technologies">🛠️ 기술</h2>
 
 | Category | Stack |
