@@ -126,7 +126,11 @@ public class PrivateRoomService {
         checkRoomUserDeletedAndSetAlive(privateRoomReceiver, privateRoom, privateChat.getCreatedAt());
         checkRoomUserDeletedAndSetAlive(privateRoomSender, privateRoom, privateChat.getCreatedAt());
 
-        String gptResponse = gptApiProvider.getChatCompletion(message);
+
+        Optional<String> lastGptChat = privateRoomRepository.findLastGptChat(privateRoom.getId());
+        String gptResponse = lastGptChat.isEmpty()
+                ? gptApiProvider.getChatCompletion(message)
+                : gptApiProvider.getChatCompletionWithPrevContent(message, lastGptChat.get());
         PrivateChat gptPrivateChat = privateRoom.addGptToUserChat(gptResponse);
         em.flush();
 
