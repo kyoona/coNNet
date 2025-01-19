@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.response.status.BaseErrorCode.NOT_CHATROOM_USER;
@@ -52,7 +53,10 @@ public class GptRoomService {
         } else {
             gptRoom = findGptRoomByUuid(chatRoomUuid);
             checkGptRoomUser(gptRoom.getId(), userId);
-            content = gptApiProvider.getChatCompletion(gptRoomChatAddDto.getMessage());
+            Optional<String> lastGptChat = gptRoomRepository.getLastGptChat(gptRoom.getId());
+            content =  lastGptChat.isEmpty()
+                    ? gptApiProvider.getChatCompletion(gptRoomChatAddDto.getMessage())
+                    : gptApiProvider.getChatCompletionWithPrevContent(gptRoomChatAddDto.getMessage(), lastGptChat.get());
         }
 
         GptRoomUser writer = gptRoom.getGptRoomUsers().get(0);

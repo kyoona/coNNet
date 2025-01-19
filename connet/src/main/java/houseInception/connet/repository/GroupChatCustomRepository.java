@@ -10,6 +10,7 @@ public interface GroupChatCustomRepository{
 
     Optional<Long> findGroupIdOfChat(Long chatId);
     Map<Long, Long> findRecentGroupChatOfTaps(List<Long> channelTapList);
+    Optional<String> findLastGptChatOfTap(Long groupId);
 
     List<GroupChatResDto> getChatList(Long tapId, int page);
 

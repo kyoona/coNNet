@@ -8,17 +8,21 @@ import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.chatEmoji.ChatEmojiResDto;
 import houseInception.connet.dto.privateRoom.*;
 import houseInception.connet.exception.PrivateRoomException;
+import houseInception.connet.exception.SocketException;
 import houseInception.connet.exception.UserBlockException;
 import houseInception.connet.repository.PrivateRoomRepository;
 import houseInception.connet.repository.UserRepository;
+import houseInception.connet.socketManager.SocketManager;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.util.List;
 
@@ -36,6 +40,8 @@ class PrivateRoomServiceTest {
     PrivateRoomRepository privateRoomRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    SocketManager socketManager;
 
     @Autowired
     EntityManager em;
@@ -55,6 +61,11 @@ class PrivateRoomServiceTest {
         em.persist(user2);
         em.persist(user3);
         em.persist(user4);
+
+        socketManager.addSocket(user1.getId(), Mockito.mock(WebSocketSession.class));
+        socketManager.addSocket(user2.getId(), Mockito.mock(WebSocketSession.class));
+        socketManager.addSocket(user3.getId(), Mockito.mock(WebSocketSession.class));
+        socketManager.addSocket(user4.getId(), Mockito.mock(WebSocketSession.class));
     }
 
     @AfterEach
@@ -115,6 +126,18 @@ class PrivateRoomServiceTest {
     }
 
     @Test
+    void addPrivateChat_소켓연결x() {
+        //given
+        User noSocketUser = User.create("noSocketUser", null, null, null);
+        em.persist(noSocketUser);
+
+        //when
+        PrivateChatAddDto chatAddDto = new PrivateChatAddDto("mess1", null);
+        assertThatThrownBy(() -> privateRoomService.addPrivateChat(noSocketUser.getId(), user2.getId(), chatAddDto))
+                .isInstanceOf(SocketException.class);
+    }
+
+    @Test
     void addGptChat_채팅방_존재() {
         //given
         PrivateRoom privateRoom = PrivateRoom.create(user1, user2);
@@ -131,6 +154,23 @@ class PrivateRoomServiceTest {
         PrivateChat gptChat = privateRoomRepository.findPrivateChatsById(result.getGptChatId()).orElseThrow();
         assertThat(gptChat.getMessage()).isEqualTo(result.getMessage());
         log.info("gpt response = {}", result.getMessage());
+    }
+
+    @Test
+    void addGptChat_이전_응답_기반() {
+        //given
+        PrivateRoom privateRoom = PrivateRoom.create(user1, user2);
+        em.persist(privateRoom);
+
+        //when
+        GptPrivateChatAddResDto res1 = privateRoomService.addGptChat(user1.getId(), user2.getId(), "Playstation 4 pro는 언제 출시됐어?");
+        GptPrivateChatAddResDto res2 = privateRoomService.addGptChat(user1.getId(), user2.getId(), "달러 기준으로 얼마야?");
+        GptPrivateChatAddResDto res3 = privateRoomService.addGptChat(user1.getId(), user2.getId(), "한국 원화 기준으로 바꿔줄래");
+
+        //then
+        log.info(res1.getMessage());
+        log.info(res2.getMessage());
+        log.info(res3.getMessage());
     }
 
     @Test

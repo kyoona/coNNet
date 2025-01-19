@@ -25,7 +25,7 @@ public class GptApiProvider {
     public String getChatCompletion(String content) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(GPT_API_KEY); // Authorization 헤더에 Bearer 토큰 추가
+        headers.setBearerAuth(GPT_API_KEY);
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", "gpt-4o");
@@ -56,10 +56,46 @@ public class GptApiProvider {
         }
     }
 
+    public String getChatCompletionWithPrevContent(String content, String prevContent) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(GPT_API_KEY);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("model", "gpt-4o");
+        requestBody.put("max_completion_tokens", 16384);
+
+        Map<String, String> userMessage = new HashMap<>();
+        userMessage.put("role", "user");
+        userMessage.put("content", "이전에 저가 생성한 응답과 새로운 질문이 연관이 있다면 이전 응답을 기반으로 응답을 생성해줘. " +
+                "이전 응답 : [" + prevContent +"]" +
+                "새로운 질문 : [" + content + "]");
+
+        List<Map<String, String>> messages = new ArrayList<>();
+        messages.add(userMessage);
+        requestBody.put("messages", messages);
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+        // API 요청
+        ResponseEntity<String> response = restTemplate.exchange(
+                OPENAI_API_URL,
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+
+        try {
+            return objectMapper.readValue(response.getBody(), ChatCompletionResponse.class).getChoices().get(0).getMessage().getContent();
+        } catch (Exception e) {
+            throw new JsonParseException();
+        }
+    }
+
     public GptResDto getChatCompletionWithTitle(String content) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(GPT_API_KEY); // Authorization 헤더에 Bearer 토큰 추가
+        headers.setBearerAuth(GPT_API_KEY);
 
         Map<String, String> userMessage = new HashMap<>();
         userMessage.put("role", "user");

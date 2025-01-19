@@ -2,6 +2,7 @@ package houseInception.connet.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import houseInception.connet.domain.ChatterRole;
 import houseInception.connet.domain.Status;
 import houseInception.connet.domain.gptRoom.*;
 import houseInception.connet.dto.GptRoom.GptRoomChatResDto;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.gptRoom.QGptRoom.gptRoom;
@@ -33,6 +35,23 @@ public class GptRoomCustomRepositoryImpl implements GptRoomCustomRepository {
                 )
                 .orderBy(gptRoomChat.createdAt.asc())
                 .fetch();
+    }
+
+    @Override
+    public Optional<String> getLastGptChat(Long gptRoomId) {
+        String chat = query
+                .select(gptRoomChat.content)
+                .from(gptRoomChat)
+                .where(
+                        gptRoomChat.gptRoom.id.eq(gptRoomId),
+                        gptRoomChat.writerRole.eq(ChatterRole.GPT),
+                        gptRoomChat.status.eq(ALIVE)
+                )
+                .orderBy(gptRoomChat.createdAt.desc())
+                .limit(1)
+                .fetchOne();
+
+        return Optional.ofNullable(chat);
     }
 
     @Override
