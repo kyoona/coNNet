@@ -59,3 +59,14 @@ pub-sub구조를 통해 서비스간 결합도를 낮추어 OCP원칙을 지키�
 상황에 따라 일관성을 포기하고 성능을 위해 직접적으로 어그리게이트에 수정을 가해도 되는지 고민이 많이 되었습니다. </br></br>
 - 엔티티를 보수적으로 사용하기 위해 database에서 조회를 할때 dto를 통해 반환하였고 필요에 따라 fetch join을 활용하였습니다. 또한 엔티티를 파라미터로 넘기는 것에 있어 신중하게 구현하였습니다. 이를 통해 예상치 못한 lazy loading, dirty check를 통한 변경을 방지할 수 있었지만 JPA의 이점 또한 상쇄되는것 같았습니다. JPA의 기능들을 어디까지 사용해도 좋을지 trade-off에 대해 생각하고 개선해야 합니다. 또한 ORM기술이 아닌 SQl Mapper를 사용해도 괜찮을것 같다는 생각이 들었습니다.
 
+<h2>👥팀원 및 일정</h2>
+### 팀원 소개
+
+| 이름       | 역할      | GitHub 프로필 링크           |
+|------------|-----------|------------------------------|
+| 김철수     | 프론트엔드 | [@chulsoo](https://github.com/chulsoo) |
+| 이영희     | 프론트엔드 | [@younghee](https://github.com/younghee) |
+| 박민수     | 프론트엔드 | [@minsoo](https://github.com/minsoo) |
+| 최지은     | 프론트엔드 | [@jieun](https://github.com/jieun) |
+| 홍길동     | 백엔드    | [@gildong](https://github.com/gildong) |
+
