@@ -1,5 +1,4 @@
 <h1>Connet : Connect Network🔗</h1>
-<h1 style="font-weight: bold">Connet : Connect Network✨</h1>
 <p>
   약속을 지키는 그날까지 <b>"약속을 편리하게 관리하고, 재미있게 지각을 방지하자”</b></br></br>
   본 서비스는 (구)https://github.com/kyoona/AiKu_backend 를 개선하여 서비스 런칭을 목표로 하고 있습니다.</br>
