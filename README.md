@@ -64,7 +64,7 @@ pub-sub구조를 통해 서비스간 결합도를 낮추어 OCP원칙을 지키�
 | 종류   | URL                   |
 |--------|----------------------------------------------|
 | API 명세서 | https://thene.notion.site/API-1808113bb5c38076ac93dac21587e209?pvs=73 |
-| E-R 다이어그램   | <img src='https://github.com/user-attachments/assets/bbaf9bc7-0469-47fd-8116-79203291d049' width="100"/></img> |
+| E-R 다이어그램   | https://thene.notion.site/E-R-1808113bb5c3807cbcc9ca6092287e30?pvs=73 |
 </br>
 
 <h2>👥팀원 및 일정</h2>
