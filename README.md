@@ -60,10 +60,10 @@ pub-sub구조를 통해 서비스간 결합도를 낮추어 OCP원칙을 지키�
 
 <h2>📄문서</h2>
 
-| 이름   | URL                   |
+| 종류   | URL                   |
 |--------|----------------------------------------------|
-| 정우현 | [@woohyeonDev](https://github.com/woohyeonDev) |
-| Hoon   | [@simba-HOON](https://github.com/simba-HOON) |
+| API 명세서 | [@woohyeonDev](https://github.com/woohyeonDev) |
+| E-R 다이어그램   | [@simba-HOON](https://github.com/simba-HOON) |
 
 <h2>👥팀원 및 일정</h2>
 
