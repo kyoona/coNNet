@@ -7,6 +7,8 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.ChatRoomType;
+import houseInception.connet.domain.ChatterRole;
+import houseInception.connet.domain.Status;
 import houseInception.connet.dto.DefaultUserResDto;
 import houseInception.connet.dto.groupChat.GroupChatResDto;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static houseInception.connet.domain.QChatEmoji.chatEmoji;
 import static houseInception.connet.domain.QGroupChat.groupChat;
+import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.group.QGroupUser.groupUser;
 import static houseInception.connet.domain.user.QUser.user;
 
@@ -53,6 +56,23 @@ public class GroupChatCustomRepositoryImpl implements GroupChatCustomRepository{
                         (tuple) -> tuple.get(groupChat.tapId),
                         (tuple) -> tuple.get(groupChat.id.max())
                 ));
+    }
+
+    @Override
+    public Optional<String> findLastGptChatOfTap(Long tapId) {
+        String chat = query
+                .select(groupChat.message)
+                .from(groupChat)
+                .where(
+                        groupChat.tapId.eq(tapId),
+                        groupChat.writerRole.eq(ChatterRole.GPT),
+                        groupChat.status.eq(ALIVE)
+                )
+                .orderBy(groupChat.createdAt.desc())
+                .limit(1)
+                .fetchOne();
+
+        return Optional.ofNullable(chat);
     }
 
     @Override

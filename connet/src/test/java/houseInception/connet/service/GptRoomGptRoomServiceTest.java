@@ -10,6 +10,7 @@ import houseInception.connet.exception.GptRoomException;
 import houseInception.connet.repository.GptRoomRepository;
 import houseInception.connet.repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import static houseInception.connet.domain.Status.DELETED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Slf4j
 @Transactional
 @SpringBootTest
 class GptRoomGptRoomServiceTest {
@@ -113,6 +115,26 @@ class GptRoomGptRoomServiceTest {
         //when
         assertThatThrownBy(() -> gptRoomService.addGptChat(newUser.getId(), gptRoomChatAddDto))
                 .isInstanceOf(GptRoomException.class);
+    }
+
+    @Test
+    void addGptChat_이전_응답_기반_생성() {
+        //given
+        GptRoom gptRoom = GptRoom.createGptRoom(user1);
+        em.persist(gptRoom);
+
+        String message1 = "Playstation 5은 몇달러야?";
+        GptRoomChatAddDto gptRoomChatAddDto1 = new GptRoomChatAddDto(gptRoom.getGptRoomUuid(), message1);
+        GptChatResDto gptChatResDto1 = gptRoomService.addGptChat(user1.getId(), gptRoomChatAddDto1);
+        log.info(gptChatResDto1.getMessage());
+
+        //when
+        String message = "현재 한국 환율로 바꿔서 말해줘";
+        GptRoomChatAddDto gptRoomChatAddDto2 = new GptRoomChatAddDto(gptRoom.getGptRoomUuid(), message);
+        GptChatResDto gptChatResDto2 = gptRoomService.addGptChat(user1.getId(), gptRoomChatAddDto2);
+
+        //then
+        log.info(gptChatResDto2.getMessage());
     }
 
     @Test

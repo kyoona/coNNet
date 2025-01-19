@@ -17,6 +17,7 @@ public interface PrivateRoomCustomRepository {
     Optional<PrivateRoomUser> findPrivateRoomUser(Long privateRoomId, Long userId);
     List<PrivateChat> findPrivateChatsInPrivateRoom(Long privateRoomId);
     Optional<PrivateChat> findPrivateChatsById(Long privateChatId);
+    Optional<String> findLastGptChat(Long privateRoomId);
 
     List<Long> findLastChatTimeOfPrivateRooms(List<Long> privateRoomIdList);
     boolean existsAlivePrivateRoomUser(Long userId, Long privateRoomId);

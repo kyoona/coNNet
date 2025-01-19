@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import houseInception.connet.domain.ChatRoomType;
+import houseInception.connet.domain.ChatterRole;
 import houseInception.connet.domain.UserBlockType;
 import houseInception.connet.domain.privateRoom.*;
 import houseInception.connet.dto.DefaultUserResDto;
@@ -21,7 +22,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static houseInception.connet.domain.QChatEmoji.chatEmoji;
-import static houseInception.connet.domain.QChatReadLog.chatReadLog;
 import static houseInception.connet.domain.QUserBlock.userBlock;
 import static houseInception.connet.domain.Status.ALIVE;
 import static houseInception.connet.domain.privateRoom.QPrivateChat.privateChat;
@@ -94,6 +94,23 @@ public class PrivateRoomCustomRepositoryImpl implements PrivateRoomCustomReposit
                 .fetchOne();
 
         return Optional.ofNullable(findPrivateChat);
+    }
+
+    @Override
+    public Optional<String> findLastGptChat(Long privateRoomId) {
+        String chat = query
+                .select(privateChat.message)
+                .from(privateChat)
+                .where(
+                        privateChat.privateRoom.id.eq(privateRoomId),
+                        privateChat.writerRole.eq(ChatterRole.GPT),
+                        privateChat.status.eq(ALIVE)
+                )
+                .orderBy(privateChat.createdAt.desc())
+                .limit(1)
+                .fetchOne();
+
+        return Optional.ofNullable(chat);
     }
 
     @Override
