@@ -8,6 +8,7 @@ import houseInception.connet.domain.user.User;
 import houseInception.connet.dto.chatEmoji.ChatEmojiResDto;
 import houseInception.connet.dto.privateRoom.*;
 import houseInception.connet.exception.PrivateRoomException;
+import houseInception.connet.exception.SocketException;
 import houseInception.connet.exception.UserBlockException;
 import houseInception.connet.repository.PrivateRoomRepository;
 import houseInception.connet.repository.UserRepository;
@@ -122,6 +123,18 @@ class PrivateRoomServiceTest {
                 .isInstanceOf(UserBlockException.class);
         assertThatThrownBy(() -> privateRoomService.addPrivateChat(user2.getId(), user1.getId(), chatAddDto))
                 .isInstanceOf(UserBlockException.class);
+    }
+
+    @Test
+    void addPrivateChat_소켓연결x() {
+        //given
+        User noSocketUser = User.create("noSocketUser", null, null, null);
+        em.persist(noSocketUser);
+
+        //when
+        PrivateChatAddDto chatAddDto = new PrivateChatAddDto("mess1", null);
+        assertThatThrownBy(() -> privateRoomService.addPrivateChat(noSocketUser.getId(), user2.getId(), chatAddDto))
+                .isInstanceOf(SocketException.class);
     }
 
     @Test
