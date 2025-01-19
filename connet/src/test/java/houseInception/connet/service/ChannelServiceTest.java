@@ -248,13 +248,17 @@ class ChannelServiceTest {
 
         GroupChat chat1 = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(0), tap1.getId(), "mess", null);
         GroupChat chat2 = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(1), tap1.getId(), "mess", null);
-        GroupChat chat3 = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(1), tap2.getId(), "mess", null);
+        GroupChat chat3 = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(1), tap1.getId(), "mess", null);
+        GroupChat chat4 = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(1), tap2.getId(), "mess", null);
+        GroupChat chat5 = GroupChat.createUserToUser(group.getId(), group.getGroupUserList().get(1), tap2.getId(), "mess", null);
         em.persist(chat1);
         em.persist(chat2);
         em.persist(chat3);
+        em.persist(chat4);
+        em.persist(chat5);
 
         ChatReadLog groupChatLog1 = ChatReadLog.createGroupChatLog(user1.getId(), tap1.getId(), chat1.getId());
-        ChatReadLog groupChatLog2 = ChatReadLog.createGroupChatLog(user1.getId(), tap2.getId(), chat3.getId());
+        ChatReadLog groupChatLog2 = ChatReadLog.createGroupChatLog(user1.getId(), tap2.getId(), chat5.getId());
         em.persist(groupChatLog1);
         em.persist(groupChatLog2);
 
@@ -263,8 +267,19 @@ class ChannelServiceTest {
 
         //then
         assertThat(result.get(0).getTaps())
+                .filteredOn(TapResDto::getTapId, tap1.getId())
                 .extracting(TapResDto::isUnread)
-                .containsExactlyInAnyOrder(true, false, false);
+                .containsExactly(true);
+
+        assertThat(result.get(0).getTaps())
+                .filteredOn(TapResDto::getTapId, tap2.getId())
+                .extracting(TapResDto::isUnread)
+                .containsExactly(false);
+
+        assertThat(result.get(0).getTaps())
+                .filteredOn(TapResDto::getTapId, tap3.getId())
+                .extracting(TapResDto::isUnread)
+                .containsExactly(false);
     }
 
     @Test
