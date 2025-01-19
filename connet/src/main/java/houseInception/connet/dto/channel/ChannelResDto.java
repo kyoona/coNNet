@@ -3,11 +3,13 @@ package houseInception.connet.dto.channel;
 import houseInception.connet.repository.dto.ChannelTapDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Getter
 @NoArgsConstructor
 public class ChannelResDto {
@@ -23,10 +25,10 @@ public class ChannelResDto {
         this.channelName = channelInfo.getChannelName();
 
         channelTapDto.forEach((dto) -> {
+            log.info("tap id = {} / recent chat id = {}/ recent read id = {}", dto.getTapId(), recentChatOfTaps.get(dto.getTapId()), recentReadLogOfTaps.get(dto.getTapId()));
             if(dto.getTapId() != null){
                 boolean isAllread = (recentChatOfTaps.get(dto.getTapId()) == null)
                         || (recentChatOfTaps.get(dto.getTapId()).equals(recentReadLogOfTaps.get(dto.getTapId())));
-                System.out.println("isAllread = " + isAllread);
                 this.taps.add(new TapResDto(dto.getTapId(), dto.getTapName(), !isAllread));
             }
         });
