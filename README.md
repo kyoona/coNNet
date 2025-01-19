@@ -1,4 +1,4 @@
-<h1 style="font-weight: bold;"> Gpt와 함께하는 그룹챗 Connet✨</h1>
+<h1 style="font-weight: bold"> Gpt와 함께하는 그룹챗 Connet✨</h1>
 
 <p align="center">
   약속을 지키는 그날까지 <b>"약속을 편리하게 관리하고, 재미있게 지각을 방지하자”</b></br></br>
