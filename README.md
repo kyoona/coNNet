@@ -1,4 +1,4 @@
-<h1 align="center" style="font-weight: bold;">Gpt와 함께하는 그룹챗 Connet ✨</h1>
+<h1 style="font-weight: bold;">Gpt와 함께하는 그룹챗 Connet✨</h1>
 <p align="center">
   <img align='center' src='https://github.com/user-attachments/assets/d14b7984-07a7-47f5-9b0c-0453487fa9dd' width="700"/></img>
 </p>
