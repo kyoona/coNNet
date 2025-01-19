@@ -11,14 +11,17 @@ import houseInception.connet.exception.PrivateRoomException;
 import houseInception.connet.exception.UserBlockException;
 import houseInception.connet.repository.PrivateRoomRepository;
 import houseInception.connet.repository.UserRepository;
+import houseInception.connet.socketManager.SocketManager;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.util.List;
 
@@ -36,6 +39,8 @@ class PrivateRoomServiceTest {
     PrivateRoomRepository privateRoomRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    SocketManager socketManager;
 
     @Autowired
     EntityManager em;
@@ -55,6 +60,11 @@ class PrivateRoomServiceTest {
         em.persist(user2);
         em.persist(user3);
         em.persist(user4);
+
+        socketManager.addSocket(user1.getId(), Mockito.mock(WebSocketSession.class));
+        socketManager.addSocket(user2.getId(), Mockito.mock(WebSocketSession.class));
+        socketManager.addSocket(user3.getId(), Mockito.mock(WebSocketSession.class));
+        socketManager.addSocket(user4.getId(), Mockito.mock(WebSocketSession.class));
     }
 
     @AfterEach

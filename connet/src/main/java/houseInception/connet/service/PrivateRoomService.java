@@ -8,10 +8,12 @@ import houseInception.connet.domain.privateRoom.PrivateRoomUser;
 import houseInception.connet.dto.*;
 import houseInception.connet.dto.privateRoom.*;
 import houseInception.connet.exception.PrivateRoomException;
+import houseInception.connet.exception.SocketException;
 import houseInception.connet.externalServiceProvider.gpt.GptApiProvider;
 import houseInception.connet.externalServiceProvider.s3.S3ServiceProvider;
 import houseInception.connet.repository.ChatReadLogRepository;
 import houseInception.connet.repository.PrivateRoomRepository;
+import houseInception.connet.response.status.BaseErrorCode;
 import houseInception.connet.service.util.CommonDomainService;
 import houseInception.connet.socketManager.SocketServiceProvider;
 import houseInception.connet.socketManager.dto.PrivateChatSocketDto;
@@ -50,6 +52,8 @@ public class PrivateRoomService {
 
     @Transactional
     public PrivateChatAddResDto addPrivateChat(Long userId, Long targetId, PrivateChatAddDto chatAddDto) {
+        checkConnectedUserSocket(userId);
+
         User targetUser = domainService.findUser(targetId);
         User user = domainService.findUser(userId);
 
@@ -107,6 +111,8 @@ public class PrivateRoomService {
 
     @Transactional
     public GptPrivateChatAddResDto addGptChat(Long userId, Long targetId, String message) {
+        checkConnectedUserSocket(userId);
+
         User targetUser = domainService.findUser(targetId);
         User user = domainService.findUser(userId);
 
@@ -205,5 +211,11 @@ public class PrivateRoomService {
     private PrivateRoomUser findPrivateRoomUser(Long privateRoomId, Long userId){
         return privateRoomRepository.findPrivateRoomUser(privateRoomId, userId)
                 .orElseThrow(() -> new PrivateRoomException(NOT_CHATROOM_USER));
+    }
+
+    private void checkConnectedUserSocket(Long userId){
+        if(!socketServiceProvider.isUserConnectedSocket(userId)){
+            throw new SocketException(UNCONNECTED_SOCKET);
+        }
     }
 }
