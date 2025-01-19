@@ -20,10 +20,9 @@
 | --- | --- |
 | Language | Java |
 | Framework | Spring Boot |
-| Library | Spring Data JPA, Spring Cloud Gateway, Query DSL |
-| Database | H2 |
-| Infra | AWS, Kafka, Docker, Kubernetes |
-| Cloud Service | Firebase Messaging |
+| Library | Spring Data JPA, Query DSL |
+| Database | My SQL |
+| Infra | Docker |
 
 </br>
 <h2>💻주요 화면 및 기능</h2>
