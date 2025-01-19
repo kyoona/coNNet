@@ -134,6 +134,23 @@ class PrivateRoomServiceTest {
     }
 
     @Test
+    void addGptChat_이전_응답_기반() {
+        //given
+        PrivateRoom privateRoom = PrivateRoom.create(user1, user2);
+        em.persist(privateRoom);
+
+        //when
+        GptPrivateChatAddResDto res1 = privateRoomService.addGptChat(user1.getId(), user2.getId(), "Playstation 4 pro는 언제 출시됐어?");
+        GptPrivateChatAddResDto res2 = privateRoomService.addGptChat(user1.getId(), user2.getId(), "달러 기준으로 얼마야?");
+        GptPrivateChatAddResDto res3 = privateRoomService.addGptChat(user1.getId(), user2.getId(), "한국 원화 기준으로 바꿔줄래");
+
+        //then
+        log.info(res1.getMessage());
+        log.info(res2.getMessage());
+        log.info(res3.getMessage());
+    }
+
+    @Test
     void getPrivateRoomList() {
         //given
         PrivateRoom privateRoom1 = PrivateRoom.create(user1, user2);
