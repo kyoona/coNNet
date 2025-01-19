@@ -67,9 +67,9 @@ public class GptApiProvider {
 
         Map<String, String> userMessage = new HashMap<>();
         userMessage.put("role", "user");
-        userMessage.put("content", "이전에 저가 생성한 응답과 새로운 질문이 연관이 있다면 이전 응답을 기반으로 응답을 생성해줘. " +
+        userMessage.put("content", "이전에 저가 생성한 응답과 새로운 질문이 연관이 있다면 이전 응답을 기반으로 응답을 생성해줘. 만약 관련된 주제나 질의가 아니라면 연관짓지 말고 새로운 응답을 생성해줘." +
                 "이전 응답 : [" + prevContent +"]" +
-                "새로운 질문 : [" + content + "]");
+                "질문 : [" + content + "]");
 
         List<Map<String, String>> messages = new ArrayList<>();
         messages.add(userMessage);
