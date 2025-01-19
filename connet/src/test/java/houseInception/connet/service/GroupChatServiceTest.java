@@ -10,18 +10,22 @@ import houseInception.connet.dto.groupChat.*;
 import houseInception.connet.exception.ChannelException;
 import houseInception.connet.exception.GroupChatException;
 import houseInception.connet.exception.GroupException;
+import houseInception.connet.exception.SocketException;
 import houseInception.connet.repository.ChannelRepository;
 import houseInception.connet.repository.GroupChatRepository;
 import houseInception.connet.repository.GroupRepository;
 import houseInception.connet.repository.UserRepository;
+import houseInception.connet.socketManager.SocketManager;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.util.List;
 
@@ -45,6 +49,8 @@ class GroupChatServiceTest {
     GroupRepository groupRepository;
     @Autowired
     EntityManager em;
+    @Autowired
+    SocketManager socketManager;
     
     User groupOwner;
     User groupUser;
@@ -66,6 +72,9 @@ class GroupChatServiceTest {
         groupChannel = Channel.create(group.getId(), "channel");
         groupChannelTap = groupChannel.addTap("tap");
         em.persist(groupChannel);
+
+        socketManager.addSocket(groupOwner.getId(), Mockito.mock(WebSocketSession.class));
+        socketManager.addSocket(groupUser.getId(), Mockito.mock(WebSocketSession.class));
     }
 
     @AfterEach
@@ -89,10 +98,24 @@ class GroupChatServiceTest {
     }
 
     @Test
+    void addChat_소켓연결X() {
+        //given
+        User user = User.create("user", null, null, null);
+        em.persist(user);
+
+        //when
+        GroupChatAddDto chatAddDto = new GroupChatAddDto("message", null, groupChannelTap.getId());
+        assertThatThrownBy(() -> groupChatService.addChat(user.getId(), group.getGroupUuid(), chatAddDto))
+                .isInstanceOf(SocketException.class);
+    }
+
+    @Test
     void addChat_권한X() {
         //given
         User user = User.create("user", null, null, null);
         em.persist(user);
+
+        socketManager.addSocket(user.getId(), Mockito.mock(WebSocketSession.class));
 
         //when
         GroupChatAddDto chatAddDto = new GroupChatAddDto("message", null, groupChannelTap.getId());

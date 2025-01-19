@@ -84,7 +84,7 @@ public class GroupChatService {
     @Transactional
     public GroupGptChatAddResDto addGptChat(Long userId, String groupUuid, GroupGptChatAddDto chatAddDto) {
         checkConnectedUserSocket(userId);
-        
+
         Long groupId = findGroupIdByUuid(groupUuid);
         checkExistTapInGroup(chatAddDto.getTapId(), groupUuid);
         GroupUser groupUser = findGroupUser(userId, groupUuid);
