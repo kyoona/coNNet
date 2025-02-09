@@ -67,6 +67,10 @@ pub-sub구조를 통해 서비스간 결합도를 낮추어 OCP원칙을 지키�
 | E-R 다이어그램   | https://thene.notion.site/E-R-1808113bb5c3807cbcc9ca6092287e30?pvs=73 |
 </br>
 
+</br>
+<h2>📺최종 결과물</h2>
+</br>
+
 <h2>👥팀원 및 일정</h2>
 2024.10.08 ~
 
@@ -76,5 +80,3 @@ pub-sub구조를 통해 서비스간 결합도를 낮추어 OCP원칙을 지키�
 | Hoon   | FE        | [@simba-HOON](https://github.com/simba-HOON) |
 | 윤소은 | FE        | [@Dubabbi](https://github.com/Dubabbi)       |
 | 곽유나 | BE        | [@kyoona](https://github.com/kyoona)         |
-
-
