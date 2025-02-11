@@ -69,6 +69,10 @@ pub-sub구조를 통해 서비스간 결합도를 낮추어 OCP원칙을 지키�
 
 </br>
 <h2>📺최종 결과물</h2>
+https://github.com/user-attachments/assets/8915bc49-a034-43df-a60f-890b5a583460
+
+제한된 업로드 크기 제한으로 특정 기능만 시연하였습니다.
+
 </br>
 
 <h2>👥팀원 및 일정</h2>
